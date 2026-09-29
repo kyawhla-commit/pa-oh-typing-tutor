@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 const rowsByLayout: Record<string, string[][]> = {
   QWERTY: [
     ["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "Backspace"],
@@ -105,6 +107,11 @@ const wideKeyLabels: Record<string, string> = {
   Shift: "⇧",
 };
 
+const keyboardSizing = {
+  "--keyboard-key-gap": "clamp(2px, 0.55cqw, 6px)",
+  "--keyboard-key-size": "clamp(16px, calc((100cqw - 78px) / 14.3), 56px)",
+} as CSSProperties;
+
 interface VirtualKeyboardProps {
   pressedKey?: string;
   errorKey?: string;
@@ -124,10 +131,10 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
 
   if (layout === "Pa'O") {
     return (
-      <div className="overflow-x-auto pb-1" role="img" aria-label="Pa'O Myanmar keyboard layout">
-        <div className="mx-auto w-fit min-w-[880px] space-y-1.5 select-none">
+      <div className="w-full min-w-0" style={{ containerType: "inline-size" }} role="img" aria-label="Pa'O Myanmar keyboard layout">
+        <div className="mx-auto w-full space-y-[var(--keyboard-key-gap)] select-none" style={keyboardSizing}>
           {paoRows.map((row, rowIndex) => (
-            <div key={`pao-row-${rowIndex}`} className="flex justify-center gap-1.5">
+            <div key={`pao-row-${rowIndex}`} className="flex justify-center gap-[var(--keyboard-key-gap)]">
               {row.map((key) => {
                 const legends = paoKeyLegends[key.code];
                 const typedKey = key.space ? " " : key.special ? key.code : key.label;
@@ -137,14 +144,18 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
                 const isPressed = Boolean(pressed) && candidates.includes(pressed);
                 const isError = Boolean(error) && candidates.includes(error);
                 const isWide = key.special || key.space;
+                const keyStyle: CSSProperties = {
+                  width: key.space ? "calc(var(--keyboard-key-size) * 5.7)" : isWide ? "calc(var(--keyboard-key-size) * 1.3)" : "var(--keyboard-key-size)",
+                  height: "var(--keyboard-key-size)",
+                  fontSize: "clamp(8px, calc(var(--keyboard-key-size) * 0.22), 12px)",
+                };
 
                 return (
                   <div
                     key={key.code}
                     aria-hidden="true"
-                    className={`
-                      relative h-14 flex shrink-0 items-center justify-center rounded-sm text-xs font-medium border transition-all duration-75
-                      ${key.space ? "w-80" : isWide ? "px-3 min-w-[72px]" : "w-14"}
+                    style={keyStyle}
+                    className={`relative flex shrink-0 items-center justify-center rounded-sm border font-medium transition-all duration-75
                       ${isError
                         ? "bg-red-500 text-white border-red-400 scale-95 shadow-none"
                         : isPressed
@@ -156,9 +167,9 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
                       key.label
                     ) : (
                       <>
-                        <span className={`absolute left-[7px] top-[5px] text-[10px] leading-none ${isPressed || isError ? "text-white" : "text-slate-500"}`}>{key.label}</span>
-                        {legends && <span className={`absolute right-[7px] top-[5px] font-myanmar text-[13px] leading-none ${isPressed || isError ? "text-white" : "text-slate-600"}`}>{legends.shifted}</span>}
-                        {legends && <span className={`absolute bottom-[6px] left-0 right-0 text-center font-myanmar text-base font-medium leading-none ${isPressed || isError ? "text-white" : "text-slate-800"}`}>{legends.unshifted}</span>}
+                        <span style={{ left: "calc(var(--keyboard-key-size) * 0.125)", top: "calc(var(--keyboard-key-size) * 0.09)", fontSize: "clamp(6px, calc(var(--keyboard-key-size) * 0.18), 10px)" }} className={`absolute leading-none ${isPressed || isError ? "text-white" : "text-slate-500"}`}>{key.label}</span>
+                        {legends && <span style={{ right: "calc(var(--keyboard-key-size) * 0.125)", top: "calc(var(--keyboard-key-size) * 0.09)", fontSize: "clamp(6px, calc(var(--keyboard-key-size) * 0.23), 13px)" }} className={`absolute font-myanmar leading-none ${isPressed || isError ? "text-white" : "text-slate-600"}`}>{legends.shifted}</span>}
+                        {legends && <span style={{ bottom: "calc(var(--keyboard-key-size) * 0.11)", fontSize: "clamp(7px, calc(var(--keyboard-key-size) * 0.286), 16px)" }} className={`absolute left-0 right-0 text-center font-myanmar font-medium leading-none ${isPressed || isError ? "text-white" : "text-slate-800"}`}>{legends.unshifted}</span>}
                       </>
                     )}
                   </div>
@@ -172,23 +183,27 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
   }
 
   return (
-    <div className="overflow-x-auto pb-1" aria-hidden>
-      <div className="mx-auto w-fit min-w-[880px] space-y-1.5 select-none">
+    <div className="w-full min-w-0" style={{ containerType: "inline-size" }} aria-hidden>
+      <div className="mx-auto w-full space-y-[var(--keyboard-key-gap)] select-none" style={keyboardSizing}>
         {rows.map((row, rowIndex) => (
-          <div key={`${layout}-${rowIndex}`} className="flex gap-1.5 justify-center">
+          <div key={`${layout}-${rowIndex}`} className="flex justify-center gap-[var(--keyboard-key-gap)]">
             {row.map((key, keyIndex) => {
               const normalized = normalizeKey(key);
               const isSpace = key === "Space";
               const isPressed = normalized === pressed;
               const isError = normalized === error;
               const isWide = wideKeys.has(key);
+              const keyStyle: CSSProperties = {
+                width: isSpace ? "calc(var(--keyboard-key-size) * 5.7)" : isWide ? "calc(var(--keyboard-key-size) * 1.3)" : "var(--keyboard-key-size)",
+                height: "var(--keyboard-key-size)",
+                fontSize: "clamp(8px, calc(var(--keyboard-key-size) * 0.22), 12px)",
+              };
 
               return (
                 <div
                   key={`${key}-${keyIndex}`}
-                  className={`
-                    h-14 flex items-center justify-center rounded-sm text-xs font-medium border transition-all duration-75
-                    ${isSpace ? "w-80" : isWide ? "px-3 min-w-[72px]" : "w-14"}
+                  style={keyStyle}
+                  className={`flex items-center justify-center rounded-sm border font-medium transition-all duration-75
                     ${isError
                       ? "bg-red-500 text-white border-red-400 scale-95 shadow-none"
                       : isPressed
