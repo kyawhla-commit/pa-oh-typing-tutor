@@ -1,31 +1,61 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import TypingBox, { createTypingState, processKeyPress, type TypingState } from "../../components/TypingBox";
 import VirtualKeyboard from "../../components/VirtualKeyboard";
 import { useLearningData } from "../../data/LearningContext";
 import { lessonContent } from "../lessons/lessonContent";
 
-const modes = ["Words", "Sentences", "Paragraph", "Code"] as const;
-type PracticeMode = (typeof modes)[number];
+type PracticeMode = "words" | "sentences" | "paragraphs" | "code";
 
-const practiceTexts: Record<PracticeMode, string> = {
-  Words: "the quick brown fox jumps over the lazy dog and runs into the forest",
-  Sentences: "The quick brown fox jumps over the lazy dog. A journey of a thousand miles begins with a single step.",
-  Paragraph: "Typing is a fundamental skill in the digital age. Regular practice helps improve speed and accuracy over time. Focus on rhythm and precision rather than just raw speed.",
-  Code: 'const greet = (name) => { return `Hello, ${name}!`; }; console.log(greet("world"));',
+const modes: { key: PracticeMode; label: string; icon: string }[] = [
+  { key: "words", label: "Words", icon: "🔤" },
+  { key: "sentences", label: "Sentences", icon: "💬" },
+  { key: "paragraphs", label: "Paragraph", icon: "📄" },
+  { key: "code", label: "Code", icon: "💻" },
+];
+
+const practiceTexts: Record<PracticeMode, string[]> = {
+  words: [
+    "the quick brown fox jumps over the lazy dog and runs away into the forest",
+    "programming is the art of telling another human what one wants the computer to do",
+    "success is not final failure is not fatal it is the courage to continue that counts",
+  ],
+  sentences: [
+    "The best way to predict the future is to create it. Every expert was once a beginner.",
+    "Simplicity is the ultimate sophistication. Good design is obvious. Great design is transparent.",
+    "Code is like humor. When you have to explain it, it is bad. Write clean self-documenting code.",
+  ],
+  paragraphs: [
+    "In the beginning was the command line. Before the graphical user interface was democratized, people typed their instructions directly into machines. There was no mouse, no icons, no windows. Just text. The command line remains the most direct path to computational power, and those who master it gain a superpower.",
+    "Touch typing is one of the most valuable skills a knowledge worker can develop. The ability to type without looking at your keyboard frees your mind to focus on what you're actually creating. Professional typists routinely exceed 80 words per minute, while the average person types around 40. The gap represents hours of productivity every single day.",
+  ],
+  code: [
+    "function fibonacci(n) {\n  if (n <= 1) return n;\n  return fibonacci(n - 1) + fibonacci(n - 2);\n}\n\nconst result = fibonacci(10);\nconsole.log(result);",
+    "const fetchUser = async (id) => {\n  const response = await fetch(`/api/users/${id}`);\n  if (!response.ok) throw new Error('Failed');\n  return response.json();\n};",
+  ],
 };
 
+function pickText(mode: PracticeMode, current?: string) {
+  const options = practiceTexts[mode];
+  const alternatives = options.filter((text) => text !== current);
+  const pool = alternatives.length ? alternatives : options;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
 export default function Practice() {
-  const [mode, setMode] = useState<PracticeMode>("Words");
   const [searchParams] = useSearchParams();
   const lessonId = Number(searchParams.get("lesson")) || null;
-  const text = lessonId ? lessonContent[lessonId] || practiceTexts.Words : practiceTexts[mode];
+  const [mode, setMode] = useState<PracticeMode>("words");
+  const lessonText = lessonId ? lessonContent[lessonId] : undefined;
+  const [passage, setPassage] = useState(() => pickText("words"));
+  const text = lessonText || passage;
   const [session, setSession] = useState<TypingState>(() => createTypingState(text));
   const [elapsed, setElapsed] = useState(0);
   const [pressedKey, setPressedKey] = useState("");
   const [errorKey, setErrorKey] = useState("");
+  const [showKeyboard, setShowKeyboard] = useState(true);
   const savedRef = useRef(false);
-  const { addResult, completeLesson } = useLearningData();
+  const { addResult, completeLesson, preferences } = useLearningData();
 
   useEffect(() => {
     setSession(createTypingState(text));
@@ -35,7 +65,7 @@ export default function Practice() {
 
   useEffect(() => {
     if (!session.startTime || session.isComplete) return;
-    const interval = window.setInterval(() => setElapsed(Date.now() - session.startTime!), 250);
+    const interval = window.setInterval(() => setElapsed(Math.floor((Date.now() - session.startTime!) / 1000)), 250);
     return () => window.clearInterval(interval);
   }, [session.startTime, session.isComplete]);
 
@@ -44,6 +74,7 @@ export default function Practice() {
     const durationSeconds = Math.max(1, Math.round(((session.endTime || Date.now()) - (session.startTime || Date.now())) / 1000));
     addResult({
       mode: "practice",
+      label: lessonId ? `Lesson ${lessonId}` : modes.find((item) => item.key === mode)?.label || "Practice",
       wpm: session.wpm,
       accuracy: session.accuracy,
       characters: session.typed.length,
@@ -52,59 +83,115 @@ export default function Practice() {
     });
     if (lessonId) completeLesson(lessonId);
     savedRef.current = true;
-  }, [session, lessonId, addResult, completeLesson]);
+  }, [session, lessonId, mode, addResult, completeLesson]);
 
-  const handleType = (key: string) => {
+  const handleType = useCallback((key: string) => {
     if (key !== "Backspace") {
-      const expected = session.text[session.typed.length];
       setPressedKey(key);
-      setErrorKey(key === expected ? "" : key);
+      setErrorKey(key === session.text[session.typed.length] ? "" : key);
       window.setTimeout(() => { setPressedKey(""); setErrorKey(""); }, 140);
     }
     setSession((current) => processKeyPress(current, key));
-  };
+  }, [session.text, session.typed.length]);
 
-  const reset = () => {
-    setSession(createTypingState(text));
+  const reset = useCallback((nextText = text) => {
+    setSession(createTypingState(nextText));
     setElapsed(0);
     savedRef.current = false;
+  }, [text]);
+
+  const changeMode = (nextMode: PracticeMode) => {
+    setMode(nextMode);
+    const nextText = pickText(nextMode, mode === nextMode ? text : undefined);
+    setPassage(nextText);
+    reset(nextText);
   };
 
-  const elapsedNow = session.isComplete && session.endTime && session.startTime
-    ? session.endTime - session.startTime
-    : session.startTime ? Math.max(elapsed, Date.now() - session.startTime) : 0;
-  const minutes = Math.floor(elapsedNow / 60000);
-  const seconds = Math.floor((elapsedNow % 60000) / 1000);
-  const time = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-  const progress = Math.round((session.typed.length / text.length) * 100);
+  const newText = () => {
+    const nextText = pickText(mode, passage);
+    setPassage(nextText);
+    reset(nextText);
+  };
+
+  const elapsedSeconds = session.isComplete && session.endTime && session.startTime
+    ? Math.floor((session.endTime - session.startTime) / 1000)
+    : session.startTime ? Math.max(elapsed, Math.floor((Date.now() - session.startTime) / 1000)) : 0;
 
   return (
-    <div className="max-w-4xl p-6 lg:p-8">
-      <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div><h1 className="text-2xl font-bold text-[#0F172A]">{lessonId ? `Lesson ${lessonId} practice` : "Practice"}</h1><p className="text-sm text-[#64748B]">{lessonId ? "Finish this typing exercise to save your result and complete the lesson." : "Focus, type, improve. Results are added to your shared progress."}</p></div>
-        {!lessonId && <div className="flex flex-wrap items-center gap-1 rounded-xl border border-[#E2E8F0] bg-white p-1">{modes.map((item) => <button key={item} onClick={() => setMode(item)} className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${mode === item ? "bg-[#2563EB] text-white" : "text-[#64748B] hover:text-[#0F172A]"}`}>{item}</button>)}</div>}
+    <div className="mx-auto max-w-4xl p-5 sm:p-8">
+      <header className="mb-7 flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">{lessonId ? `Lesson ${lessonId} practice` : "Practice"}</h1>
+          <p className="mt-0.5 text-sm text-slate-500">{lessonId ? "Complete this exercise to save your result and finish the lesson" : "Open-ended typing without time pressure"}</p>
+        </div>
+        <button
+          onClick={() => setShowKeyboard((visible) => !visible)}
+          className="shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-500 transition-colors hover:text-slate-700"
+          aria-expanded={showKeyboard}
+        >
+          {showKeyboard ? "Hide" : "Show"} keyboard
+        </button>
       </header>
 
-      <div className="mb-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_150px]">
-        <section className="rounded-2xl border border-[#E2E8F0] bg-white p-5 sm:p-6">
-          <div className="mb-4 flex items-center justify-between"><span className="text-xs font-medium uppercase tracking-wide text-[#64748B]">Type the text below</span><span className="font-mono text-lg font-bold text-[#0F172A]">{time}</span></div>
-          <TypingBox state={session} onType={handleType} onBackspace={() => handleType("Backspace")} pressedKey={pressedKey} errorKey={errorKey} fontSize="md" />
-          <div className="mt-4 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-xs text-[#64748B]"><div className="h-1.5 w-24 overflow-hidden rounded-full bg-[#E2E8F0]"><div className="h-full rounded-full bg-[#2563EB] transition-all" style={{ width: `${progress}%` }} /></div>{session.typed.length}/{text.length} chars{savedRef.current && <span className="font-semibold text-[#16A34A]">· Session saved</span>}</div>
-            <button onClick={reset} className="text-xs font-medium text-[#64748B] transition-colors hover:text-[#2563EB]">Reset</button>
+      {!lessonId && (
+        <div className="mb-6 flex flex-wrap gap-2" role="tablist" aria-label="Practice text type">
+          {modes.map(({ key, label, icon }) => (
+            <button
+              key={key}
+              role="tab"
+              aria-selected={mode === key}
+              onClick={() => changeMode(key)}
+              className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium transition-colors ${mode === key ? "bg-blue-600 text-white" : "border border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}
+            >
+              <span aria-hidden>{icon}</span>{label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="mb-6 grid grid-cols-3 gap-3 sm:gap-4">
+        {[
+          { label: "WPM", value: session.wpm, color: "text-blue-600" },
+          { label: "Accuracy", value: `${session.accuracy}%`, color: "text-emerald-600" },
+          { label: "Time", value: `${elapsedSeconds}s`, color: "text-slate-700" },
+        ].map(({ label, value, color }) => (
+          <div key={label} className="rounded-2xl border border-slate-200 bg-white px-3 py-4 text-center sm:px-5">
+            <p className={`font-mono text-2xl font-semibold sm:text-3xl ${color}`}>{value}</p>
+            <p className="mt-1 text-xs text-slate-400">{label}</p>
           </div>
-        </section>
-        <section className="grid grid-cols-2 gap-3 lg:grid-cols-1">
-          {[
-            { label: "WPM", value: session.wpm, color: "text-[#2563EB]" },
-            { label: "Accuracy", value: `${session.accuracy}%`, color: "text-[#16A34A]" },
-            { label: "Errors", value: session.errors, color: session.errors ? "text-[#DC2626]" : "text-[#94A3B8]" },
-            { label: "Chars", value: session.typed.length, color: "text-[#64748B]" },
-          ].map(({ label, value, color }) => <div key={label} className="rounded-xl border border-[#E2E8F0] bg-white p-3 text-center sm:p-4"><div className={`text-xl font-bold sm:text-2xl ${color}`}>{value}</div><div className="mt-0.5 text-xs text-[#94A3B8]">{label}</div></div>)}
-        </section>
+        ))}
       </div>
 
-      <section className="rounded-2xl border border-[#E2E8F0] bg-white p-4 sm:p-5"><h2 className="mb-3 text-xs font-medium text-[#64748B]">Virtual keyboard</h2><VirtualKeyboard pressedKey={pressedKey} errorKey={errorKey} /></section>
+      <TypingBox
+        state={session}
+        onType={handleType}
+        onBackspace={() => handleType("Backspace")}
+        pressedKey={pressedKey}
+        errorKey={errorKey}
+        fontSize="md"
+      />
+
+      {session.isComplete ? (
+        <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center">
+          <p className="mb-2 text-2xl" aria-hidden>🎉</p>
+          <h2 className="mb-1 text-lg font-semibold text-emerald-800">Nice work!</h2>
+          <p className="mb-4 text-sm text-emerald-700">{session.wpm} WPM · {session.accuracy}% accuracy · {session.errors} errors</p>
+          <button onClick={newText} className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-700">
+            Next text →
+          </button>
+        </div>
+      ) : (
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <p className="text-xs text-slate-400">Press any key to start · Backspace to correct</p>
+          <button onClick={newText} className="text-sm text-slate-500 transition-colors hover:text-slate-700">↺ New text</button>
+        </div>
+      )}
+
+      {showKeyboard && (
+        <div className="mt-8">
+          <VirtualKeyboard pressedKey={pressedKey} errorKey={errorKey} layout={preferences.keyboardLayout} />
+        </div>
+      )}
     </div>
   );
 }

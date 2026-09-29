@@ -8,6 +8,7 @@ export interface Learner {
 export interface PracticeResult {
   id: string;
   mode: "practice" | "test";
+  label?: string;
   wpm: number;
   accuracy: number;
   characters: number;
@@ -36,6 +37,8 @@ interface LearningContextValue extends LearningData {
   signIn: (learner: Learner) => void;
   signOut: () => void;
   addResult: (result: Omit<PracticeResult, "id" | "createdAt">) => void;
+  resetProgress: () => void;
+  deleteLocalAccount: () => void;
   completeLesson: (lessonId: number) => void;
   updatePreferences: (preferences: Partial<Preferences>) => void;
 }
@@ -92,6 +95,13 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
       ...current,
       results: [{ ...result, id: crypto.randomUUID(), createdAt: new Date().toISOString() }, ...current.results],
     })),
+    resetProgress: () => setData((current) => ({ ...current, results: [], completedLessons: [] })),
+    deleteLocalAccount: () => setData({
+      learner: null,
+      results: [],
+      completedLessons: [],
+      preferences: defaultPreferences,
+    }),
     completeLesson: (lessonId) => setData((current) => ({
       ...current,
       completedLessons: current.completedLessons.includes(lessonId)
