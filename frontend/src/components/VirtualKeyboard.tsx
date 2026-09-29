@@ -72,33 +72,27 @@ const paoKeyLegends: Record<string, { shifted: string; unshifted: string }> = {
   Slash: { shifted: "?", unshifted: "/" },
 };
 
-type PaOKey = { code: string; label: string; span: number; modifier?: boolean };
-const makeKeys = (letters: string[]) => letters.map((letter) => ({ code: `Key${letter}`, label: letter, span: 2 }));
+type PaOKey = { code: string; label: string; special?: boolean; space?: boolean };
+const makeKeys = (letters: string[]) => letters.map((letter) => ({ code: `Key${letter}`, label: letter }));
 const paoRows: PaOKey[][] = [
   [
-    { code: "Backquote", label: "`", span: 2 },
-    ...[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((digit) => ({ code: `Digit${digit}`, label: String(digit), span: 2 })),
-    { code: "Minus", label: "-", span: 2 }, { code: "Equal", label: "=", span: 2 },
-    { code: "Backspace", label: "Backspace", span: 4, modifier: true },
+    { code: "Backquote", label: "`" },
+    ...[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((digit) => ({ code: `Digit${digit}`, label: String(digit) })),
+    { code: "Minus", label: "-" }, { code: "Equal", label: "=" }, { code: "Backspace", label: "⌫", special: true },
   ],
   [
-    { code: "Tab", label: "Tab", span: 3, modifier: true }, ...makeKeys(["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"]),
-    { code: "BracketLeft", label: "[", span: 2 }, { code: "BracketRight", label: "]", span: 2 }, { code: "Backslash", label: "\\", span: 3 },
+    { code: "Tab", label: "⇥", special: true }, ...makeKeys(["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"]),
+    { code: "BracketLeft", label: "[" }, { code: "BracketRight", label: "]" }, { code: "Backslash", label: "\\" },
   ],
   [
-    { code: "Caps", label: "Caps Lock", span: 4, modifier: true }, ...makeKeys(["A", "S", "D", "F", "G", "H", "J", "K", "L"]),
-    { code: "Semicolon", label: ";", span: 2 }, { code: "Quote", label: "'", span: 2 }, { code: "Enter", label: "Enter", span: 4, modifier: true },
+    { code: "Caps", label: "⇪", special: true }, ...makeKeys(["A", "S", "D", "F", "G", "H", "J", "K", "L"]),
+    { code: "Semicolon", label: ";" }, { code: "Quote", label: "'" }, { code: "Enter", label: "↵", special: true },
   ],
   [
-    { code: "ShiftLeft", label: "Shift", span: 5, modifier: true }, ...makeKeys(["Z", "X", "C", "V", "B", "N", "M"]),
-    { code: "Comma", label: ",", span: 2 }, { code: "Period", label: ".", span: 2 }, { code: "Slash", label: "/", span: 2 }, { code: "ShiftRight", label: "Shift", span: 5, modifier: true },
+    { code: "ShiftLeft", label: "⇧", special: true }, ...makeKeys(["Z", "X", "C", "V", "B", "N", "M"]),
+    { code: "Comma", label: "," }, { code: "Period", label: "." }, { code: "Slash", label: "/" }, { code: "ShiftRight", label: "⇧", special: true },
   ],
-  [
-    { code: "ControlLeft", label: "Ctrl", span: 3, modifier: true }, { code: "MetaLeft", label: "Win", span: 3, modifier: true },
-    { code: "AltLeft", label: "Alt", span: 3, modifier: true }, { code: "Space", label: "", span: 9, modifier: true },
-    { code: "AltRight", label: "Alt", span: 3, modifier: true }, { code: "MetaRight", label: "Win", span: 3, modifier: true },
-    { code: "ContextMenu", label: "Menu", span: 3, modifier: true }, { code: "ControlRight", label: "Ctrl", span: 3, modifier: true },
-  ],
+  [{ code: "Space", label: "", space: true }],
 ];
 
 const wideKeys = new Set(["Backspace", "Tab", "Caps", "Enter", "Shift", "Space"]);
@@ -130,39 +124,48 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
 
   if (layout === "Pa'O") {
     return (
-      <div className="overflow-x-auto pb-1" role="img" aria-label="Pa'O keyboard layout">
-        <div
-          className="mx-auto grid min-w-[560px] max-w-[1085px] grid-cols-[repeat(30,minmax(0,1fr))] gap-[5px] rounded-2xl border border-[#e8e8ed] bg-[#efeff2] p-3 sm:p-5"
-          style={{ gridTemplateRows: "repeat(5, clamp(44px, 5vw, 60px))" }}
-        >
-          {paoRows.flat().map((key) => {
-            const legends = paoKeyLegends[key.code];
-            const normalized = normalizeKey(key.code === "Space" ? " " : legends?.unshifted || key.label);
-            const shifted = legends ? normalizeKey(legends.shifted) : "";
-            const label = key.label ? normalizeKey(key.label) : "";
-            const isPressed = Boolean(pressed) && (normalized === pressed || Boolean(shifted) && shifted === pressed || Boolean(label) && label === pressed);
-            const isError = Boolean(error) && (normalized === error || Boolean(shifted) && shifted === error || Boolean(label) && label === error);
+      <div className="overflow-x-auto pb-1" role="img" aria-label="Pa'O Myanmar keyboard layout">
+        <div className="mx-auto w-fit min-w-[650px] space-y-1.5 select-none">
+          {paoRows.map((row, rowIndex) => (
+            <div key={`pao-row-${rowIndex}`} className="flex justify-center gap-1.5">
+              {row.map((key) => {
+                const legends = paoKeyLegends[key.code];
+                const typedKey = key.space ? " " : key.special ? key.code : key.label;
+                const expectedKey = key.space ? " " : legends?.unshifted || typedKey;
+                const shiftedKey = legends?.shifted || "";
+                const candidates = [typedKey, expectedKey, shiftedKey].filter(Boolean).map(normalizeKey);
+                const isPressed = Boolean(pressed) && candidates.includes(pressed);
+                const isError = Boolean(error) && candidates.includes(error);
+                const isWide = key.special || key.space;
 
-            return (
-              <div
-                key={key.code}
-                style={{ gridColumn: `span ${key.span}` }}
-                className={`relative min-w-0 overflow-hidden rounded-md border bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-colors ${
-                  isError ? "border-red-400 bg-red-500 text-white" : isPressed ? "border-blue-500 bg-blue-600 text-white" : "border-[#d2d2d7] hover:border-[#b8b8bd] hover:bg-[#fafafa]"
-                }`}
-              >
-                {key.modifier ? (
-                  <span className={`absolute left-1.5 top-1 text-[8px] font-medium uppercase leading-none sm:left-[7px] sm:top-[5px] sm:text-[10px] ${isPressed || isError ? "text-white" : "text-[#888]"}`}>{key.label}</span>
-                ) : (
-                  <>
-                    <span className={`absolute left-1 top-1 text-[8px] font-medium leading-none sm:left-[7px] sm:top-[5px] sm:text-[10px] ${isPressed || isError ? "text-white" : "text-[#888]"}`}>{key.label}</span>
-                    {legends && <span className={`absolute right-1 top-1 font-myanmar text-[9px] leading-none sm:right-[7px] sm:top-[5px] sm:text-[13px] ${isPressed || isError ? "text-white" : "text-[#444]"}`}>{legends.shifted}</span>}
-                    {legends && <span className={`absolute bottom-1 left-0 right-0 text-center font-myanmar text-[12px] font-medium leading-none sm:bottom-[6px] sm:text-base ${isPressed || isError ? "text-white" : "text-[#1d1d1f]"}`}>{legends.unshifted}</span>}
-                  </>
-                )}
-              </div>
-            );
-          })}
+                return (
+                  <div
+                    key={key.code}
+                    aria-hidden="true"
+                    className={`
+                      relative h-10 flex shrink-0 items-center justify-center rounded-sm text-xs font-medium border transition-all duration-75
+                      ${key.space ? "w-64" : isWide ? "px-3 min-w-[52px]" : "w-10"}
+                      ${isError
+                        ? "bg-red-500 text-white border-red-400 scale-95 shadow-none"
+                        : isPressed
+                          ? "bg-blue-600 text-white border-blue-500 scale-95 shadow-none"
+                          : "bg-white text-slate-600 border-slate-200 shadow-sm hover:bg-slate-50"}
+                    `}
+                  >
+                    {key.space ? null : key.special ? (
+                      key.label
+                    ) : (
+                      <>
+                        <span className={`absolute left-[5px] top-[4px] text-[9px] leading-none ${isPressed || isError ? "text-white" : "text-slate-500"}`}>{key.label}</span>
+                        {legends && <span className={`absolute right-[5px] top-[4px] font-myanmar text-[10px] leading-none ${isPressed || isError ? "text-white" : "text-slate-600"}`}>{legends.shifted}</span>}
+                        {legends && <span className={`absolute bottom-[5px] left-0 right-0 text-center font-myanmar text-sm font-medium leading-none ${isPressed || isError ? "text-white" : "text-slate-800"}`}>{legends.unshifted}</span>}
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
         </div>
       </div>
     );
