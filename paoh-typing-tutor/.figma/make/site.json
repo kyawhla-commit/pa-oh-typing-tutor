@@ -1,0 +1,10 @@
+{
+  "description": "Streamline project collaboration by allowing teams to manage tasks, share files, and communicate effectively in one centralized platform.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

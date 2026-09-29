@@ -1,0 +1,10 @@
+{
+  "description": "Enhance your typing skills with interactive lessons and real-time feedback designed to improve speed and accuracy for all skill levels.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
