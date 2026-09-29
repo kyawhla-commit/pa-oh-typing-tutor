@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import TypingBox, { createTypingState, processKeyPress, type TypingState } from "../../components/TypingBox";
 import VirtualKeyboard from "../../components/VirtualKeyboard";
 import { useLearningData } from "../../data/LearningContext";
-import { lessonContent } from "../lessons/lessonContent";
+import { getLessonCatalog } from "../lessons/lessonCatalog";
 
 type PracticeMode = "words" | "sentences" | "paragraphs" | "code";
 
@@ -46,7 +46,7 @@ export default function Practice() {
   const [searchParams] = useSearchParams();
   const lessonId = Number(searchParams.get("lesson")) || null;
   const [mode, setMode] = useState<PracticeMode>("words");
-  const lessonText = lessonId ? lessonContent[lessonId] : undefined;
+  const lessonText = lessonId ? getLessonCatalog().find((lesson) => lesson.id === lessonId && lesson.status === "Published")?.content : undefined;
   const [passage, setPassage] = useState(() => pickText("words"));
   const text = lessonText || passage;
   const [session, setSession] = useState<TypingState>(() => createTypingState(text));

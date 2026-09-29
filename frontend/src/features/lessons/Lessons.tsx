@@ -1,20 +1,10 @@
-import { useState } from 'react'
-import { CheckCircle, Lock, Play, Clock } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { CheckCircle, Lock, Play, Clock, BookOpen } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useLearningData } from '../../data/LearningContext'
+import { getLessonCatalog, subscribeToLessonCatalog, type LessonCategory } from './lessonCatalog'
 
-const CATEGORIES = ['Beginner', 'Intermediate', 'Advanced', 'Programming']
-
-const lessons = [
-  { id: 1, title: 'Home Row Keys', desc: 'Master ASDF and JKL; — the foundation of touch typing.', progress: 100, status: 'completed', duration: '10 min', difficulty: 'Beginner', cat: 'Beginner' },
-  { id: 2, title: 'Top Row Keys', desc: 'Expand to QWERTY and YUIOP with proper finger placement.', progress: 75, status: 'active', duration: '12 min', difficulty: 'Beginner', cat: 'Beginner' },
-  { id: 3, title: 'Bottom Row Keys', desc: 'Complete the full keyboard with ZXCVB and NM,./', progress: 0, status: 'locked', duration: '15 min', difficulty: 'Beginner', cat: 'Beginner' },
-  { id: 4, title: 'Common Words', desc: 'Practice the 100 most common English words for fluency.', progress: 0, status: 'locked', duration: '20 min', difficulty: 'Intermediate', cat: 'Intermediate' },
-  { id: 5, title: 'Numbers & Symbols', desc: 'Tackle number row and shift-key symbols efficiently.', progress: 0, status: 'locked', duration: '18 min', difficulty: 'Intermediate', cat: 'Intermediate' },
-  { id: 6, title: 'Speed Drills', desc: 'Push your WPM ceiling with intensive speed exercises.', progress: 0, status: 'locked', duration: '25 min', difficulty: 'Advanced', cat: 'Advanced' },
-  { id: 7, title: 'JavaScript Syntax', desc: 'Type common JS patterns, arrow functions, and destructuring.', progress: 0, status: 'locked', duration: '30 min', difficulty: 'Advanced', cat: 'Programming' },
-  { id: 8, title: 'Python Patterns', desc: 'Practice Python indentation, list comprehensions, and f-strings.', progress: 0, status: 'locked', duration: '28 min', difficulty: 'Advanced', cat: 'Programming' },
-]
+const CATEGORIES: LessonCategory[] = ['Beginner', 'Intermediate', 'Advanced', 'Programming']
 
 const diffColor: Record<string, string> = {
   Beginner: 'bg-green-50 text-green-700',
@@ -24,13 +14,18 @@ const diffColor: Record<string, string> = {
 
 export default function Lessons() {
   const [activeTab, setActiveTab] = useState('All')
+  const [catalog, setCatalog] = useState(getLessonCatalog)
   const navigate = useNavigate()
   const { completedLessons } = useLearningData()
 
-  const availableLessons = lessons.map((lesson) => {
+  useEffect(() => subscribeToLessonCatalog(() => setCatalog(getLessonCatalog())), [])
+
+  const publishedLessons = catalog.filter((lesson) => lesson.status === 'Published')
+  const availableLessons = publishedLessons.map((lesson, index) => {
     const completed = completedLessons.includes(lesson.id)
-    const unlocked = lesson.id === 1 || completedLessons.includes(lesson.id - 1)
-    return { ...lesson, status: completed ? 'completed' : unlocked ? 'active' : 'locked', progress: completed ? 100 : 0 }
+    const previousLesson = publishedLessons[index - 1]
+    const unlocked = index === 0 || (previousLesson ? completedLessons.includes(previousLesson.id) : false)
+    return { ...lesson, desc: lesson.description, cat: lesson.category, duration: `${lesson.durationMinutes} min`, status: completed ? 'completed' : unlocked ? 'active' : 'locked', progress: completed ? 100 : 0 }
   })
   const filtered = activeTab === 'All' ? availableLessons : availableLessons.filter(l => l.cat === activeTab)
 
@@ -115,6 +110,7 @@ export default function Lessons() {
           </div>
         ))}
       </div>
+      {filtered.length === 0 && <div className="rounded-2xl border border-dashed border-[#CBD5E1] bg-white p-10 text-center"><BookOpen className="mx-auto mb-3 text-[#94A3B8]" /><p className="font-medium text-[#0F172A]">No published lessons in this category</p><p className="mt-1 text-sm text-[#64748B]">Choose another category to keep practicing.</p></div>}
     </div>
   )
 }
