@@ -1,8 +1,8 @@
-# Typing Tutor combined frontend
+# Typing Tutor
 
-This folder is the single React/Vite workspace for the five Typing Tutor projects.
+The five prototypes are combined into one routed React app with a shared navigation shell and a shared learner record.
 
-## Run it
+## Run locally
 
 ```powershell
 cd frontend
@@ -10,14 +10,22 @@ pnpm install
 pnpm dev
 ```
 
-Open the local address printed by Vite. The home page links to each version.
+Use the local address printed by Vite. Build with `pnpm build`; check TypeScript with `pnpm typecheck`.
 
-## Versions
+## App features
 
-- `versions/typingtutor` — Typing Tutor with profile and admin screens
-- `versions/typingtutor2` — TypeMaster dashboard and practice flow
-- `versions/typingtutor3` — Tutor app with sign in, achievements, and settings
-- `versions/typingtutor4` — Streamlined tutor with dark mode
-- `versions/typingtutor5` — Routed tutor with charts and responsive navigation
+- Local demo sign in and learner registration
+- Dashboard and practice history
+- Four practice modes and timed typing tests
+- Sequential lessons that unlock after completion
+- Progress charts, achievement rules, and a sample community leaderboard
+- Learner profile, shared preferences, dark mode, and the admin CMS screen
 
-Each version keeps its own `src` tree, styles, assets, and HTML entry. Shared dependencies and build tooling live at the `frontend` root. Build all six pages with `pnpm build`.
+Practice results, completed lessons, profile details, and preferences persist in browser local storage. Authentication and admin permissions are demo-only; connect a backend and enforce server-side authorization before using real accounts or private data.
+
+## Source migration
+
+- `src/App.tsx` routes the single app.
+- `src/features` groups screens by product feature.
+- `src/data/LearningContext.tsx` owns the shared browser-persisted learner state.
+- `versions/` retains the five input source trees as reference material. They are not separate production entry points.
