@@ -1,20 +1,29 @@
+import { useEffect, useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { ArrowRight, BookOpen, Clock3, Flame, Target, TrendingUp, Trophy, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import {
+  ArrowRight, BookOpen, CalendarDays, Check, CheckCircle2, Clock3, Flame,
+  Gauge, Play, Sparkles, Target, TrendingUp, Trophy, Zap,
+} from "lucide-react";
 import { useLearningData, type PracticeResult } from "../../data/LearningContext";
+import { getLessonCatalog, subscribeToLessonCatalog, type LessonRecord } from "../lessons/lessonCatalog";
 
 const dateKey = (date: Date) => `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 
+function startOfDay(date: Date) {
+  const value = new Date(date);
+  value.setHours(0, 0, 0, 0);
+  return value;
+}
+
 function getStreak(results: PracticeResult[]) {
   const activeDays = new Set(results.map((result) => dateKey(new Date(result.createdAt))));
-  const date = new Date();
-  date.setHours(0, 0, 0, 0);
-  if (!activeDays.has(dateKey(date))) date.setDate(date.getDate() - 1);
-
+  const cursor = startOfDay(new Date());
+  if (!activeDays.has(dateKey(cursor))) cursor.setDate(cursor.getDate() - 1);
   let streak = 0;
-  while (activeDays.has(dateKey(date))) {
+  while (activeDays.has(dateKey(cursor))) {
     streak += 1;
-    date.setDate(date.getDate() - 1);
+    cursor.setDate(cursor.getDate() - 1);
   }
   return streak;
 }
@@ -22,218 +31,163 @@ function getStreak(results: PracticeResult[]) {
 function formatDuration(seconds: number) {
   if (seconds < 60) return `${seconds}s`;
   const minutes = Math.floor(seconds / 60);
-  const remainder = seconds % 60;
-  return remainder ? `${minutes}m ${remainder}s` : `${minutes} min`;
+  const remainingSeconds = seconds % 60;
+  if (minutes < 60) return remainingSeconds ? `${minutes}m ${remainingSeconds}s` : `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return remainingMinutes ? `${hours}h ${remainingMinutes}m` : `${hours} hr`;
+}
+
+function getGreeting(date: Date) {
+  const hour = date.getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
 }
 
 function EmptyChart({ title, message, onPractice }: { title: string; message: string; onPractice: () => void }) {
-  return (
-    <div className="flex h-[208px] flex-col items-center justify-center rounded-xl bg-slate-50 px-5 text-center">
-      <TrendingUp size={20} className="mb-2 text-blue-500" />
-      <p className="text-sm font-semibold text-[#0F172A]">{title}</p>
-      <p className="mt-1 max-w-xs text-xs leading-relaxed text-[#64748B]">{message}</p>
-      <button onClick={onPractice} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#2563EB] hover:text-blue-800">
-        Start a session <ArrowRight size={13} />
-      </button>
-    </div>
-  );
+  return <div className="flex h-[210px] flex-col items-center justify-center rounded-xl bg-slate-50 px-5 text-center">
+    <TrendingUp size={21} className="mb-2 text-blue-500" /><p className="text-sm font-semibold text-[#0F172A]">{title}</p><p className="mt-1 max-w-xs text-xs leading-relaxed text-[#64748B]">{message}</p>
+    <button onClick={onPractice} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#2563EB] hover:text-blue-800">Start a session <ArrowRight size={13} /></button>
+  </div>;
+}
+
+function SummaryCard({ label, value, unit, icon: Icon, color, helper }: {
+  label: string; value: string; unit: string; icon: typeof Zap; color: string; helper: string;
+}) {
+  return <article className="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-sm shadow-slate-900/[0.02] sm:p-5">
+    <div className="flex items-center justify-between gap-2"><span className="text-xs font-medium text-[#64748B] sm:text-sm">{label}</span><span className={`grid h-9 w-9 place-items-center rounded-xl ${color}`}><Icon size={17} /></span></div>
+    <p className="mt-4 truncate text-2xl font-semibold tracking-tight text-[#0F172A] sm:text-3xl">{value}<span className="ml-1.5 text-xs font-medium text-[#94A3B8] sm:text-sm">{unit}</span></p>
+    <p className="mt-1 truncate text-[11px] text-[#94A3B8]">{helper}</p>
+  </article>;
 }
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { learner, results, completedLessons, preferences } = useLearningData();
-  const averageWpm = results.length ? Math.round(results.reduce((sum, result) => sum + result.wpm, 0) / results.length) : null;
-  const averageAccuracy = results.length ? Math.round(results.reduce((sum, result) => sum + result.accuracy, 0) / results.length) : null;
-  const totalWords = Math.round(results.reduce((sum, result) => sum + result.characters / 5, 0));
-  const totalHours = (results.reduce((sum, result) => sum + result.durationSeconds, 0) / 3600).toFixed(1);
+  const [catalog, setCatalog] = useState(getLessonCatalog);
+  const now = new Date();
+  const firstName = learner?.name.trim().split(/\s+/)[0] || "Learner";
 
-  const today = new Date();
-  const todayWords = results
-    .filter((result) => new Date(result.createdAt).toDateString() === today.toDateString())
-    .reduce((sum, result) => sum + result.characters / 5, 0);
-  const goalPercent = preferences.dailyGoal > 0 ? Math.min(100, Math.round((todayWords / preferences.dailyGoal) * 100)) : 0;
-  const wordsRemaining = Math.max(0, Math.ceil(preferences.dailyGoal - todayWords));
+  useEffect(() => subscribeToLessonCatalog(() => setCatalog(getLessonCatalog())), []);
+
+  const todayResults = useMemo(() => results.filter((result) => dateKey(new Date(result.createdAt)) === dateKey(now)), [results]);
+  const todayWords = todayResults.reduce((sum, result) => sum + Math.max(0, result.characters || 0) / 5, 0);
+  const dailyGoal = Math.max(0, preferences.dailyGoal || 0);
+  const goalPercent = dailyGoal ? Math.min(100, Math.round((todayWords / dailyGoal) * 100)) : 0;
+  const remainingWords = Math.max(0, Math.ceil(dailyGoal - todayWords));
   const streak = getStreak(results);
-  const currentLevel = Math.floor(completedLessons.length / 3) + 1;
-
-  const weekStart = new Date();
-  weekStart.setHours(0, 0, 0, 0);
+  const weekStart = startOfDay(now);
   weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
-  const weekEnd = new Date(weekStart);
-  weekEnd.setDate(weekStart.getDate() + 7);
+  const nextWeekStart = new Date(weekStart);
+  nextWeekStart.setDate(nextWeekStart.getDate() + 7);
   const weeklyResults = results.filter((result) => {
     const date = new Date(result.createdAt);
-    return date >= weekStart && date < weekEnd;
+    return date >= weekStart && date < nextWeekStart;
   });
+  const previousWeekStart = new Date(weekStart);
+  previousWeekStart.setDate(previousWeekStart.getDate() - 7);
+  const previousWeekResults = results.filter((result) => {
+    const date = new Date(result.createdAt);
+    return date >= previousWeekStart && date < weekStart;
+  });
+
   const weekData = Array.from({ length: 7 }, (_, index) => {
     const date = new Date(weekStart);
     date.setDate(weekStart.getDate() + index);
-    const sessions = weeklyResults.filter((result) => new Date(result.createdAt).toDateString() === date.toDateString());
-    const minutes = sessions.reduce((sum, result) => sum + result.durationSeconds, 0) / 60;
+    const sessions = weeklyResults.filter((result) => dateKey(new Date(result.createdAt)) === dateKey(date));
+    const durationSeconds = sessions.reduce((sum, result) => sum + Math.max(0, result.durationSeconds || 0), 0);
     return {
       day: date.toLocaleDateString(undefined, { weekday: "short" }),
-      wpm: sessions.length ? Math.round(sessions.reduce((sum, result) => sum + result.wpm, 0) / sessions.length) : null,
-      minutes: Number(minutes.toFixed(1)),
+      speed: sessions.length ? Math.round(sessions.reduce((sum, result) => sum + result.wpm, 0) / sessions.length) : null,
+      minutes: Number((durationSeconds / 60).toFixed(1)),
       sessions: sessions.length,
     };
   });
-  const latestResults = [...results].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 5);
 
-  const statCards = [
-    { label: "Average Speed", value: averageWpm === null ? "—" : String(averageWpm), unit: "WPM", icon: Zap, color: "text-[#2563EB] bg-blue-50" },
-    { label: "Accuracy", value: averageAccuracy === null ? "—" : String(averageAccuracy), unit: "%", icon: Target, color: "text-[#16A34A] bg-green-50" },
-    { label: "Total Words", value: totalWords.toLocaleString(), unit: "typed", icon: BookOpen, color: "text-purple-600 bg-purple-50" },
-    { label: "Practice Time", value: totalHours, unit: "hours", icon: Clock3, color: "text-amber-600 bg-amber-50" },
+  const averageWpm = weeklyResults.length ? Math.round(weeklyResults.reduce((sum, result) => sum + result.wpm, 0) / weeklyResults.length) : null;
+  const averageAccuracy = weeklyResults.length ? Math.round(weeklyResults.reduce((sum, result) => sum + result.accuracy, 0) / weeklyResults.length) : null;
+  const previousAverageWpm = previousWeekResults.length ? Math.round(previousWeekResults.reduce((sum, result) => sum + result.wpm, 0) / previousWeekResults.length) : null;
+  const speedDelta = averageWpm !== null && previousAverageWpm !== null ? averageWpm - previousAverageWpm : null;
+  const totalWords = Math.round(results.reduce((sum, result) => sum + Math.max(0, result.characters || 0) / 5, 0));
+  const totalPracticeSeconds = results.reduce((sum, result) => sum + Math.max(0, result.durationSeconds || 0), 0);
+  const totalActiveDays = new Set(results.map((result) => dateKey(new Date(result.createdAt)))).size;
+  const latestResults = useMemo(() => [...results].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 5), [results]);
+  const publishedLessons = useMemo(() => catalog.filter((lesson) => lesson.status === "Published").sort((a, b) => a.id - b.id), [catalog]);
+  const learningPath = publishedLessons.slice(0, 5).map((lesson, index, list) => {
+    const completed = completedLessons.includes(lesson.id);
+    const previous = list[index - 1];
+    const unlocked = index === 0 || (previous ? completedLessons.includes(previous.id) : false);
+    return { lesson, completed, unlocked };
+  });
+  const lessonsCompleted = publishedLessons.filter((lesson) => completedLessons.includes(lesson.id)).length;
+  const weekTotalMinutes = weekData.reduce((sum, day) => sum + day.minutes, 0);
+  const greetingDate = now.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+
+  const cards = [
+    { label: "Average speed", value: averageWpm === null ? "—" : String(averageWpm), unit: "WPM", icon: Zap, color: "bg-blue-50 text-blue-600", helper: "This week" },
+    { label: "Accuracy", value: averageAccuracy === null ? "—" : String(averageAccuracy), unit: averageAccuracy === null ? "" : "%", icon: Target, color: "bg-emerald-50 text-emerald-600", helper: "This week" },
+    { label: "Words typed", value: totalWords.toLocaleString(), unit: "words", icon: BookOpen, color: "bg-violet-50 text-violet-600", helper: "All time · estimated from characters" },
+    { label: "Practice time", value: results.length ? formatDuration(totalPracticeSeconds) : "0 min", unit: "", icon: Clock3, color: "bg-amber-50 text-amber-600", helper: "All time" },
   ];
 
-  return (
-    <div className="w-full space-y-6 p-5 sm:p-6 lg:p-8">
-      <section className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="mb-1 text-xs font-semibold uppercase tracking-[.14em] text-[#94A3B8]">Your learning overview</p>
-          <h1 className="text-2xl font-bold text-[#0F172A] sm:text-3xl">Welcome back, {learner?.name.split(" ")[0] || "Learner"} <span aria-hidden>👋</span></h1>
-          <p className="mt-1 text-sm text-[#64748B]">A little practice today builds lasting typing speed.</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-2 text-center">
-            <div className="text-[10px] font-medium uppercase tracking-wide text-blue-600">Level</div>
-            <div className="text-lg font-bold text-blue-700">{currentLevel}</div>
-          </div>
-          <div className="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-2 text-center">
-            <div className="text-[10px] font-medium uppercase tracking-wide text-amber-600">Daily goal</div>
-            <div className="text-lg font-bold text-amber-700">{goalPercent}%</div>
-          </div>
-          <div className="rounded-2xl border border-green-100 bg-green-50 px-4 py-2 text-center">
-            <div className="text-[10px] font-medium uppercase tracking-wide text-green-600">Streak</div>
-            <div className="flex items-center justify-center gap-1 text-lg font-bold text-green-700"><Flame size={15} />{streak}</div>
-          </div>
-        </div>
-      </section>
+  const recentDate = (createdAt: string) => {
+    const date = new Date(createdAt);
+    return Number.isNaN(date.getTime()) ? "Unknown date" : date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  };
 
-      <section className="flex flex-wrap items-center gap-x-5 gap-y-3 rounded-2xl border border-[#E2E8F0] bg-white p-4 sm:gap-x-6 sm:px-5">
-        <div className="flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-[#2563EB]"><Target size={18} /></div>
-          <div><p className="text-xs text-[#64748B]">Current level</p><p className="text-sm font-semibold text-[#0F172A]">{completedLessons.length ? `Level ${currentLevel}` : "Getting started"}</p></div>
+  return <div className="mx-auto w-full max-w-[1440px] space-y-5 p-4 pb-10 sm:p-6 lg:p-8">
+    <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div><p className="mb-1 text-xs font-semibold uppercase tracking-[.14em] text-[#94A3B8]">Learning workspace · {greetingDate}</p><h1 className="text-2xl font-bold tracking-tight text-[#0F172A] sm:text-3xl">{getGreeting(now)}, {firstName} <span aria-hidden>👋</span></h1><p className="mt-1 text-sm text-[#64748B]">Your practice, progress, and next lesson in one place.</p></div>
+      <div className="flex gap-2"><button onClick={() => navigate("/test")} className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#E2E8F0] bg-white px-3.5 py-2.5 text-sm font-semibold text-[#475569] transition-colors hover:bg-slate-50"><Gauge size={16} />Take a test</button><button onClick={() => navigate("/practice")} className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"><Play size={15} fill="currentColor" />Start practicing</button></div>
+    </header>
+
+    <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(290px,0.36fr)]">
+      <article className="relative flex min-h-[208px] flex-col overflow-hidden rounded-2xl bg-gradient-to-br from-[#1D4ED8] via-[#2563EB] to-[#4F83F1] p-5 text-white sm:p-6">
+        <div aria-hidden className="pointer-events-none absolute -right-16 -top-24 h-72 w-72 rounded-full border-[38px] border-white/[0.07]" />
+        <div aria-hidden className="pointer-events-none absolute -bottom-28 right-24 h-60 w-60 rounded-full border-[28px] border-white/[0.06]" />
+        <div className="relative flex h-full flex-1 flex-col justify-between gap-7 sm:flex-row sm:items-center"><div className="max-w-xl"><div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-xs font-medium text-blue-50"><Sparkles size={13} />Your learning overview</div><h2 className="text-xl font-semibold leading-snug sm:text-2xl">Build a little speed every day.</h2><p className="mt-2 max-w-lg text-sm leading-relaxed text-blue-100">{streak ? `You’re on a ${streak}-day streak. Keep the momentum going with one focused session.` : "A short, focused session is a great way to get started today."}</p><button onClick={() => navigate("/practice")} className="mt-5 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-50">Continue practice <ArrowRight size={15} /></button></div>
+          <div className="grid grid-cols-2 gap-2 self-start sm:min-w-48 sm:grid-cols-1"><div className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-white/10 px-3 py-2.5"><span className="grid h-8 w-8 place-items-center rounded-lg bg-white/15"><Flame size={16} /></span><div><p className="text-[10px] text-blue-100">Current streak</p><p className="text-sm font-semibold">{streak} {streak === 1 ? "day" : "days"}</p></div></div><div className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-white/10 px-3 py-2.5"><span className="grid h-8 w-8 place-items-center rounded-lg bg-white/15"><Trophy size={16} /></span><div><p className="text-[10px] text-blue-100">Lessons completed</p><p className="text-sm font-semibold">{lessonsCompleted} / {publishedLessons.length}</p></div></div></div>
         </div>
-        <div className="hidden h-8 w-px bg-[#E2E8F0] sm:block" />
-        <div className="flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-green-50 text-[#16A34A]"><Zap size={18} /></div>
-          <div><p className="text-xs text-[#64748B]">Words today</p><p className="text-sm font-semibold text-[#0F172A]">{Math.floor(todayWords)} / {preferences.dailyGoal}</p></div>
-        </div>
-        <div className="hidden h-8 w-px bg-[#E2E8F0] sm:block" />
-        <div className="flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-amber-50 text-amber-600"><Flame size={18} /></div>
-          <div><p className="text-xs text-[#64748B]">Activity</p><p className="text-sm font-semibold text-[#0F172A]">{results.length ? `${new Set(results.map((result) => new Date(result.createdAt).toDateString())).size} active days` : "No sessions yet"}</p></div>
-        </div>
-        <div className="ml-auto flex min-w-36 flex-1 items-center gap-2 sm:max-w-56">
-          <div className="h-2 flex-1 overflow-hidden rounded-full bg-[#E2E8F0]" role="progressbar" aria-label="Daily word goal" aria-valuenow={goalPercent} aria-valuemin={0} aria-valuemax={100}>
-            <div className="h-full rounded-full bg-[#2563EB] transition-[width]" style={{ width: `${goalPercent}%` }} />
-          </div>
-          <span className="text-xs font-medium text-[#64748B]">{goalPercent}%</span>
-        </div>
-      </section>
+      </article>
 
-      <section className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
-        {statCards.map(({ label, value, unit, icon: Icon, color }) => (
-          <article key={label} className="rounded-2xl border border-[#E2E8F0] bg-white p-4 sm:p-5">
-            <div className={`mb-3 grid h-10 w-10 place-items-center rounded-xl ${color}`}><Icon size={18} /></div>
-            <div className="text-2xl font-bold text-[#0F172A] sm:text-3xl">{value}</div>
-            <div className="mt-0.5 text-xs text-[#64748B]">{label} · <span className="font-medium">{unit}</span></div>
-          </article>
-        ))}
-      </section>
+      <article className="flex flex-col justify-between rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm shadow-slate-900/[0.02] sm:flex-row sm:items-center xl:flex-col xl:items-stretch">
+        <div className="flex items-center gap-4"><div className="relative grid h-[84px] w-[84px] shrink-0 place-items-center"><svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full -rotate-90" role="img" aria-label={`${goalPercent}% of daily word goal complete`}><circle cx="50" cy="50" r="42" fill="none" stroke="#E2E8F0" strokeWidth="8" /><circle cx="50" cy="50" r="42" fill="none" stroke="#2563EB" strokeWidth="8" strokeLinecap="round" strokeDasharray={2 * Math.PI * 42} strokeDashoffset={2 * Math.PI * 42 * (1 - goalPercent / 100)} className="transition-[stroke-dashoffset] duration-500" /></svg><span className="text-lg font-bold text-[#0F172A]">{goalPercent}%</span></div><div><p className="text-xs font-medium text-[#64748B]">Today&apos;s word goal</p><p className="mt-1 text-xl font-semibold text-[#0F172A]">{Math.floor(todayWords).toLocaleString()} <span className="text-sm font-normal text-[#94A3B8]">/ {dailyGoal.toLocaleString()}</span></p><p className="mt-1 text-xs text-[#64748B]">{dailyGoal === 0 ? "Set a daily goal in Settings" : goalPercent >= 100 ? "Daily goal complete — great work!" : `${remainingWords.toLocaleString()} words to reach your goal`}</p></div></div>
+        <div className="mt-4 sm:mt-0 sm:w-44 xl:mt-5 xl:w-full"><div className="mb-1.5 flex justify-between text-[10px] font-medium text-[#94A3B8]"><span>Daily target</span><span>{goalPercent}%</span></div><div className="h-2 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-label="Daily word goal" aria-valuenow={goalPercent} aria-valuemin={0} aria-valuemax={100}><div className="h-full rounded-full bg-blue-600 transition-[width] duration-500" style={{ width: `${goalPercent}%` }} /></div><button onClick={() => navigate("/settings")} className="mt-2 text-xs font-medium text-blue-600 hover:text-blue-800">Adjust goal</button></div>
+      </article>
+    </section>
 
-      <section className="grid gap-4 xl:grid-cols-2">
-        <article className="rounded-2xl border border-[#E2E8F0] bg-white p-4 sm:p-5">
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <div><h2 className="text-sm font-semibold text-[#0F172A]">Speed This Week</h2><p className="mt-0.5 text-xs text-[#94A3B8]">Average words per minute by day</p></div>
-            <TrendingUp size={18} className="text-[#2563EB]" />
-          </div>
-          {weeklyResults.length ? (
-            <ResponsiveContainer width="100%" height={208}>
-              <LineChart data={weekData} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                <XAxis dataKey="day" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                <YAxis allowDecimals={false} width={36} tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} domain={[0, "dataMax + 10"]} />
-                <Tooltip contentStyle={{ background: "#fff", border: "1px solid #E2E8F0", borderRadius: 10, fontSize: 12 }} formatter={(value) => [`${value ?? 0} WPM`, "Average speed"]} />
-                <Line type="monotone" dataKey="wpm" connectNulls stroke="#2563EB" strokeWidth={2.5} dot={{ r: 3, fill: "#2563EB" }} activeDot={{ r: 5 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <EmptyChart title="Your speed chart starts with one session" message="Complete a practice or typing test this week and your daily speed trend will appear here." onPractice={() => navigate("/practice")} />
-          )}
-        </article>
+    <section className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4" aria-label="Typing summary">{cards.map((card) => <SummaryCard key={card.label} {...card} />)}</section>
 
-        <article className="rounded-2xl border border-[#E2E8F0] bg-white p-4 sm:p-5">
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <div><h2 className="text-sm font-semibold text-[#0F172A]">Weekly Practice</h2><p className="mt-0.5 text-xs text-[#94A3B8]">Time spent typing, by day</p></div>
-            <Clock3 size={18} className="text-[#2563EB]" />
-          </div>
-          {weeklyResults.length ? (
-            <>
-              <ResponsiveContainer width="100%" height={172}>
-                <BarChart data={weekData} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                  <XAxis dataKey="day" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                  <YAxis width={36} tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={{ background: "#fff", border: "1px solid #E2E8F0", borderRadius: 10, fontSize: 12 }} formatter={(value) => [`${value ?? 0} min`, "Practice time"]} />
-                  <Bar dataKey="minutes" fill="#4F7DF3" radius={[6, 6, 0, 0]} maxBarSize={34} />
-                </BarChart>
-              </ResponsiveContainer>
-              <div className="mt-1 flex items-center justify-between text-xs text-[#64748B]">
-                <span>Total: {(weekData.reduce((sum, day) => sum + day.minutes, 0)).toFixed(1)} min this week</span>
-                <span>{weeklyResults.length} {weeklyResults.length === 1 ? "session" : "sessions"}</span>
-              </div>
-            </>
-          ) : (
-            <EmptyChart title="No practice time this week yet" message="Your weekly activity chart will fill in as you complete sessions." onPractice={() => navigate("/practice")} />
-          )}
-        </article>
-      </section>
+    <section className="grid gap-4 xl:grid-cols-2">
+      <article className="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-sm shadow-slate-900/[0.02] sm:p-5">
+        <div className="mb-4 flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-sm font-semibold text-[#0F172A]">Speed this week</h2><p className="mt-1 text-xs text-[#64748B]">Average words per minute by day</p></div>{speedDelta !== null && <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${speedDelta >= 0 ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>{speedDelta >= 0 ? <TrendingUp size={13} /> : <TrendingUp size={13} className="rotate-180" />}{speedDelta >= 0 ? "+" : ""}{speedDelta} vs last week</span>}</div>
+        {weeklyResults.length ? <div className="h-[210px] w-full" role="img" aria-label="Average typing speed by day this week"><ResponsiveContainer width="100%" height="100%"><LineChart data={weekData} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}><CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} /><XAxis dataKey="day" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} /><YAxis allowDecimals={false} width={36} tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} domain={[0, "dataMax + 10"]} /><Tooltip contentStyle={{ background: "#fff", border: "1px solid #E2E8F0", borderRadius: 10, fontSize: 12 }} formatter={(value) => [`${value ?? 0} WPM`, "Average speed"]} /><Line type="monotone" dataKey="speed" connectNulls stroke="#2563EB" strokeWidth={2.5} dot={{ r: 3, fill: "#2563EB", strokeWidth: 0 }} activeDot={{ r: 5 }} /></LineChart></ResponsiveContainer></div> : <EmptyChart title="Your speed trend starts here" message="Complete a practice or typing test this week to see your daily speed trend." onPractice={() => navigate("/practice")} />}
+        <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-[#64748B]"><span>{weeklyResults.length} completed {weeklyResults.length === 1 ? "session" : "sessions"}</span><span>{averageWpm === null ? "No speed recorded yet" : `Weekly average · ${averageWpm} WPM`}</span></div>
+      </article>
 
-      <section className="grid gap-4 xl:grid-cols-[minmax(280px,0.8fr)_minmax(0,1.7fr)]">
-        <article className="flex min-h-52 flex-col rounded-2xl bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] p-5 text-white sm:p-6">
-          <div className="mb-1 flex items-center gap-2 text-xs font-medium text-blue-100"><Trophy size={14} />Today&apos;s challenge</div>
-          <h2 className="text-lg font-bold">{goalPercent >= 100 ? "Daily goal complete!" : `Type ${wordsRemaining.toLocaleString()} more ${wordsRemaining === 1 ? "word" : "words"}`}</h2>
-          <p className="mt-1 text-sm text-blue-100">{goalPercent >= 100 ? "Great work. Keep your momentum going with another short session." : `Reach your ${preferences.dailyGoal.toLocaleString()} word goal with a focused practice session.`}</p>
-          <div className="mt-auto pt-4">
-            <div className="mb-2 flex items-center justify-between text-xs text-blue-100"><span>Today&apos;s progress</span><span>{Math.floor(todayWords).toLocaleString()} / {preferences.dailyGoal.toLocaleString()}</span></div>
-            <div className="h-2 overflow-hidden rounded-full bg-blue-400/40"><div className="h-full rounded-full bg-white transition-[width]" style={{ width: `${goalPercent}%` }} /></div>
-            <button onClick={() => navigate("/practice")} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-[#2563EB] transition-colors hover:bg-blue-50">
-              {goalPercent >= 100 ? "Keep practicing" : "Continue practice"}<ArrowRight size={15} />
-            </button>
-          </div>
-        </article>
+      <article className="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-sm shadow-slate-900/[0.02] sm:p-5">
+        <div className="mb-4 flex items-start justify-between gap-3"><div><h2 className="text-sm font-semibold text-[#0F172A]">Practice time</h2><p className="mt-1 text-xs text-[#64748B]">Minutes spent typing, by day</p></div><CalendarDays size={18} className="text-blue-600" /></div>
+        {weeklyResults.length ? <><div className="h-[174px] w-full" role="img" aria-label="Practice duration by day this week"><ResponsiveContainer width="100%" height="100%"><BarChart data={weekData} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}><CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} /><XAxis dataKey="day" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} /><YAxis width={36} tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} /><Tooltip contentStyle={{ background: "#fff", border: "1px solid #E2E8F0", borderRadius: 10, fontSize: 12 }} formatter={(value) => [`${value ?? 0} min`, "Practice time"]} /><Bar dataKey="minutes" fill="#4F7DF3" radius={[6, 6, 0, 0]} maxBarSize={34} /></BarChart></ResponsiveContainer></div><div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-[#64748B]"><span>{weekTotalMinutes.toFixed(1)} min this week</span><span>{weeklyResults.length} {weeklyResults.length === 1 ? "session" : "sessions"}</span></div></> : <EmptyChart title="Your weekly practice chart is ready" message="Your daily practice times will appear here after you complete a session." onPractice={() => navigate("/practice")} />}
+      </article>
+    </section>
 
-        <article className="overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white">
-          <div className="flex items-center justify-between border-b border-[#E2E8F0] px-4 py-4 sm:px-5">
-            <div><h2 className="text-sm font-semibold text-[#0F172A]">Recent Sessions</h2><p className="mt-0.5 text-xs text-[#94A3B8]">Your latest saved practice and tests</p></div>
-            <button onClick={() => navigate("/progress")} className="text-xs font-semibold text-[#2563EB] hover:text-blue-800">View progress</button>
-          </div>
-          {latestResults.length ? (
-            <div className="divide-y divide-[#F1F5F9]">
-              {latestResults.map((session) => (
-                <div key={session.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-3 sm:px-5">
-                  <time className="w-24 shrink-0 text-xs text-[#64748B]">{new Date(session.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</time>
-                  <span className="max-w-36 truncate rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700">{session.label || (session.mode === "test" ? "Typing Test" : "Practice")}</span>
-                  <div className="ml-auto flex items-center gap-2 text-xs sm:gap-3">
-                    <span className="font-mono font-semibold text-[#2563EB]">{session.wpm} WPM</span>
-                    <span className="text-green-600">{session.accuracy}%</span>
-                    <span className="hidden text-[#94A3B8] sm:inline">{formatDuration(session.durationSeconds)}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex min-h-40 flex-col items-center justify-center px-5 py-6 text-center">
-              <div className="mb-2 grid h-10 w-10 place-items-center rounded-full bg-blue-50 text-blue-600"><BookOpen size={18} /></div>
-              <p className="text-sm font-semibold text-[#0F172A]">Your first session is waiting</p>
-              <p className="mt-1 max-w-sm text-xs text-[#64748B]">Complete a short practice or typing test to start building your history.</p>
-              <button onClick={() => navigate("/practice")} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#2563EB] hover:text-blue-800">Start practicing <ArrowRight size={13} /></button>
-            </div>
-          )}
-        </article>
-      </section>
-    </div>
-  );
+    <section className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+      <article className="overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-sm shadow-slate-900/[0.02]">
+        <div className="flex items-center justify-between gap-3 border-b border-[#E2E8F0] px-4 py-4 sm:px-5"><div><h2 className="text-sm font-semibold text-[#0F172A]">Learning path</h2><p className="mt-1 text-xs text-[#64748B]">Continue where you left off</p></div><button onClick={() => navigate("/lessons")} className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-800">All lessons <ArrowRight size={13} /></button></div>
+        {learningPath.length ? <div className="divide-y divide-slate-100">{learningPath.map(({ lesson, completed, unlocked }) => <LessonRow key={lesson.id} lesson={lesson} completed={completed} unlocked={unlocked} onOpen={() => navigate(`/practice?lesson=${lesson.id}`)} />)}</div> : <div className="flex min-h-44 flex-col items-center justify-center px-5 py-8 text-center"><BookOpen size={22} className="mb-2 text-slate-400" /><p className="text-sm font-semibold text-[#0F172A]">No published lessons yet</p><p className="mt-1 text-xs text-[#64748B]">Your lessons will appear here when they’re ready.</p><button onClick={() => navigate("/lessons")} className="mt-3 text-xs font-semibold text-blue-600 hover:text-blue-800">Browse lessons</button></div>}
+      </article>
+
+      <article className="overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-sm shadow-slate-900/[0.02]">
+        <div className="flex items-center justify-between border-b border-[#E2E8F0] px-4 py-4 sm:px-5"><div><h2 className="text-sm font-semibold text-[#0F172A]">Recent sessions</h2><p className="mt-1 text-xs text-[#64748B]">Your latest completed practice and tests</p></div><button onClick={() => navigate("/progress")} className="text-xs font-semibold text-blue-600 hover:text-blue-800">View progress</button></div>
+        {latestResults.length ? <div className="divide-y divide-slate-100">{latestResults.map((session) => <div key={session.id} className="flex items-center gap-3 px-4 py-3.5 sm:px-5"><span className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${session.mode === "test" ? "bg-violet-50 text-violet-600" : "bg-blue-50 text-blue-600"}`}>{session.mode === "test" ? <Target size={17} /> : <BookOpen size={17} />}</span><div className="min-w-0 flex-1"><p className="truncate text-sm font-medium text-[#0F172A]">{session.label || (session.mode === "test" ? "Typing test" : "Practice session")}</p><p className="mt-0.5 text-xs text-[#64748B]">{recentDate(session.createdAt)} · {formatDuration(session.durationSeconds)}</p></div><div className="shrink-0 text-right"><p className="font-mono text-sm font-semibold text-blue-700">{session.wpm} <span className="text-[10px] font-medium text-[#94A3B8]">WPM</span></p><p className="text-xs text-emerald-700">{session.accuracy}% accuracy</p></div></div>)}</div> : <div className="flex min-h-44 flex-col items-center justify-center px-5 py-8 text-center"><span className="mb-2 grid h-10 w-10 place-items-center rounded-full bg-blue-50 text-blue-600"><BookOpen size={18} /></span><p className="text-sm font-semibold text-[#0F172A]">Your first session is waiting</p><p className="mt-1 max-w-xs text-xs text-[#64748B]">Complete a short practice or typing test to start building your history.</p><button onClick={() => navigate("/practice")} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-800">Start practicing <ArrowRight size={13} /></button></div>}
+      </article>
+    </section>
+
+    <footer className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#E2E8F0] bg-white px-4 py-3 text-xs text-[#64748B]"><span>Based on your saved typing sessions and published lessons.</span><span className="inline-flex items-center gap-1.5"><Check size={14} className="text-emerald-600" />Your learning data is up to date</span></footer>
+  </div>;
+}
+
+function LessonRow({ lesson, completed, unlocked, onOpen }: { lesson: LessonRecord; completed: boolean; unlocked: boolean; onOpen: () => void }) {
+  return <div className="flex items-center gap-3 px-4 py-3.5 sm:px-5"><span className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${completed ? "bg-emerald-50 text-emerald-600" : unlocked ? "bg-blue-50 text-blue-600" : "bg-slate-100 text-slate-400"}`}>{completed ? <CheckCircle2 size={18} /> : <BookOpen size={17} />}</span><div className="min-w-0 flex-1"><p className="truncate text-sm font-medium text-[#0F172A]">{lesson.title}</p><p className="mt-0.5 truncate text-xs text-[#64748B]">{lesson.difficulty} · {lesson.durationMinutes} min</p></div><button onClick={onOpen} disabled={!unlocked} className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${!unlocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : completed ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100" : "bg-blue-600 text-white hover:bg-blue-700"}`}>{completed ? "Review" : unlocked ? <><Play size={12} fill="currentColor" />Start</> : "Locked"}</button></div>;
 }
