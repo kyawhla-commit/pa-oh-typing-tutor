@@ -118,7 +118,8 @@ export default function Practice() {
     : session.startTime ? Math.max(elapsed, Math.floor((Date.now() - session.startTime) / 1000)) : 0;
 
   return (
-    <div className="mx-auto max-w-4xl p-5 sm:p-8">
+    <div className="mx-auto max-w-6xl p-5 sm:p-8">
+      <div className="mx-auto w-full max-w-4xl">
       <header className="mb-7 flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">{lessonId ? `Lesson ${lessonId} practice` : "Practice"}</h1>
@@ -187,8 +188,10 @@ export default function Practice() {
         </div>
       )}
 
+      </div>
+
       {showKeyboard && (
-        <div className="mt-8">
+        <div className="mx-auto mt-8 w-full max-w-[1100px]">
           <VirtualKeyboard pressedKey={pressedKey} errorKey={errorKey} layout={preferences.keyboardLayout} />
         </div>
       )}

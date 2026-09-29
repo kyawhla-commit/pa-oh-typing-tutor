@@ -125,7 +125,7 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
   if (layout === "Pa'O") {
     return (
       <div className="overflow-x-auto pb-1" role="img" aria-label="Pa'O Myanmar keyboard layout">
-        <div className="mx-auto w-fit min-w-[650px] space-y-1.5 select-none">
+        <div className="mx-auto w-fit min-w-[880px] space-y-1.5 select-none">
           {paoRows.map((row, rowIndex) => (
             <div key={`pao-row-${rowIndex}`} className="flex justify-center gap-1.5">
               {row.map((key) => {
@@ -143,8 +143,8 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
                     key={key.code}
                     aria-hidden="true"
                     className={`
-                      relative h-10 flex shrink-0 items-center justify-center rounded-sm text-xs font-medium border transition-all duration-75
-                      ${key.space ? "w-64" : isWide ? "px-3 min-w-[52px]" : "w-10"}
+                      relative h-14 flex shrink-0 items-center justify-center rounded-sm text-xs font-medium border transition-all duration-75
+                      ${key.space ? "w-80" : isWide ? "px-3 min-w-[72px]" : "w-14"}
                       ${isError
                         ? "bg-red-500 text-white border-red-400 scale-95 shadow-none"
                         : isPressed
@@ -156,9 +156,9 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
                       key.label
                     ) : (
                       <>
-                        <span className={`absolute left-[5px] top-[4px] text-[9px] leading-none ${isPressed || isError ? "text-white" : "text-slate-500"}`}>{key.label}</span>
-                        {legends && <span className={`absolute right-[5px] top-[4px] font-myanmar text-[10px] leading-none ${isPressed || isError ? "text-white" : "text-slate-600"}`}>{legends.shifted}</span>}
-                        {legends && <span className={`absolute bottom-[5px] left-0 right-0 text-center font-myanmar text-sm font-medium leading-none ${isPressed || isError ? "text-white" : "text-slate-800"}`}>{legends.unshifted}</span>}
+                        <span className={`absolute left-[7px] top-[5px] text-[10px] leading-none ${isPressed || isError ? "text-white" : "text-slate-500"}`}>{key.label}</span>
+                        {legends && <span className={`absolute right-[7px] top-[5px] font-myanmar text-[13px] leading-none ${isPressed || isError ? "text-white" : "text-slate-600"}`}>{legends.shifted}</span>}
+                        {legends && <span className={`absolute bottom-[6px] left-0 right-0 text-center font-myanmar text-base font-medium leading-none ${isPressed || isError ? "text-white" : "text-slate-800"}`}>{legends.unshifted}</span>}
                       </>
                     )}
                   </div>
@@ -172,35 +172,37 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
   }
 
   return (
-    <div className="space-y-1.5 select-none" aria-hidden>
-      {rows.map((row, rowIndex) => (
-        <div key={`${layout}-${rowIndex}`} className="flex gap-1.5 justify-center">
-          {row.map((key, keyIndex) => {
-            const normalized = normalizeKey(key);
-            const isSpace = key === "Space";
-            const isPressed = normalized === pressed;
-            const isError = normalized === error;
-            const isWide = wideKeys.has(key);
+    <div className="overflow-x-auto pb-1" aria-hidden>
+      <div className="mx-auto w-fit min-w-[880px] space-y-1.5 select-none">
+        {rows.map((row, rowIndex) => (
+          <div key={`${layout}-${rowIndex}`} className="flex gap-1.5 justify-center">
+            {row.map((key, keyIndex) => {
+              const normalized = normalizeKey(key);
+              const isSpace = key === "Space";
+              const isPressed = normalized === pressed;
+              const isError = normalized === error;
+              const isWide = wideKeys.has(key);
 
-            return (
-              <div
-                key={`${key}-${keyIndex}`}
-                className={`
-                  h-10 flex items-center justify-center rounded-sm text-xs font-medium border transition-all duration-75
-                  ${isSpace ? "w-56" : isWide ? "px-3 min-w-[52px]" : "w-10"}
-                  ${isError
-                    ? "bg-red-500 text-white border-red-400 scale-95 shadow-none"
-                    : isPressed
-                    ? "bg-blue-600 text-white border-blue-500 scale-95 shadow-none"
-                    : "bg-white text-slate-600 border-slate-200 shadow-sm hover:bg-slate-50"}
-                }`}
-              >
-                {isSpace ? null : wideKeyLabels[key] || key}
-              </div>
-            );
-          })}
-        </div>
-      ))}
+              return (
+                <div
+                  key={`${key}-${keyIndex}`}
+                  className={`
+                    h-14 flex items-center justify-center rounded-sm text-xs font-medium border transition-all duration-75
+                    ${isSpace ? "w-80" : isWide ? "px-3 min-w-[72px]" : "w-14"}
+                    ${isError
+                      ? "bg-red-500 text-white border-red-400 scale-95 shadow-none"
+                      : isPressed
+                        ? "bg-blue-600 text-white border-blue-500 scale-95 shadow-none"
+                        : "bg-white text-slate-600 border-slate-200 shadow-sm hover:bg-slate-50"}
+                  `}
+                >
+                  {isSpace ? null : wideKeyLabels[key] || key}
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
