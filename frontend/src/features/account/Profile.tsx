@@ -29,7 +29,7 @@ export default function Profile() {
             <div><h2 className="font-semibold text-[#0F172A]">Learner profile</h2><p className="text-sm text-[#64748B]">Saved locally in this browser</p></div>
           </div>
           <label className="mb-4 block text-sm font-medium text-[#334155]">Display name<input value={name} onChange={(event) => setName(event.target.value)} required className="mt-1.5 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 py-2.5 text-sm outline-none focus:border-[#2563EB]" /></label>
-          <label className="mb-5 block text-sm font-medium text-[#334155]">Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required className="mt-1.5 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 py-2.5 text-sm outline-none focus:border-[#2563EB]" /></label>
+          <label className="mb-5 block text-sm font-medium text-[#334155]">Email <span className="font-normal text-[#94A3B8]">(optional)</span><input type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" className="mt-1.5 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 py-2.5 text-sm outline-none focus:border-[#2563EB]" /><span className="mt-1 block text-xs font-normal text-[#64748B]">Optional contact detail, saved only in this browser.</span></label>
           <button className="rounded-xl bg-[#2563EB] px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">{saved ? "Saved" : "Save profile"}</button>
         </form>
         <section className="rounded-2xl border border-[#E2E8F0] bg-white p-6">
@@ -40,7 +40,7 @@ export default function Profile() {
             <Stat label="Best speed" value={`${Math.max(0, ...results.map((result) => result.wpm))} WPM`} />
             <Stat label="Latest accuracy" value={latest ? `${latest.accuracy}%` : "—"} />
           </div>
-          <p className="mt-5 rounded-xl bg-[#F8FAFC] p-4 text-sm leading-relaxed text-[#64748B]">Finish a practice session or test to add your first result here. Your progress is shared across the dashboard and progress pages.</p>
+          <p className="mt-5 rounded-xl bg-[#F8FAFC] p-4 text-sm leading-relaxed text-[#64748B]">Finish a practice session or test to add your first result here. Your practice history appears across learning pages in this browser.</p>
         </section>
       </div>
     </div>
