@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --color-primary: #2563EB;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-light: #EFF6FF;
+  --color-background: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F1F5F9;
+  --color-border: #E2E8F0;
+  --color-border-strong: #CBD5E1;
+  --color-text: #0F172A;
+  --color-text-2: #475569;
+  --color-text-3: #94A3B8;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-accent: #8B5CF6;
+  --color-sidebar: #0F172A;
+  --color-sidebar-text: #94A3B8;
+  --color-sidebar-active: #1E293B;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  margin: 0;
+}
+
+/* Hide scrollbars by default */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+/* Typing engine styles */
+.typing-char { transition: color 0.05s; }
+.typing-char.correct { color: var(--color-text); }
+.typing-char.incorrect { color: var(--color-error); background: #FEF2F2; }
+.typing-char.current { border-bottom: 2px solid var(--color-primary); }
+.typing-char.pending { color: var(--color-text-3); }
+
+/* Virtual keyboard */
+.key-highlight {
+  background: var(--color-primary) !important;
+  color: white !important;
+  transform: scale(0.95);
+  box-shadow: 0 0 0 2px #93C5FD;
+}
+
+/* Chart tooltip */
+.recharts-tooltip-wrapper { border-radius: 8px !important; }

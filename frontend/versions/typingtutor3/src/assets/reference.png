@@ -1,0 +1,557 @@
+You are a senior full-stack engineer. Build a production-ready Typing Tutor SaaS web application called "TypeMaster".
+
+The application must be scalable, secure, maintainable, and ready for deployment.
+
+================================================
+TECH STACK
+================================================
+
+Frontend:
+- Next.js 16 App Router
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- React Hook Form
+- Zod validation
+- TanStack Query
+- Zustand for client state
+- Recharts for analytics
+- Framer Motion animations
+
+Backend:
+- NestJS
+- TypeScript
+- PostgreSQL
+- TypeORM
+- Redis caching
+- JWT authentication
+- Swagger API documentation
+
+Infrastructure:
+- Docker
+- Nginx reverse proxy
+- CI/CD pipeline
+- Environment based configuration
+
+
+================================================
+SYSTEM MODULES
+================================================
+
+Create these modules:
+
+
+AUTH MODULE
+
+Features:
+- Register
+- Login
+- Logout
+- Refresh token
+- Forgot password
+- Reset password
+- Email verification
+
+Roles:
+
+USER
+ADMIN
+
+
+Security:
+- Password hashing using bcrypt
+- JWT access token
+- Refresh token rotation
+- Rate limiting
+- Input validation
+
+
+================================================
+USER MODULE
+================================================
+
+Entity:
+
+User
+
+Fields:
+
+id
+username
+email
+passwordHash
+avatar
+role
+level
+experiencePoints
+targetWpm
+dailyGoal
+createdAt
+updatedAt
+
+
+Features:
+
+- Profile management
+- Learning preferences
+- Statistics summary
+
+
+================================================
+TYPING ENGINE MODULE
+================================================
+
+This is the core feature.
+
+
+Support:
+
+1. Practice Mode
+
+Types:
+
+- Words
+- Sentences
+- Paragraph
+- Code
+
+
+2. Test Mode
+
+Duration:
+
+15 seconds
+30 seconds
+60 seconds
+300 seconds
+
+
+Real-time calculation:
+
+
+WPM:
+
+(words typed / minutes)
+
+
+Accuracy:
+
+(correct characters / total characters) * 100
+
+
+Track:
+
+- Correct characters
+- Wrong characters
+- Backspaces
+- Completion time
+
+
+Store every session.
+
+
+================================================
+LESSON MODULE
+================================================
+
+Entity:
+
+
+Lesson
+
+Fields:
+
+id
+title
+description
+level
+category
+content
+order
+duration
+
+
+Categories:
+
+BEGINNER
+
+- Home row keys
+- Top row keys
+- Bottom row keys
+- Numbers
+
+
+INTERMEDIATE
+
+- Common words
+- Sentences
+- Speed practice
+
+
+ADVANCED
+
+- Long paragraphs
+- Programming
+
+
+================================================
+PRACTICE HISTORY MODULE
+================================================
+
+
+Entity:
+
+TypingSession
+
+
+Fields:
+
+id
+userId
+lessonId
+mode
+duration
+wpm
+accuracy
+errors
+charactersTyped
+createdAt
+
+
+
+Provide APIs:
+
+
+GET
+/users/me/history
+
+
+GET
+/users/me/statistics
+
+
+
+================================================
+ACHIEVEMENT MODULE
+================================================
+
+
+Create achievement system.
+
+
+Examples:
+
+FIRST_30_WPM
+
+FIRST_1000_WORDS
+
+SEVEN_DAY_STREAK
+
+ACCURACY_MASTER
+
+
+
+Entities:
+
+
+Achievement
+
+UserAchievement
+
+
+================================================
+LEADERBOARD MODULE
+================================================
+
+
+Support:
+
+- Global ranking
+- Weekly ranking
+- Monthly ranking
+- Friends ranking
+
+
+
+Ranking based on:
+
+- Highest WPM
+- Accuracy
+- Total practice
+
+
+================================================
+ANALYTICS MODULE
+================================================
+
+
+Generate:
+
+- WPM trend
+- Accuracy trend
+- Practice time
+- Daily streak
+- Weak keys analysis
+
+
+
+================================================
+ADMIN PANEL
+================================================
+
+
+Admin features:
+
+Dashboard:
+
+- Total users
+- Active users
+- Practice sessions
+- Average WPM
+
+
+Management:
+
+- User management
+- Lesson management
+- Achievement management
+
+
+================================================
+DATABASE DESIGN
+================================================
+
+
+Create entities:
+
+
+User
+
+Lesson
+
+TypingSession
+
+Achievement
+
+UserAchievement
+
+DailyChallenge
+
+Leaderboard
+
+
+
+Create:
+
+- Relations
+- Indexes
+- Migration files
+- Seed data
+
+
+================================================
+FRONTEND REQUIREMENTS
+================================================
+
+
+Pages:
+
+
+Public:
+
+/
+login
+register
+
+
+User:
+
+
+/dashboard
+
+/practice
+
+/test
+
+/lessons
+
+/progress
+
+/achievements
+
+/leaderboard
+
+/settings
+
+
+Admin:
+
+/admin
+
+
+================================================
+UI REQUIREMENTS
+================================================
+
+
+Design style:
+
+Modern SaaS dashboard.
+
+Colors:
+
+Primary:
+#2563EB
+
+Background:
+#F8FAFC
+
+
+Components:
+
+
+Sidebar
+
+Navbar
+
+StatCard
+
+TypingBox
+
+VirtualKeyboard
+
+LessonCard
+
+ChartCard
+
+LeaderboardTable
+
+AchievementCard
+
+
+
+Responsive:
+
+Desktop
+Tablet
+Mobile
+
+
+
+================================================
+TYPING EXPERIENCE
+================================================
+
+
+Implement:
+
+- Real-time character highlighting
+- Keyboard event handling
+- Virtual keyboard animation
+- Error highlighting
+- Timer
+- Auto scrolling
+- Pause/resume
+- Sound feedback option
+
+
+================================================
+TESTING
+================================================
+
+
+Backend:
+
+- Unit tests
+- Integration tests
+
+
+Frontend:
+
+- Component tests
+- E2E tests
+
+
+Use:
+
+Jest
+Playwright
+
+
+================================================
+CODE QUALITY
+================================================
+
+
+Rules:
+
+- Clean architecture
+- SOLID principles
+- No duplicated code
+- Strong TypeScript typing
+- Proper error handling
+- DTO validation
+- API documentation
+- Environment variables
+
+
+================================================
+DEPLOYMENT
+================================================
+
+
+Provide:
+
+Dockerfile
+
+docker-compose.yml
+
+Nginx configuration
+
+Production environment example
+
+Database migration commands
+
+Deployment documentation
+
+
+================================================
+DELIVERY ORDER
+================================================
+
+
+Build in phases:
+
+
+Phase 1:
+Authentication + User system
+
+
+Phase 2:
+Typing engine
+
+
+Phase 3:
+Lessons
+
+
+Phase 4:
+Progress analytics
+
+
+Phase 5:
+Achievements
+
+
+Phase 6:
+Leaderboard
+
+
+Phase 7:
+Admin panel
+
+
+After each phase:
+- Explain changes
+- Provide files created
+- Provide testing instructions
