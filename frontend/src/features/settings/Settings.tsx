@@ -113,14 +113,14 @@ export default function Settings() {
 
         <fieldset className="mt-5">
           <legend className="mb-2 flex items-center gap-2 text-sm font-medium text-[#0F172A]"><Keyboard size={15} className="text-[#64748B]" />Preferred keyboard layout</legend>
-          <div className="grid grid-cols-3 gap-2">
-            {["QWERTY", "Dvorak", "Colemak"].map((layout) => (
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {["QWERTY", "Dvorak", "Colemak", "Pa'O"].map((layout) => (
               <button key={layout} type="button" aria-pressed={draft.keyboardLayout === layout} onClick={() => setPreference("keyboardLayout", layout)} className={`rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors ${draft.keyboardLayout === layout ? "border-[#2563EB] bg-blue-50 text-[#2563EB]" : "border-[#E2E8F0] text-[#64748B] hover:bg-slate-50"}`}>
-                {layout}
+                {layout === "Pa'O" ? "Pa'O · Myanmar" : layout}
               </button>
             ))}
           </div>
-          <p className="mt-2 text-xs text-[#94A3B8]">The Practice on-screen keyboard follows your selected layout.</p>
+          <p className="mt-2 text-xs text-[#94A3B8]">The Practice keyboard follows your selected layout. Pa'O displays both Latin key positions and Myanmar/Pa'O characters.</p>
         </fieldset>
       </section>
 
