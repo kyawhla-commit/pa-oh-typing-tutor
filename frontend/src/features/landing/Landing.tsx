@@ -1,4 +1,5 @@
 import ThemeToggle from '../../components/ThemeToggle'
+import VirtualKeyboard from '../../components/VirtualKeyboard'
 import { useNavigate } from 'react-router-dom'
 import { Keyboard, Play, CheckCircle, BarChart3, Trophy, Zap, Users, Target } from 'lucide-react'
 
@@ -125,26 +126,8 @@ export default function Landing() {
                 </div>
               ))}
             </div>
-            {/* Mini keyboard */}
-            <div className="space-y-1.5">
-              {[
-                ['Q','W','E','R','T','Y','U','I','O','P'],
-                ['A','S','D','F','G','H','J','K','L'],
-                ['Z','X','C','V','B','N','M'],
-              ].map((row, i) => (
-                <div key={i} className="flex justify-center gap-1">
-                  {row.map(k => (
-                    <div
-                      key={k}
-                      className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-medium border transition-colors ${
-                        k === 'J' ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-white text-[#64748B] border-[#E2E8F0]'
-                      }`}
-                    >
-                      {k}
-                    </div>
-                  ))}
-                </div>
-              ))}
+            <div className="mt-5 px-3 py-3 sm:px-4 sm:py-4">
+              <VirtualKeyboard layout="Pa'O" />
             </div>
           </div>
           <div className="absolute -top-4 -right-4 w-20 h-20 bg-blue-50 rounded-2xl -z-10" />

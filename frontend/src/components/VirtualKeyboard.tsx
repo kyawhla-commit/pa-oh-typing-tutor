@@ -108,8 +108,8 @@ const wideKeyLabels: Record<string, string> = {
 };
 
 const keyboardSizing = {
-  "--keyboard-key-gap": "clamp(2px, 0.55cqw, 6px)",
-  "--keyboard-key-size": "clamp(16px, calc((100cqw - 78px) / 14.3), 56px)",
+  "--keyboard-key-gap": "clamp(1px, 0.55cqw, 6px)",
+  "--keyboard-key-size": "clamp(12px, calc((100cqw - 18px) / 14.3), 56px)",
 } as CSSProperties;
 
 interface VirtualKeyboardProps {
