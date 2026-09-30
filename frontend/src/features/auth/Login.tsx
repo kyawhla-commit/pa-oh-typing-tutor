@@ -1,3 +1,4 @@
+import ThemeToggle from '../../components/ThemeToggle';
 import { ArrowLeft, ArrowRight, BookOpen, Check, HardDrive, UserRound } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLearningData } from '../../data/LearningContext';
@@ -35,6 +36,7 @@ export default function Login() {
 
         <section className="flex items-center p-6 sm:p-10 lg:p-12">
           <div className="mx-auto w-full max-w-md">
+            <div className="mb-6 flex justify-end"><ThemeToggle /></div>
             <p className="text-sm font-semibold text-blue-700">Your learning space</p>
             <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">Continue learning</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">This app uses a local learner profile. There is no online account or password sign-in.</p>

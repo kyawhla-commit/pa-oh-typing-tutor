@@ -1,3 +1,4 @@
+import ThemeToggle from '../../components/ThemeToggle'
 import { useNavigate } from 'react-router-dom'
 import { Keyboard, Play, CheckCircle, BarChart3, Trophy, Zap, Users, Target } from 'lucide-react'
 
@@ -40,8 +41,8 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-white font-[Inter,sans-serif]">
       {/* Navbar */}
-      <nav className="border-b border-[#E2E8F0] px-6 h-16 flex items-center">
-        <div className="max-w-6xl mx-auto w-full flex items-center justify-between">
+      <nav className="border-b border-[#E2E8F0] px-4 sm:px-6 min-h-16 py-3 flex items-center">
+        <div className="max-w-6xl mx-auto w-full flex flex-wrap gap-3 items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-[#2563EB] flex items-center justify-center">
               <Keyboard size={16} className="text-white" />
@@ -49,6 +50,7 @@ export default function Landing() {
             <span className="font-bold text-lg text-[#0F172A] tracking-tight">Typing Tutor</span>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <button
               onClick={() => navigate('/login')}
               className="text-sm text-[#64748B] hover:text-[#0F172A] font-medium transition-colors"

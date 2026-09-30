@@ -1,3 +1,4 @@
+import ThemeToggle from '../../components/ThemeToggle';
 import { ArrowLeft, ArrowRight, HardDrive, Info, UserRound } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -34,6 +35,7 @@ export default function Register() {
 
         <section className="flex items-center p-6 sm:p-10 lg:p-12">
           <div className="mx-auto w-full max-w-md">
+            <div className="mb-6 flex justify-end"><ThemeToggle /></div>
             <p className="text-sm font-semibold text-blue-700">{learner ? 'Profile settings' : 'Get started'}</p>
             <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">{learner ? 'Update your profile' : 'Create your profile'}</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">Set a display name for your local learning workspace.</p>

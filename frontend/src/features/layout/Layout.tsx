@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useLearningData } from '../../data/LearningContext'
+import ThemeToggle from '../../components/ThemeToggle'
 import {
   LayoutDashboard, Keyboard, FileText, TrendingUp,
   Trophy, Users, Settings, Menu, X, ChevronRight,
@@ -118,12 +119,13 @@ export default function Layout({ children }: { children: ReactNode }) {
             <p className="text-sm font-semibold text-[#0F172A]">{pageTitle}</p>
           </div>
 
-          <div className="ml-auto flex items-center gap-3">
-            <div className="flex items-center gap-1.5 bg-amber-50 text-amber-700 rounded-xl px-3 py-1.5 text-sm font-medium">
+          <div className="ml-auto flex items-center gap-2 sm:gap-3">
+            <ThemeToggle />
+            <div className="hidden md:flex items-center gap-1.5 bg-amber-50 text-amber-700 rounded-xl px-3 py-1.5 text-sm font-medium">
               <span>🔥</span>
               <span>{practicedDays ? `${practicedDays} active days` : 'Start your streak'}</span>
             </div>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#2563EB] to-[#60A5FA] flex items-center justify-center text-white text-sm font-semibold">
+            <div className="hidden sm:flex w-8 h-8 rounded-full bg-gradient-to-br from-[#2563EB] to-[#60A5FA] items-center justify-center text-white text-sm font-semibold">
               {initials}
             </div>
             <button onClick={() => { signOut(); navigate('/login') }} className="flex items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A]" aria-label="Sign out">

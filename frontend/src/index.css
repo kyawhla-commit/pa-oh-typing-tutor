@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&family=Noto+Sans+Myanmar:wght@400;500;700&display=swap');
 @import "tailwindcss";
+@import "./theme.css";
 @source not "../versions";
 
 @theme inline {
@@ -51,21 +52,6 @@ body { margin: 0; min-width: 320px; min-height: 100vh; background: var(--backgro
 .font-display { font-family: 'Outfit', 'Inter', sans-serif; }
 .font-mono { font-family: 'JetBrains Mono', monospace; }
 .font-myanmar { font-family: 'Noto Sans Myanmar', 'Inter', sans-serif; }
-
-.app-shell[data-theme='dark'] { color-scheme: dark; background: #0B1220; color: #E2E8F0; }
-.app-shell[data-theme='dark'] .bg-white { background-color: #142137 !important; }
-.app-shell[data-theme='dark'] [class~="bg-[#F8FAFC]"],
-.app-shell[data-theme='dark'] [class~="bg-[#F1F5F9]"],
-.app-shell[data-theme='dark'] .bg-slate-50 { background-color: #0F1B2D !important; }
-.app-shell[data-theme='dark'] [class~="text-[#0F172A]"],
-.app-shell[data-theme='dark'] [class~="text-slate-900"] { color: #E2E8F0 !important; }
-.app-shell[data-theme='dark'] [class~="text-[#64748B]"],
-.app-shell[data-theme='dark'] [class~="text-[#94A3B8]"],
-.app-shell[data-theme='dark'] [class~="text-slate-500"],
-.app-shell[data-theme='dark'] [class~="text-slate-700"] { color: #A9B8CD !important; }
-.app-shell[data-theme='dark'] [class~="border-[#E2E8F0]"],
-.app-shell[data-theme='dark'] [class~="border-slate-200"] { border-color: #293A53 !important; }
-.app-shell[data-theme='dark'] [class~="bg-[#F1F5F9]"] { color: #A9B8CD; }
 
 .page-transition { animation: fadeIn .2s ease-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }

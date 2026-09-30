@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AlertTriangle, BookOpen, Check, Keyboard, Moon, RotateCcw, SlidersHorizontal, Trash2, UserRound, Volume2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLearningData, type Preferences } from "../../data/LearningContext";
+import ThemeToggle from '../../components/ThemeToggle';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ export default function Settings() {
   const [notice, setNotice] = useState("");
   const [dangerAction, setDangerAction] = useState<"reset-progress" | "delete-account" | null>(null);
 
-  const changed = (Object.keys(preferences) as (keyof Preferences)[]).some((key) => draft[key] !== preferences[key]);
+  const changed = (Object.keys(preferences) as (keyof Preferences)[]).some((key) => key !== 'darkMode' && draft[key] !== preferences[key]);
   const setPreference = <K extends keyof Preferences>(key: K, value: Preferences[K]) => {
     setDraft((current) => ({ ...current, [key]: value }));
     setSaved(false);
@@ -20,7 +21,7 @@ export default function Settings() {
 
   const save = () => {
     if (!changed) return;
-    updatePreferences(draft);
+    updatePreferences({ ...draft, darkMode: preferences.darkMode });
     setSaved(true);
     window.setTimeout(() => setSaved(false), 2500);
   };
@@ -107,7 +108,10 @@ export default function Settings() {
       <section className="rounded-2xl border border-[#E2E8F0] bg-white p-5 sm:p-6">
         <div className="mb-4 flex items-center gap-2 text-[#2563EB]"><SlidersHorizontal size={17} /><h2 className="text-sm font-semibold text-[#0F172A]">App preferences</h2></div>
         <div className="divide-y divide-[#F1F5F9]">
-          <Toggle icon={Moon} label="Dark mode" description="Use a darker theme for your learning workspace." value={draft.darkMode} onChange={(value) => setPreference("darkMode", value)} />
+          <div className="flex flex-wrap items-center justify-between gap-4 py-4">
+            <div><p className="text-sm font-medium text-[#0F172A]">Appearance</p><p className="mt-1 text-xs text-[#64748B]">{preferences.darkMode ? 'Dark' : 'Light'} mode · saved automatically</p></div>
+            <ThemeToggle large />
+          </div>
           <Toggle icon={Volume2} label="Sound feedback" description="Save whether you want sound feedback in future typing sessions." value={draft.sounds} onChange={(value) => setPreference("sounds", value)} />
         </div>
 

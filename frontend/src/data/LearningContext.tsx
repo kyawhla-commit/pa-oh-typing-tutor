@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useState } from "react";
 
 export interface Learner {
   name: string;
@@ -82,6 +82,11 @@ const LearningContext = createContext<LearningContextValue | null>(null);
 
 export function LearningProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<LearningData>(loadData);
+
+  useLayoutEffect(() => {
+    document.documentElement.dataset.theme = data.preferences.darkMode ? 'dark' : 'light';
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', data.preferences.darkMode ? '#0b1220' : '#f8fafc');
+  }, [data.preferences.darkMode]);
 
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));

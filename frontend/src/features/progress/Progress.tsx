@@ -217,7 +217,7 @@ export default function Progress() {
   ];
 
   const heatColor = (minutes: number) => {
-    if (!minutes) return "#F1F5F9";
+    if (!minutes) return "var(--muted)";
     if (minutes < 5) return "#DBEAFE";
     if (minutes < 15) return "#93C5FD";
     if (minutes < 30) return "#4F83F1";
@@ -254,7 +254,7 @@ export default function Progress() {
     </section>
 
     <section className="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-sm shadow-slate-900/[0.02] sm:p-5">
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3"><div><h2 className="font-semibold text-[#0F172A]">Practice consistency</h2><p className="mt-1 text-xs text-[#64748B]">Daily typing activity for the current and previous two months</p></div><div className="flex items-center gap-1.5 text-[10px] text-[#64748B]"><span>Less</span>{[0, 1, 2, 3, 4].map((level) => <span key={level} className="h-3 w-3 rounded-[3px]" style={{ backgroundColor: ["#F1F5F9", "#DBEAFE", "#93C5FD", "#4F83F1", "#1D4ED8"][level] }} />)}<span>More</span></div></div>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3"><div><h2 className="font-semibold text-[#0F172A]">Practice consistency</h2><p className="mt-1 text-xs text-[#64748B]">Daily typing activity for the current and previous two months</p></div><div className="flex items-center gap-1.5 text-[10px] text-[#64748B]"><span>Less</span>{[0, 1, 2, 3, 4].map((level) => <span key={level} className="h-3 w-3 rounded-[3px]" style={{ backgroundColor: ["var(--muted)", "#DBEAFE", "#93C5FD", "#4F83F1", "#1D4ED8"][level] }} />)}<span>More</span></div></div>
       <div className="overflow-x-auto pb-1"><div className="w-fit min-w-full"><div className="mb-1 grid gap-1" style={{ gridTemplateColumns: `24px repeat(${heatmapWeeks.length}, 14px)` }}><span />{heatmapWeeks.map((week, weekIndex) => { const monthStart = week.find((cell) => cell?.date.getDate() === 1); const firstWeek = weekIndex === 0; const monthDate = monthStart?.date ?? (firstWeek ? week.find((cell) => cell !== null)?.date : undefined); return <span key={weekIndex} className="h-4 whitespace-nowrap text-[10px] text-[#94A3B8]">{monthDate ? monthDate.toLocaleDateString(undefined, { month: "short" }) : ""}</span>; })}</div>
         <div className="flex gap-1"><div className="grid w-6 shrink-0 grid-rows-7 gap-1">{["Mon", "", "Wed", "", "Fri", "", "Sun"].map((weekday, row) => <span key={row} className="flex h-3.5 items-center text-[9px] text-[#94A3B8]">{weekday}</span>)}</div>{heatmapWeeks.map((week, weekIndex) => <div key={weekIndex} className="grid w-[14px] shrink-0 grid-rows-7 gap-1">{week.map((cell, dayIndex) => cell ? <div key={cell.key} role="img" title={`${cell.date.toLocaleDateString()}: ${cell.sessions ? `${cell.sessions} ${cell.sessions === 1 ? "session" : "sessions"}, ${formatDuration(cell.minutes * 60)}` : "No practice"}`} aria-label={`${cell.date.toLocaleDateString()}, ${cell.sessions ? `${cell.sessions} ${cell.sessions === 1 ? "session" : "sessions"}` : "no practice"}`} className="h-3.5 w-3.5 rounded-[3px] outline-offset-1 transition-transform hover:scale-110" style={{ backgroundColor: heatColor(cell.minutes) }} /> : <span key={`future-${weekIndex}-${dayIndex}`} className="h-3.5 w-3.5" aria-hidden="true" />)}</div>)}</div></div></div>
       <p className="mt-3 text-xs text-[#64748B]">{new Set(results.map((result) => dateKey(new Date(result.createdAt)))).size} total active days · {longestStreak} day longest streak</p>
