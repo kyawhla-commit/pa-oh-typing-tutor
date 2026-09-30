@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowRight, BookOpen, Check, CheckCircle2, ChevronRight, Clock3,
   Code2, Keyboard, LockKeyhole, Play, Search, Sparkles, Target, X, Zap,
 } from "lucide-react";
 import { useLearningData } from "../../data/LearningContext";
-import { getLessonCatalog, subscribeToLessonCatalog, type LessonCategory, type LessonRecord } from "./lessonCatalog";
+import { useLessonCatalog } from "./LessonCatalogContext";
+import type { LessonCategory, LessonRecord } from "./lessonCatalog";
 
 type LessonProgress = LessonRecord & { completed: boolean; unlocked: boolean; previousTitle?: string };
 type CategoryFilter = "All" | LessonCategory;
@@ -55,11 +56,9 @@ function LessonCard({ lesson, index, isNext, onStart }: {
 export default function Lessons() {
   const navigate = useNavigate();
   const { completedLessons } = useLearningData();
-  const [catalog, setCatalog] = useState(getLessonCatalog);
+  const { catalog, catalogStatus, catalogError } = useLessonCatalog();
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>("All");
   const [search, setSearch] = useState("");
-
-  useEffect(() => subscribeToLessonCatalog(() => setCatalog(getLessonCatalog())), []);
 
   const lessons = useMemo(() => getLessonState(catalog, completedLessons), [catalog, completedLessons]);
   const nextLesson = lessons.find((lesson) => !lesson.completed && lesson.unlocked);
@@ -89,6 +88,7 @@ export default function Lessons() {
     {filtered.length ? <section className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3" aria-label={`${activeCategory} lessons`}>{filtered.map((lesson) => <LessonCard key={lesson.id} lesson={lesson} index={lessons.findIndex((item) => item.id === lesson.id)} isNext={lesson.id === nextLesson?.id} onStart={() => navigate(`/practice?lesson=${lesson.id}`)} />)}</section>
       : <section className="rounded-2xl border border-dashed border-[#CBD5E1] bg-white px-6 py-14 text-center"><span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-slate-100 text-slate-500"><BookOpen size={22} /></span><h2 className="mt-4 font-semibold text-[#0F172A]">{lessons.length ? "No lessons match this view" : "No published lessons yet"}</h2><p className="mx-auto mt-1 max-w-md text-sm text-[#64748B]">{lessons.length ? "Try another category or clear your search to see more lessons." : "Published learning content will appear here. You can still practice freely while you wait."}</p>{search && <button onClick={() => { setSearch(""); setActiveCategory("All"); }} className="mt-4 text-sm font-semibold text-blue-600 hover:text-blue-800">Clear filters</button>}{!lessons.length && <button onClick={() => navigate("/practice")} className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-800">Open free practice <ChevronRight size={15} /></button>}</section>}
 
-    <footer className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between"><span className="inline-flex items-center gap-1.5"><CheckCircle2 size={14} className="text-emerald-600" />Your lesson progress is saved on this device.</span><button onClick={() => navigate("/progress")} className="inline-flex items-center gap-1 self-start font-semibold text-blue-600 hover:text-blue-800 sm:self-auto">View your progress <ArrowRight size={13} /></button></footer>
+    {catalogError && <p role="status" className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">Could not refresh the shared lesson catalog. Showing the available cached lessons.</p>}
+    <footer className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between"><span className="inline-flex items-center gap-1.5"><CheckCircle2 size={14} className="text-emerald-600" />{catalogStatus === "synced" ? "Lessons are shared through Supabase; your completion progress syncs with your account." : "Your lesson progress is saved on this device."}</span><button onClick={() => navigate("/progress")} className="inline-flex items-center gap-1 self-start font-semibold text-blue-600 hover:text-blue-800 sm:self-auto">View your progress <ArrowRight size={13} /></button></footer>
   </div>;
 }

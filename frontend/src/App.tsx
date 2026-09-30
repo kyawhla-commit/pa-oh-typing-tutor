@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./features/layout/Layout";
 import { LearningProvider, useLearningData } from "./data/LearningContext";
+import { LessonCatalogProvider } from "./features/lessons/LessonCatalogContext";
 
 const Achievements = lazy(() => import("./features/achievements/Achievements"));
 const AdminCMS = lazy(() => import("./features/admin/AdminCMS"));
@@ -66,9 +67,11 @@ function AppRoutes() {
 export default function App() {
   return (
     <LearningProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <LessonCatalogProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </LessonCatalogProvider>
     </LearningProvider>
   );
 }

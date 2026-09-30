@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useNavigate } from "react-router-dom";
 import {
@@ -6,7 +6,8 @@ import {
   Gauge, Play, Sparkles, Target, TrendingUp, Trophy, Zap,
 } from "lucide-react";
 import { useLearningData, type PracticeResult } from "../../data/LearningContext";
-import { getLessonCatalog, subscribeToLessonCatalog, type LessonRecord } from "../lessons/lessonCatalog";
+import { useLessonCatalog } from "../lessons/LessonCatalogContext";
+import type { LessonRecord } from "../lessons/lessonCatalog";
 
 const dateKey = (date: Date) => `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 
@@ -65,11 +66,9 @@ function SummaryCard({ label, value, unit, icon: Icon, color, helper }: {
 export default function Dashboard() {
   const navigate = useNavigate();
   const { learner, results, completedLessons, preferences } = useLearningData();
-  const [catalog, setCatalog] = useState(getLessonCatalog);
+  const { catalog } = useLessonCatalog();
   const now = new Date();
   const firstName = learner?.name.trim().split(/\s+/)[0] || "Learner";
-
-  useEffect(() => subscribeToLessonCatalog(() => setCatalog(getLessonCatalog())), []);
 
   const todayResults = useMemo(() => results.filter((result) => dateKey(new Date(result.createdAt)) === dateKey(now)), [results]);
   const todayWords = todayResults.reduce((sum, result) => sum + Math.max(0, result.characters || 0) / 5, 0);

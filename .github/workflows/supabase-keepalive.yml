@@ -1,0 +1,47 @@
+name: Keep Supabase project active
+
+on:
+  schedule:
+    # Supabase recommends a few user database requests per day for Free projects.
+    - cron: '13 */8 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  keepalive:
+    name: Query published lesson catalog
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Record a small database read
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "$SUPABASE_URL" || -z "$SUPABASE_PUBLISHABLE_KEY" ]]; then
+            echo "Add SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY in repository Actions secrets." >&2
+            exit 1
+          fi
+
+          case "$SUPABASE_URL" in
+            https://*.supabase.co) ;;
+            *) echo "SUPABASE_URL must be the project's https://<project-ref>.supabase.co URL." >&2; exit 1 ;;
+          esac
+
+          SUPABASE_URL="${SUPABASE_URL%/}"
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --output /dev/null \
+            --write-out 'Supabase lesson query returned HTTP %{http_code}\n' \
+            --max-time 30 \
+            --retry 3 \
+            --retry-all-errors \
+            --retry-delay 10 \
+            --header "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+            --header 'Accept: application/json' \
+            "$SUPABASE_URL/rest/v1/lesson_catalog?select=id&status=eq.Published&limit=1"
