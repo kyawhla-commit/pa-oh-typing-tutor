@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { AlertCircle, ArrowRight, Award, BookOpen, CheckCircle2, Info, Keyboard, LoaderCircle, Search, Target, Trophy, Users, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLearningData } from "../../data/LearningContext";
+import { filterSessionsInRange, summarizeSessions } from "../../data/sessionAnalytics";
 import { supabase } from "../../lib/supabase";
 
 type RankBy = "speed" | "accuracy";
@@ -135,18 +136,12 @@ export default function Leaderboard() {
 
   const periodTests = useMemo(() => {
     const start = periodStart(timeRange);
-    const now = Date.now();
-    return results.filter((result) => {
-      if (result.mode !== "test") return false;
-      const createdAt = new Date(result.createdAt).getTime();
-      return Number.isFinite(createdAt) && (!start || (createdAt >= start.getTime() && createdAt <= now));
-    });
+    return filterSessionsInRange(results, start).filter((result) => result.mode === "test");
   }, [results, timeRange]);
 
-  const bestWpm = Math.max(0, ...periodTests.map((result) => result.wpm));
-  const averageAccuracy = periodTests.length
-    ? periodTests.reduce((sum, result) => sum + result.accuracy, 0) / periodTests.length
-    : null;
+  const testSummary = summarizeSessions(periodTests);
+  const bestWpm = testSummary.bestWpm;
+  const averageAccuracy = testSummary.averageAccuracy;
   const entries = board.status === "unconfigured" ? [] : board.entries;
   const filteredEntries = entries.filter((entry) => entry.display_name.toLowerCase().includes(query.trim().toLowerCase()));
   const podiumEntries = [

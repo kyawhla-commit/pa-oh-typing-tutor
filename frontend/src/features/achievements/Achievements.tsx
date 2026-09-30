@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useLearningData, type PracticeResult } from "../../data/LearningContext";
+import { getLongestPracticeStreak, localDateKey, summarizeSessions } from "../../data/sessionAnalytics";
 
 type Rarity = "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary";
 type Milestone = {
@@ -35,23 +36,19 @@ function dateOnly(date: Date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
-function dayNumber(date: Date) {
-  return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
-}
-
 function firstStreakDate(results: PracticeResult[], target: number) {
   const uniqueDates = new Map<string, Date>();
   results.forEach((result) => {
     const date = dateOnly(new Date(result.createdAt));
-    const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-    uniqueDates.set(key, date);
+    const key = localDateKey(date);
+    if (key) uniqueDates.set(key, date);
   });
   const dates = [...uniqueDates.values()].sort((a, b) => a.getTime() - b.getTime());
 
   let streak = 0;
   let previous: Date | undefined;
   for (const date of dates) {
-    const consecutive = previous !== undefined && dayNumber(date) - dayNumber(previous) === 24 * 60 * 60 * 1000;
+    const consecutive = previous !== undefined && (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(previous.getFullYear(), previous.getMonth(), previous.getDate())) === 86_400_000;
     streak = consecutive ? streak + 1 : 1;
     if (streak >= target) return date.toISOString();
     previous = date;
@@ -72,24 +69,10 @@ export default function Achievements() {
   const { results, completedLessons } = useLearningData();
   const sortedResults = useMemo(() => [...results].sort((a, b) => a.createdAt.localeCompare(b.createdAt)), [results]);
   const tests = results.filter((result) => result.mode === "test");
-  const bestWpm = Math.max(0, ...results.map((result) => result.wpm));
-  const totalWords = results.reduce((sum, result) => sum + result.characters / 5, 0);
-  const longestStreak = useMemo(() => {
-    let longest = 0;
-    let current = 0;
-    let previous: Date | undefined;
-    const dates = new Map<string, Date>();
-    results.forEach((result) => {
-      const date = dateOnly(new Date(result.createdAt));
-      dates.set(`${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`, date);
-    });
-    for (const date of [...dates.values()].sort((a, b) => a.getTime() - b.getTime())) {
-      current = previous && dayNumber(date) - dayNumber(previous) === 24 * 60 * 60 * 1000 ? current + 1 : 1;
-      longest = Math.max(longest, current);
-      previous = date;
-    }
-    return longest;
-  }, [results]);
+  const lifetimeSummary = summarizeSessions(results);
+  const bestWpm = lifetimeSummary.bestWpm;
+  const totalWords = lifetimeSummary.words;
+  const longestStreak = useMemo(() => getLongestPracticeStreak(results), [results]);
 
   const nightSessions = results.filter((result) => new Date(result.createdAt).getHours() < 5).length;
   const earlySessions = results.filter((result) => {
@@ -119,8 +102,8 @@ export default function Achievements() {
     { id: "speed-100", icon: "💯", title: "Century Club", description: "Break the 100 WPM barrier", rarity: "Epic", progress: bestWpm, target: 100, progressUnit: "WPM", earnedAt: firstHundredWpm },
     { id: "words-1000", icon: "📝", title: "Word Warrior", description: "Type 1,000 words in saved sessions", rarity: "Common", progress: totalWords, target: 1000, progressUnit: "words", earnedAt: firstWordWarrior },
     { id: "words-10000", icon: "📚", title: "Wordsmith", description: "Type 10,000 words in saved sessions", rarity: "Uncommon", progress: totalWords, target: 10000, progressUnit: "words", earnedAt: firstWordsmith },
-    { id: "streak-7", icon: "🔥", title: "Week Warrior", description: "Practice on 7 consecutive days", rarity: "Uncommon", progress: longestStreak, target: 7, progressUnit: "days", earnedAt: firstWeek },
-    { id: "streak-30", icon: "💪", title: "Iron Fingers", description: "Practice on 30 consecutive days", rarity: "Epic", progress: longestStreak, target: 30, progressUnit: "days", earnedAt: firstMonth },
+    { id: "streak-7", icon: "🔥", title: "Week Warrior", description: "Complete a typing session on 7 consecutive days", rarity: "Uncommon", progress: longestStreak, target: 7, progressUnit: "days", earnedAt: firstWeek },
+    { id: "streak-30", icon: "💪", title: "Iron Fingers", description: "Complete a typing session on 30 consecutive days", rarity: "Epic", progress: longestStreak, target: 30, progressUnit: "days", earnedAt: firstMonth },
     { id: "accuracy-99", icon: "🎖️", title: "Precision Master", description: "Reach 99% accuracy in a typing test", rarity: "Rare", progress: tests.some((result) => result.accuracy >= 99) ? 1 : 0, target: 1, progressUnit: "test", earnedAt: firstPrecisionTest },
     { id: "accuracy-100", icon: "⭐", title: "Perfect Score", description: "Finish a typing test with 100% accuracy", rarity: "Legendary", progress: tests.some((result) => result.accuracy === 100) ? 1 : 0, target: 1, progressUnit: "test", earnedAt: firstPerfectTest },
     { id: "night-owl", icon: "🦉", title: "Night Owl", description: "Save 5 sessions before 5 a.m.", rarity: "Common", progress: nightSessions, target: 5, progressUnit: "sessions", earnedAt: firstNightOwl },

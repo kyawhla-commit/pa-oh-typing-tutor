@@ -37,7 +37,7 @@ function calculateResult(typed: string, target: string, elapsedSeconds: number):
 }
 
 export default function Test() {
-  const { addResult, preferences } = useLearningData();
+  const { addResult, preferences, syncStatus, syncError } = useLearningData();
   const [duration, setDuration] = useState<number>(60);
   const [difficulty, setDifficulty] = useState<Difficulty>(
     DIFFICULTIES.includes(preferences.difficulty as Difficulty) ? preferences.difficulty as Difficulty : "Medium",
@@ -168,7 +168,13 @@ export default function Test() {
               <button type="button" onClick={resetTest} className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#E2E8F0] px-5 py-3 text-sm font-semibold text-[#334155] transition hover:bg-slate-50"><RotateCcw size={16} /> Try another test</button>
               <button type="button" onClick={saveResult} disabled={saved} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563EB] px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-default disabled:bg-emerald-600">{saved ? <><Check size={16} /> Saved to your progress</> : <>Save result <ArrowRight size={16} /></>}</button>
             </div>
-            <p className="mt-3 text-center text-xs text-[#94A3B8]">Your result stays on this device unless you connect an account sync service.</p>
+            <p className="mt-3 text-center text-xs text-[#64748B]" role={syncStatus === "error" && saved ? "status" : undefined}>
+              {!saved && "Save this result to add it to your learning history."}
+              {saved && syncStatus === "synced" && "Saved to your account and synced with Supabase."}
+              {saved && syncStatus === "syncing" && "Saved to your history on this device. Syncing with Supabase…"}
+              {saved && syncStatus === "local" && "Saved to your learning history on this device."}
+              {saved && syncStatus === "error" && `Saved on this device, but account sync needs attention${syncError ? `: ${syncError}` : "."}`}
+            </p>
           </div>
         </section>
       </main>
@@ -270,7 +276,7 @@ export default function Test() {
           <div className="space-y-3 rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
             <div className="flex items-start gap-3"><span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white/15"><Check size={13} /></span><div><p className="text-xs font-semibold">Mistakes are okay</p><p className="mt-0.5 text-[11px] leading-relaxed text-blue-100">Correct them with Backspace and keep going.</p></div></div>
             <div className="flex items-start gap-3"><span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white/15"><Check size={13} /></span><div><p className="text-xs font-semibold">Your choice of pace</p><p className="mt-0.5 text-[11px] leading-relaxed text-blue-100">Cancel a run any time, or let the timer finish.</p></div></div>
-            <div className="flex items-start gap-3"><span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white/15"><Check size={13} /></span><div><p className="text-xs font-semibold">Keep your results</p><p className="mt-0.5 text-[11px] leading-relaxed text-blue-100">Save completed tests to your local progress.</p></div></div>
+            <div className="flex items-start gap-3"><span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white/15"><Check size={13} /></span><div><p className="text-xs font-semibold">Keep your results</p><p className="mt-0.5 text-[11px] leading-relaxed text-blue-100">Save completed tests to your learning history. Signed-in sessions sync across devices.</p></div></div>
           </div>
         </aside>
       </div>

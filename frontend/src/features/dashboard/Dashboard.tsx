@@ -5,29 +5,12 @@ import {
   ArrowRight, BookOpen, CalendarDays, Check, CheckCircle2, Clock3, Flame,
   Gauge, Play, Sparkles, Target, TrendingUp, Trophy, Zap,
 } from "lucide-react";
-import { useLearningData, type PracticeResult } from "../../data/LearningContext";
+import { useLearningData } from "../../data/LearningContext";
+import { getCurrentPracticeStreak, localDateKey, startOfLocalDay, summarizeSessions } from "../../data/sessionAnalytics";
 import { useLessonCatalog } from "../lessons/LessonCatalogContext";
 import type { LessonRecord } from "../lessons/lessonCatalog";
 
-const dateKey = (date: Date) => `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-
-function startOfDay(date: Date) {
-  const value = new Date(date);
-  value.setHours(0, 0, 0, 0);
-  return value;
-}
-
-function getStreak(results: PracticeResult[]) {
-  const activeDays = new Set(results.map((result) => dateKey(new Date(result.createdAt))));
-  const cursor = startOfDay(new Date());
-  if (!activeDays.has(dateKey(cursor))) cursor.setDate(cursor.getDate() - 1);
-  let streak = 0;
-  while (activeDays.has(dateKey(cursor))) {
-    streak += 1;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-  return streak;
-}
+const dateKey = localDateKey;
 
 function formatDuration(seconds: number) {
   if (seconds < 60) return `${seconds}s`;
@@ -65,18 +48,18 @@ function SummaryCard({ label, value, unit, icon: Icon, color, helper }: {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { learner, results, completedLessons, preferences } = useLearningData();
+  const { learner, results, completedLessons, preferences, syncStatus, syncError } = useLearningData();
   const { catalog } = useLessonCatalog();
   const now = new Date();
   const firstName = learner?.name.trim().split(/\s+/)[0] || "Learner";
 
-  const todayResults = useMemo(() => results.filter((result) => dateKey(new Date(result.createdAt)) === dateKey(now)), [results]);
-  const todayWords = todayResults.reduce((sum, result) => sum + Math.max(0, result.characters || 0) / 5, 0);
+  const todayResults = useMemo(() => results.filter((result) => dateKey(result.createdAt) === dateKey(now)), [results]);
+  const todayWords = summarizeSessions(todayResults).words;
   const dailyGoal = Math.max(0, preferences.dailyGoal || 0);
   const goalPercent = dailyGoal ? Math.min(100, Math.round((todayWords / dailyGoal) * 100)) : 0;
   const remainingWords = Math.max(0, Math.ceil(dailyGoal - todayWords));
-  const streak = getStreak(results);
-  const weekStart = startOfDay(now);
+  const streak = getCurrentPracticeStreak(results, now);
+  const weekStart = startOfLocalDay(now);
   weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
   const nextWeekStart = new Date(weekStart);
   nextWeekStart.setDate(nextWeekStart.getDate() + 7);
@@ -94,23 +77,25 @@ export default function Dashboard() {
   const weekData = Array.from({ length: 7 }, (_, index) => {
     const date = new Date(weekStart);
     date.setDate(weekStart.getDate() + index);
-    const sessions = weeklyResults.filter((result) => dateKey(new Date(result.createdAt)) === dateKey(date));
-    const durationSeconds = sessions.reduce((sum, result) => sum + Math.max(0, result.durationSeconds || 0), 0);
+    const sessions = weeklyResults.filter((result) => dateKey(result.createdAt) === dateKey(date));
+    const summary = summarizeSessions(sessions);
     return {
       day: date.toLocaleDateString(undefined, { weekday: "short" }),
-      speed: sessions.length ? Math.round(sessions.reduce((sum, result) => sum + result.wpm, 0) / sessions.length) : null,
-      minutes: Number((durationSeconds / 60).toFixed(1)),
+      speed: summary.averageWpm,
+      minutes: Number((summary.durationSeconds / 60).toFixed(1)),
       sessions: sessions.length,
     };
   });
 
-  const averageWpm = weeklyResults.length ? Math.round(weeklyResults.reduce((sum, result) => sum + result.wpm, 0) / weeklyResults.length) : null;
-  const averageAccuracy = weeklyResults.length ? Math.round(weeklyResults.reduce((sum, result) => sum + result.accuracy, 0) / weeklyResults.length) : null;
-  const previousAverageWpm = previousWeekResults.length ? Math.round(previousWeekResults.reduce((sum, result) => sum + result.wpm, 0) / previousWeekResults.length) : null;
+  const weeklySummary = summarizeSessions(weeklyResults);
+  const previousWeekSummary = summarizeSessions(previousWeekResults);
+  const lifetimeSummary = summarizeSessions(results);
+  const averageWpm = weeklySummary.averageWpm;
+  const averageAccuracy = weeklySummary.averageAccuracy === null ? null : Math.round(weeklySummary.averageAccuracy);
+  const previousAverageWpm = previousWeekSummary.averageWpm;
   const speedDelta = averageWpm !== null && previousAverageWpm !== null ? averageWpm - previousAverageWpm : null;
-  const totalWords = Math.round(results.reduce((sum, result) => sum + Math.max(0, result.characters || 0) / 5, 0));
-  const totalPracticeSeconds = results.reduce((sum, result) => sum + Math.max(0, result.durationSeconds || 0), 0);
-  const totalActiveDays = new Set(results.map((result) => dateKey(new Date(result.createdAt)))).size;
+  const totalWords = lifetimeSummary.words;
+  const totalPracticeSeconds = lifetimeSummary.durationSeconds;
   const latestResults = useMemo(() => [...results].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 5), [results]);
   const publishedLessons = useMemo(() => catalog.filter((lesson) => lesson.status === "Published").sort((a, b) => a.id - b.id), [catalog]);
   const learningPath = publishedLessons.slice(0, 5).map((lesson, index, list) => {
@@ -183,7 +168,15 @@ export default function Dashboard() {
       </article>
     </section>
 
-    <footer className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#E2E8F0] bg-white px-4 py-3 text-xs text-[#64748B]"><span>Based on your saved typing sessions and published lessons.</span><span className="inline-flex items-center gap-1.5"><Check size={14} className="text-emerald-600" />Your learning data is up to date</span></footer>
+    <footer className={`flex flex-wrap items-center justify-between gap-2 rounded-xl border px-4 py-3 text-xs ${syncStatus === "error" ? "border-amber-200 bg-amber-50 text-amber-900" : "border-[#E2E8F0] bg-white text-[#64748B]"}`} role="status">
+      <span>Based on your saved typing sessions and published lessons.</span>
+      <span className="inline-flex items-center gap-1.5">
+        {syncStatus === "synced" ? <><Check size={14} className="text-emerald-600" />Learning data synced</> : null}
+        {syncStatus === "syncing" ? "Syncing learning data…" : null}
+        {syncStatus === "local" ? "Saved on this device · sign in to sync across devices" : null}
+        {syncStatus === "error" ? `Saved on this device · sync issue: ${syncError || "connection unavailable"}` : null}
+      </span>
+    </footer>
   </div>;
 }
 

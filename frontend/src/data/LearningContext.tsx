@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
+import { normalizePracticeResults } from "./sessionAnalytics";
 
 export interface Learner {
   name: string;
@@ -81,7 +82,7 @@ function readStoredData(key: string, fallback: LearningData): LearningData {
       ...fallback,
       ...parsed,
       preferences: { ...defaultPreferences, ...parsed.preferences },
-      results: Array.isArray(parsed.results) ? parsed.results : [],
+      results: normalizePracticeResults(parsed.results),
       completedLessons: Array.isArray(parsed.completedLessons) ? parsed.completedLessons : [],
     };
   } catch {
@@ -105,7 +106,10 @@ function canImportGuestData(data: LearningData, user: User) {
 
 function mergeResults(...groups: PracticeResult[][]) {
   const unique = new Map<string, PracticeResult>();
-  groups.flat().forEach((result) => unique.set(result.id, result));
+  groups.flat().forEach((result) => {
+    const normalized = normalizePracticeResults([result])[0];
+    if (normalized && !unique.has(normalized.id)) unique.set(normalized.id, normalized);
+  });
   return [...unique.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
@@ -147,7 +151,7 @@ async function readCloudData(user: User): Promise<LearningData> {
       difficulty: preference.difficulty,
       keyboardLayout: preference.keyboard_layout,
     } : defaultPreferences,
-    results: sessions.map((session) => ({
+    results: normalizePracticeResults(sessions.map((session) => ({
       id: session.id,
       mode: session.mode,
       ...(session.label ? { label: session.label } : {}),
@@ -157,7 +161,7 @@ async function readCloudData(user: User): Promise<LearningData> {
       errors: session.errors,
       durationSeconds: session.duration_seconds,
       createdAt: session.created_at,
-    })),
+    }))),
     completedLessons: lessons.map((lesson) => lesson.lesson_id),
   };
 }
