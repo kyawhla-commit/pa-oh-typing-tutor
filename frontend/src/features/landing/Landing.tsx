@@ -1,7 +1,9 @@
 import ThemeToggle from '../../components/ThemeToggle'
 import VirtualKeyboard from '../../components/VirtualKeyboard'
 import { useNavigate } from 'react-router-dom'
-import { Keyboard, Play, CheckCircle, BarChart3, Trophy, Zap, Users, Target } from 'lucide-react'
+import { useState } from 'react'
+import { useLearningData } from '../../data/LearningContext'
+import { Keyboard, Play, CheckCircle, BarChart3, Trophy, Zap, Users, Target, Menu, X } from 'lucide-react'
 
 const features = [
   {
@@ -38,33 +40,70 @@ const stats = [
 
 export default function Landing() {
   const navigate = useNavigate()
+  const { learner, signIn } = useLearningData()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const startGuestPractice = () => {
+    if (!learner) signIn({ name: 'Guest learner', email: '' })
+    navigate('/practice')
+  }
 
   return (
     <div className="min-h-screen bg-white font-[Inter,sans-serif]">
       {/* Navbar */}
-      <nav className="border-b border-[#E2E8F0] px-4 sm:px-6 min-h-16 py-3 flex items-center">
-        <div className="max-w-6xl mx-auto w-full flex flex-wrap gap-3 items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#2563EB] flex items-center justify-center">
-              <Keyboard size={16} className="text-white" />
+      <nav aria-label="Main navigation" className="border-b border-[#E2E8F0] bg-white px-4 sm:px-6">
+        <div className="mx-auto max-w-6xl">
+          <div className="flex min-h-16 items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#2563EB]">
+                <Keyboard size={16} className="text-white" />
+              </div>
+              <span className="truncate text-lg font-bold tracking-tight text-[#0F172A]">Typing Tutor</span>
             </div>
-            <span className="font-bold text-lg text-[#0F172A] tracking-tight">Typing Tutor</span>
+            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+              <ThemeToggle />
+              <div className="hidden items-center gap-3 sm:flex">
+                <button
+                  onClick={() => navigate('/login')}
+                  className="text-sm font-medium text-[#64748B] transition-colors hover:text-[#0F172A]"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => navigate('/register')}
+                  className="rounded-xl bg-[#2563EB] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                >
+                  Create free account
+                </button>
+              </div>
+              <button
+                type="button"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[#E2E8F0] text-[#475569] transition-colors hover:bg-slate-50 hover:text-[#0F172A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 sm:hidden"
+                aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                aria-expanded={mobileMenuOpen}
+                aria-controls="landing-mobile-menu"
+                onClick={() => setMobileMenuOpen((open) => !open)}
+              >
+                {mobileMenuOpen ? <X size={18} aria-hidden="true" /> : <Menu size={18} aria-hidden="true" />}
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <button
-              onClick={() => navigate('/login')}
-              className="text-sm text-[#64748B] hover:text-[#0F172A] font-medium transition-colors"
-            >
-              Sign In
-            </button>
-            <button
-              onClick={() => navigate('/register')}
-              className="bg-[#2563EB] text-white text-sm font-medium px-4 py-2 rounded-xl hover:bg-blue-700 transition-colors"
-            >
-              Get Started
-            </button>
-          </div>
+          {mobileMenuOpen && (
+            <div id="landing-mobile-menu" className="grid grid-cols-2 gap-2 border-t border-[#E2E8F0] py-3 sm:hidden">
+              <button
+                onClick={() => { setMobileMenuOpen(false); navigate('/login') }}
+                className="rounded-xl border border-[#E2E8F0] px-3 py-2.5 text-sm font-semibold text-[#334155] transition-colors hover:bg-slate-50"
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => { setMobileMenuOpen(false); navigate('/register') }}
+                className="rounded-xl bg-[#2563EB] px-3 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+              >
+                Create free account
+              </button>
+            </div>
+          )}
         </div>
       </nav>
 
@@ -83,16 +122,16 @@ export default function Landing() {
           <p className="text-lg text-[#64748B] leading-relaxed mb-8 max-w-md">
             Master touch typing through interactive lessons, practice sessions, and real-time feedback tailored to your pace.
           </p>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <button
               onClick={() => navigate('/register')}
-              className="bg-[#2563EB] text-white font-semibold px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors text-sm shadow-sm"
+              className="w-full rounded-xl bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 sm:w-auto"
             >
-              Start Learning
+              Create free account
             </button>
-              <button onClick={() => navigate('/login')} className="flex items-center gap-2 border border-[#E2E8F0] text-[#0F172A] font-medium px-6 py-3 rounded-xl hover:bg-[#F8FAFC] transition-colors text-sm">
+              <button onClick={startGuestPractice} className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#E2E8F0] px-6 py-3 text-sm font-medium text-[#0F172A] transition-colors hover:bg-[#F8FAFC] sm:w-auto">
               <Play size={15} className="fill-current" />
-              Try the demo
+              Practice as guest
             </button>
           </div>
           <div className="flex items-center gap-4 mt-8 text-sm text-[#64748B]">
@@ -173,10 +212,10 @@ export default function Landing() {
           <h2 className="text-4xl font-bold text-[#0F172A] mb-4">Ready to type faster?</h2>
           <p className="text-[#64748B] mb-8">Create a local learner profile and start building speed one practice session at a time.</p>
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/register')}
             className="bg-[#2563EB] text-white font-semibold px-8 py-3.5 rounded-xl hover:bg-blue-700 transition-colors text-sm shadow-sm"
           >
-            Start for Free
+            Create free account
           </button>
         </div>
       </section>

@@ -5,9 +5,11 @@ import { LearningProvider, useLearningData } from "./data/LearningContext";
 
 const Achievements = lazy(() => import("./features/achievements/Achievements"));
 const AdminCMS = lazy(() => import("./features/admin/AdminCMS"));
+const AuthCallback = lazy(() => import("./features/auth/AuthCallback"));
 const Profile = lazy(() => import("./features/account/Profile"));
 const Login = lazy(() => import("./features/auth/Login"));
 const Register = lazy(() => import("./features/auth/Register"));
+const ResetPassword = lazy(() => import("./features/auth/ResetPassword"));
 const Dashboard = lazy(() => import("./features/dashboard/Dashboard"));
 const Landing = lazy(() => import("./features/landing/Landing"));
 const Leaderboard = lazy(() => import("./features/leaderboard/Leaderboard"));
@@ -53,6 +55,8 @@ function AppRoutes() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/auth/reset-password" element={<ResetPassword />} />
         <Route path="/*" element={<ProtectedApp />} />
       </Routes>
     </Suspense>
