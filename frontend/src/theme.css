@@ -64,6 +64,11 @@
 /* Compatibility palette for the existing utility-based page designs.
    Keep saturated action backgrounds and white text on them unchanged. */
 :root[data-theme='dark'] :is(.bg-white, [class~='bg-white/95'], [class~='bg-white/90'], [class~='bg-white/80']) { background-color: var(--card); }
+:root[data-theme='dark'] [class~='bg-white/70'] { background-color: #101b30; }
+:root[data-theme='dark'] :is([class~='bg-blue-50/70'], [class~='bg-slate-50/70']) { background-color: #142541; }
+:root[data-theme='dark'] [class~='bg-blue-50/80'] { background-color: #1a3154; }
+:root[data-theme='dark'] [class~='hover:bg-slate-50/70']:hover { background-color: #1a2a43; }
+:root[data-theme='dark'] .leaderboard-podium { border-color: #69522d; background: linear-gradient(135deg, #28251f, #172238 55%, #1b3151); }
 :root[data-theme='dark'] :is(.bg-slate-50, [class~='bg-[#F8FAFC]'], [class~='bg-[#F5F8FF]'], [class~='bg-[#F8FAFC]/95']) { background-color: var(--background); }
 :root[data-theme='dark'] :is(.bg-slate-100, .bg-slate-200, [class~='bg-[#F1F5F9]'], [class~='bg-[#E2E8F0]'], [class~='bg-[#CBD5E1]']) { background-color: var(--muted); }
 :root[data-theme='dark'] :is(.text-slate-950, .text-slate-900, .text-slate-800, [class~='text-[#0F172A]'], [class~='text-[#334155]']) { color: var(--foreground); }

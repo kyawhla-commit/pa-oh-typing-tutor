@@ -130,7 +130,7 @@ export default function Leaderboard() {
         </section>
       )}
 
-      <section className="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-blue-50 p-4 sm:p-6">
+      <section className="leaderboard-podium rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-blue-50 p-4 sm:p-6">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Award size={18} className="text-amber-500" />
