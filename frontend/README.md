@@ -26,6 +26,7 @@ Before enabling synced learning data, apply the migrations in order through the 
 
 1. [`202609300001_learning_data.sql`](supabase/migrations/202609300001_learning_data.sql) creates the profile, preferences, practice-session, and completed-lesson tables. Row-level security restricts each learner to rows whose `user_id` matches their Supabase user ID.
 2. [`202609300002_shared_lesson_catalog.sql`](supabase/migrations/202609300002_shared_lesson_catalog.sql) creates the shared lesson catalog, seeds the original lessons, and adds reader/admin policies. Learners can read published lessons; only users with the server-managed `app_metadata.role = admin` claim can manage drafts and publish content. The migration also links completion records to stable lesson IDs and prevents deleting lessons with completion history.
+3. [`202609300003_opt_in_leaderboard.sql`](supabase/migrations/202609300003_opt_in_leaderboard.sql) creates private learner-controlled leaderboard profiles and a public RPC that returns only opt-in display names and aggregate typing-test scores. It never exposes emails, auth user IDs, or individual session records.
 
 Provision administrator claims only through a trusted server-side Supabase Admin API workflow. Never set the admin role from browser-editable `user_metadata`, and never expose a service-role key in the frontend. The browser uses only the publishable key.
 
@@ -48,7 +49,7 @@ Never use the service-role key for this workflow. Commit and push the workflow t
 - Dashboard and Supabase-synced practice history
 - Four practice modes and timed typing tests
 - Supabase-backed lesson catalog with sequential lessons that unlock after completion
-- Progress charts, achievement rules, and a sample community leaderboard
+- Progress charts, achievement rules, and an opt-in Supabase-backed community leaderboard
 - Learner profile, shared preferences, dark mode, and the admin CMS screen
 
 Admin permissions remain demo-only. Do not use the current admin screen for real authorization until server-side roles and row-level security policies are configured. Supabase project configuration and migration application are required before cloud sync can be verified against a live project.
