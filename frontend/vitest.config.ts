@@ -4,6 +4,7 @@ export default defineConfig({
   test: {
     environment: "node",
     include: [
+      "src/components/**/*.test.{ts,tsx}",
       "src/features/auth/**/*.test.{ts,tsx}",
       "src/engine/typing/**/*.test.ts",
       "src/features/typing/**/*.test.{ts,tsx}",

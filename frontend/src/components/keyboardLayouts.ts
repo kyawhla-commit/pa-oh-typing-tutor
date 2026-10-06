@@ -2,6 +2,22 @@
 // on 2026-10-07. These are direct key outputs, not an IME reorder model.
 export interface KeyHint { readonly code: string; readonly label: string; readonly shift: boolean; readonly text: string }
 
+// Direct outputs for the US QWERTY keyboard drawn by VirtualKeyboard.
+export const qwertyKeyLegends: Record<string, { shifted: string; unshifted: string }> = {
+  ...Object.fromEntries(Array.from("abcdefghijklmnopqrstuvwxyz", letter => [
+    `Key${letter.toUpperCase()}`, { unshifted: letter, shifted: letter.toUpperCase() },
+  ])),
+  ...Object.fromEntries(Array.from("1234567890", (digit, index) => [
+    `Digit${digit}`, { unshifted: digit, shifted: "!@#$%^&*()"[index] },
+  ])),
+  Backquote: { unshifted: "`", shifted: "~" },
+  Minus: { unshifted: "-", shifted: "_" }, Equal: { unshifted: "=", shifted: "+" },
+  BracketLeft: { unshifted: "[", shifted: "{" }, BracketRight: { unshifted: "]", shifted: "}" },
+  Backslash: { unshifted: "\\", shifted: "|" }, Semicolon: { unshifted: ";", shifted: ":" },
+  Quote: { unshifted: "'", shifted: '"' }, Comma: { unshifted: ",", shifted: "<" },
+  Period: { unshifted: ".", shifted: ">" }, Slash: { unshifted: "/", shifted: "?" },
+};
+
 export const paoKeyLegends: Record<string, { shifted: string; unshifted: string }> = {
   Backquote: { shifted: "ဎ", unshifted: "ၐ" },
   Digit1: { shifted: "ဍ", unshifted: "၁" },
@@ -51,4 +67,3 @@ export const paoKeyLegends: Record<string, { shifted: string; unshifted: string 
   Period: { shifted: "။", unshifted: "ႏ" },
   Slash: { shifted: "?", unshifted: "/" },
 };
-

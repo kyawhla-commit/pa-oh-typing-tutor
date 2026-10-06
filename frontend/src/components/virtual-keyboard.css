@@ -1,0 +1,7 @@
+.virtual-keyboard { container: keyboard / inline-size; min-width: 0; width: 100%; }
+.keyboard-scroll-hint { display: none; }
+.keyboard-viewport { width: 100%; overflow-x: auto; overscroll-behavior-x: contain; padding: 4px; }
+.keyboard-layout { width: 100%; min-width: 600px; container-type: inline-size; }
+@container keyboard (max-width: 607px) {
+  .keyboard-scroll-hint { display: block; margin-bottom: .5rem; font-size: .75rem; line-height: 1.5; }
+}

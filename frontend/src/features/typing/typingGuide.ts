@@ -1,4 +1,4 @@
-import { paoKeyLegends, type KeyHint } from "../../components/keyboardLayouts";
+import { paoKeyLegends, qwertyKeyLegends, type KeyHint } from "../../components/keyboardLayouts";
 import type { SessionSnapshot } from "../../engine/typing";
 
 export const hasMyanmarText = (text: string) => /\p{Script=Myanmar}/u.test(text);
@@ -18,14 +18,16 @@ function keyLabel(code: string) {
   return ({ Backquote: "`", Minus: "-", Equal: "=", BracketLeft: "[", BracketRight: "]", Backslash: "\\", Semicolon: ";", Quote: "'", Comma: ",", Period: ".", Slash: "/" } as Record<string, string>)[code] ?? code;
 }
 
-const paoOutputs: KeyHint[] = Object.entries(paoKeyLegends).flatMap(([code, legends]) => [
+const outputsFor = (legendsByCode: typeof paoKeyLegends): KeyHint[] => Object.entries(legendsByCode).flatMap(([code, legends]) => [
   { code, label: keyLabel(code), shift: false, text: legends.unshifted },
   { code, label: keyLabel(code), shift: true, text: legends.shifted },
 ]).sort((a, b) => b.text.length - a.text.length);
+const directOutputs = { "Pa'O": outputsFor(paoKeyLegends), QWERTY: outputsFor(qwertyKeyLegends) };
 
-/** Only direct outputs of the checked PaOh layout; unknown layouts/text get no guessed hints. */
+/** Direct outputs of the displayed PaOh/US QWERTY layouts; never guess an IME sequence. */
 export function keysForText(text: string, layout: string): readonly KeyHint[] | null {
-  if (layout !== "Pa'O") return null;
+  if (layout !== "Pa'O" && layout !== "QWERTY") return null;
+  const outputs = directOutputs[layout];
   const keys: KeyHint[] = [];
   let remaining = text.normalize("NFC");
   while (remaining) {
@@ -33,7 +35,7 @@ export function keysForText(text: string, layout: string): readonly KeyHint[] | 
     const special = remaining[0];
     const code = special === " " ? "Space" : special === "\n" ? "Enter" : null;
     const key = code ? { code, label: code, shift: false, text: special }
-      : paoOutputs.find((candidate) => remaining.startsWith(candidate.text));
+      : outputs.find((candidate) => remaining.startsWith(candidate.text));
     // Tab navigates focus in the native adapter, so it must not be taught as a typing key.
     if (!key) return null;
     keys.push(key);
@@ -64,7 +66,6 @@ export function getTypingGuide(snapshot: SessionSnapshot) {
 }
 
 export function nextGuideKey(snapshot: SessionSnapshot, layout: string): KeyHint | null {
-  if (!hasMyanmarText(snapshot.target.text)) return null;
   const guide = getTypingGuide(snapshot);
   if (!guide) return null;
   if (guide.mistake) return { code: "Backspace", label: "Backspace", shift: false, text: "" };

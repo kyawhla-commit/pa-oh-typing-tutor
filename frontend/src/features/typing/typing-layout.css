@@ -1,0 +1,60 @@
+/* Size by usable content width: the desktop sidebar also consumes space. */
+.practice-content { container: practice / inline-size; min-width: 0; }
+.practice-page { padding: 1rem; }
+.practice-content button { min-height: 2.75rem; }
+.typing-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: .5rem;
+  height: 7rem;
+  margin-bottom: .75rem;
+}
+.typing-status > p { min-width: 0; max-height: 3rem; overflow-y: auto; }
+.typing-status > button { min-height: 2.75rem; }
+.typing-passage-window { height: clamp(8rem, 25vh, 15rem); height: clamp(8rem, 25dvh, 15rem); }
+/* Regular practice uses a smaller reading window without removing any target text. */
+.typing-passage-window-compact { height: clamp(8rem, 18vh, 10rem); height: clamp(8rem, 18dvh, 10rem); }
+.typing-passage-window-compact .typing-passage { padding: 1rem; }
+.typing-passage { padding: 1rem; overflow-wrap: anywhere; }
+.typing-passage.font-myanmar { font-size: clamp(24px, 4cqw, 28px); }
+.typing-help { overflow-wrap: anywhere; line-height: 1.6; }
+.typing-stats { gap: .5rem; margin-bottom: 1rem; }
+.typing-stat { min-width: 0; padding: .75rem .25rem; }
+.typing-stat-value { font-size: clamp(1rem, 4.5cqw, 1.875rem); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.typing-compact-guide {
+  height: 7rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) 2.75rem;
+  column-gap: .75rem;
+}
+.typing-compact-guide > div:first-child { grid-row: 1 / 3; }
+.typing-compact-guide > div:nth-child(2) { min-height: 0; max-height: 100%; overflow-y: auto; }
+.typing-compact-guide > button { grid-column: 2; grid-row: 2; min-height: 2.75rem; }
+.typing-full-guide { height: clamp(12rem, 45vh, 20rem); height: clamp(12rem, 45dvh, 20rem); }
+.typing-full-guide-content { grid-template-columns: minmax(0, 1fr); }
+
+@media (min-width: 640px) { .practice-page { padding: 2rem; } }
+@container practice (min-width: 640px) {
+  .typing-status { height: 3.5rem; flex-direction: row; align-items: center; }
+  .typing-passage { padding: 1.25rem; }
+  .typing-stats { gap: 1rem; margin-bottom: 1.5rem; }
+  .typing-stat { padding: 1rem; }
+  .typing-compact-guide { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; grid-template-rows: 1fr; }
+  .typing-compact-guide > div:first-child { grid-row: auto; }
+  .typing-compact-guide > button { grid-column: auto; grid-row: auto; }
+  .typing-full-guide { height: clamp(12rem, 35vh, 16rem); height: clamp(12rem, 35dvh, 16rem); }
+  .typing-full-guide-content { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* A pinned card must leave room to reach its keyboard and controls. */
+@media (min-height: 1000px) {
+  @container practice (min-width: 640px) {
+    .typing-surface-bounded { position: sticky; top: 0; z-index: 20; background: var(--background, #F8FAFC); padding-bottom: .5rem; }
+  }
+}
+@media (max-height: 600px) {
+  .practice-page { padding-block: .75rem; }
+  .typing-status { height: 3.5rem; flex-direction: row; align-items: center; }
+  .typing-status > p { max-height: 3rem; }
+}

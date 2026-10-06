@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useLearningData } from '../../data/LearningContext'
+import { useLessonCatalog } from '../lessons/LessonCatalogContext'
 import ThemeToggle from '../../components/ThemeToggle'
 import { supabase } from '../../lib/supabase'
 import {
@@ -27,6 +28,8 @@ export default function Layout({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
   const location = useLocation()
   const { learner, results, signOut, preferences, syncStatus, syncError } = useLearningData()
+  const { canManageCatalog } = useLessonCatalog()
+  const visibleNavItems = navItems.filter((item) => item.to !== '/admin' || canManageCatalog)
   const [signOutError, setSignOutError] = useState('')
   const initials = learner?.name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase() || 'A'
   const pageTitle = navItems.find((item) => location.pathname.startsWith(item.to))?.label || 'Dashboard'
@@ -46,7 +49,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="app-shell flex h-screen bg-[#F8FAFC] overflow-hidden" data-theme={preferences.darkMode ? 'dark' : 'light'}>
+    <div className="app-shell flex bg-[#F8FAFC] overflow-hidden" data-theme={preferences.darkMode ? 'dark' : 'light'}>
       {/* Sidebar */}
       <aside
         className={`
@@ -72,7 +75,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-          {navItems.map(({ to, icon: Icon, label }) => (
+          {visibleNavItems.map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}
               to={to}
@@ -118,20 +121,20 @@ export default function Layout({ children }: { children: ReactNode }) {
       )}
 
       {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden">
         {/* Top Navbar */}
-        <header className="h-16 bg-white border-b border-[#E2E8F0] flex items-center px-4 lg:px-6 gap-4 flex-shrink-0">
+        <header className="h-16 bg-white border-b border-[#E2E8F0] flex items-center px-3 sm:px-4 lg:px-6 gap-2 sm:gap-4 flex-shrink-0">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden text-[#64748B] hover:text-[#0F172A]"
+            className="flex h-11 w-11 shrink-0 items-center justify-center lg:hidden text-[#64748B] hover:text-[#0F172A]"
             aria-label="Open navigation"
           >
             <Menu size={20} />
           </button>
 
-          <div className="flex-1">
-            <p className="text-[10px] font-semibold uppercase tracking-[.14em] text-[#94A3B8]">Learning workspace</p>
-            <p className="text-sm font-semibold text-[#0F172A]">{pageTitle}</p>
+          <div className="min-w-0 flex-1">
+            <p className="hidden sm:block text-[10px] font-semibold uppercase tracking-[.14em] text-[#94A3B8]">Learning workspace</p>
+            <p className="truncate text-sm font-semibold text-[#0F172A]">{pageTitle}</p>
           </div>
 
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
@@ -146,24 +149,24 @@ export default function Layout({ children }: { children: ReactNode }) {
                 {syncStatus === 'syncing' ? 'Syncing' : syncStatus === 'error' ? 'Sync issue' : 'Synced'}
               </span>
             )}
-            <div className="hidden md:flex items-center gap-1.5 bg-amber-50 text-amber-700 rounded-xl px-3 py-1.5 text-sm font-medium">
+            <div className="hidden xl:flex items-center gap-1.5 bg-amber-50 text-amber-700 rounded-xl px-3 py-1.5 text-sm font-medium">
               <span>🔥</span>
               <span>{practicedDays ? `${practicedDays} active days` : 'Start your streak'}</span>
             </div>
             <div className="hidden sm:flex w-8 h-8 rounded-full bg-gradient-to-br from-[#2563EB] to-[#60A5FA] items-center justify-center text-white text-sm font-semibold">
               {initials}
             </div>
-            <button onClick={() => void handleSignOut()} className="flex items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A]" aria-label="Sign out">
+            <button onClick={() => void handleSignOut()} className="flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-lg px-2 py-2 text-xs font-medium text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A]" aria-label="Sign out">
               <LogOut size={15} /> <span className="hidden sm:inline">Sign out</span>
             </button>
           </div>
         </header>
 
-        {signOutError && <p role="alert" className="border-b border-rose-200 bg-rose-50 px-4 py-2 text-xs text-rose-800">{signOutError}</p>}
-        {syncStatus === 'error' && syncError && <p role="status" className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-xs text-amber-900">Learning data is saved on this device, but cloud sync needs attention: {syncError}</p>}
+        {signOutError && <p role="alert" className="shrink-0 break-words border-b border-rose-200 bg-rose-50 px-4 py-2 text-xs text-rose-800">{signOutError}</p>}
+        {syncStatus === 'error' && syncError && <p role="status" className="shrink-0 break-words border-b border-amber-200 bg-amber-50 px-4 py-2 text-xs text-amber-900">Learning data is saved on this device, but cloud sync needs attention: {syncError}</p>}
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto [scrollbar-gutter:stable]">
           {children}
         </main>
       </div>

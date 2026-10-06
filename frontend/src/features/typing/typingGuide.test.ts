@@ -61,3 +61,32 @@ describe("Myanmar teaching hints", () => {
     expect(nextGuideKey(engine.getSnapshot(), "Pa'O")).toBeNull();
   });
 });
+
+describe("Latin teaching hints", () => {
+  it("maps US QWERTY letters, shifted symbols, Space and Enter", () => {
+    expect(keysForText("aA1!{}: \n", "QWERTY")?.map(({ code, shift }) => [code, shift])).toEqual([
+      ["KeyA", false], ["KeyA", true], ["Digit1", false], ["Digit1", true],
+      ["BracketLeft", true], ["BracketRight", true], ["Semicolon", true],
+      ["Space", false], ["Enter", false],
+    ]);
+    for (const text of ["é", "😀", "\t", "\r\n"]) expect(keysForText(text, "QWERTY")).toBeNull();
+    expect(keysForText("a", "Pa'O")).toBeNull();
+    expect(keysForText("a", "Dvorak")).toBeNull();
+    expect(keysForText("a", "constructor")).toBeNull();
+  });
+  it("guides Latin input, correction and completion without changing the scored source", () => {
+    const engine = createTypingEngine({ targetText: "aA!" });
+    const original = engine.getSnapshot();
+    expect(nextGuideKey(original, "QWERTY")).toMatchObject({ code: "KeyA", shift: false });
+    expect(engine.getSnapshot()).toBe(original);
+    engine.dispatch({ type: "INSERT_TEXT", text: "x", atMs: 0 });
+    expect(nextGuideKey(engine.getSnapshot(), "QWERTY")?.code).toBe("Backspace");
+    engine.dispatch({ type: "DELETE_BACKWARD", atMs: 1 });
+    engine.dispatch({ type: "INSERT_TEXT", text: "a", atMs: 2 });
+    expect(nextGuideKey(engine.getSnapshot(), "QWERTY")).toMatchObject({ code: "KeyA", shift: true });
+    engine.dispatch({ type: "INSERT_TEXT", text: "A!", atMs: 3 });
+    expect(nextGuideKey(engine.getSnapshot(), "QWERTY")).toBeNull();
+    expect(engine.getSnapshot().target.text).toBe("aA!");
+    expect(engine.getSnapshot().counts.incorrectInsertionAttempts).toBe(1);
+  });
+});

@@ -118,6 +118,38 @@ This is expected for a direct browser visit to `/auth/v1/settings` without an AP
 
 Try the local app in Firefox. If Firefox also cannot reach Supabase, compare another network and check the project status. These transport errors do not establish that the OAuth credentials are wrong. Keep certificate validation enabled.
 
+### Firefox “NetworkError when attempting to fetch resource” during password login
+
+The login page now distinguishes connection failures, incorrect credentials,
+unconfirmed email, rate limits and HTTP server failures. Connection failures do
+not establish whether the password is correct. Google and password-recovery
+requests also restore their controls after a thrown fetch error.
+The on-page alert is a short message with one suggested action; detailed network
+troubleshooting stays in this guide.
+
+On 7 October 2026, the linked CLI reported project `tuulerfxlnehpwcqgqup` as
+`ACTIVE_HEALTHY`. This machine reached `supabase.com` and `api.supabase.com`,
+but requests to the project’s `/auth/v1/settings` and `/auth/v1/health` failed
+with connection refused before receiving an HTTP response, including a settings
+request with the configured public key. The user also reported that allowing
+the project host in NoScript did not resolve Firefox’s error. The precise network
+cause remains unverified; the project is not paused.
+
+- Allow the project host in any browser request blocker for the local app.
+- Compare the same login on another network, such as a phone hotspot. If it
+  works there, investigate the original network’s DNS, proxy or firewall with
+  its administrator.
+- If both networks fail, compare another browser and inspect the failed request
+  in Firefox Developer Tools → Network. Record the HTTP status or transport
+  error, without sharing passwords, request authorization headers or tokens.
+- Retry the existing demo button once the endpoint is reachable. A separate
+  incorrect-password message, if returned, should then be investigated as an
+  account issue.
+
+See [Supabase Auth error codes](https://supabase.com/docs/guides/auth/debugging/error-codes)
+for server error references. A frontend error-message change cannot repair an
+unreachable network route.
+
 ## 5. Before public launch
 
 - [ ] Deploy the frontend and confirm its HTTPS address.

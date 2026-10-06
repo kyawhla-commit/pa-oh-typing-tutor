@@ -5,6 +5,8 @@ import { ArrowLeft, ArrowRight, BookOpen, Eye, EyeOff, LoaderCircle, LockKeyhole
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { demoAccounts } from './demoAccounts'
+import { describeAuthError, type AuthFailure } from './authError'
+import { AuthErrorNotice } from './AuthErrorNotice'
 
 function GoogleMark() {
   return <svg aria-hidden="true" viewBox="0 0 48 48" className="h-[18px] w-[18px]"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z" transform="translate(0 2) scale(1 .92)"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.76 7.18l7.73 6C44.42 38.06 46.98 31.91 46.98 24.55Z"/><path fill="#FBBC05" d="M10.53 28.59a14.4 14.4 0 0 1-.75-4.59c0-1.59.27-3.13.75-4.59l-7.98-6.2A23.9 23.9 0 0 0 0 24c0 3.89.94 7.57 2.56 10.78l7.97-6.19Z" transform="translate(0 -1)"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.9-5.8l-7.73-6c-2.14 1.44-4.88 2.3-8.17 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z" transform="translate(0 -1)"/></svg>
@@ -17,7 +19,7 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [passwordVisible, setPasswordVisible] = useState(false)
   const [loading, setLoading] = useState<'email' | 'google' | 'reset' | null>(null)
-  const [errorMessage, setErrorMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState<string | AuthFailure>('')
   const [notice, setNotice] = useState('')
 
   const continueAsGuest = () => {
@@ -29,13 +31,18 @@ export default function Login() {
     setErrorMessage('')
     setNotice('')
     if (!supabase) {
-      setErrorMessage('Sign-in is not configured yet. Add your Supabase project URL and publishable key to the frontend environment.')
+      setErrorMessage('Sign-in is unavailable. Contact the project owner.')
       return
     }
     setLoading('google')
-    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: getAuthRedirectUrl('/dashboard') } })
-    if (error) {
-      setErrorMessage(error.message)
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: getAuthRedirectUrl('/dashboard') } })
+      if (error) {
+        setErrorMessage(describeAuthError(error, navigator.onLine))
+        setLoading(null)
+      }
+    } catch (error) {
+      setErrorMessage(describeAuthError(error, navigator.onLine))
       setLoading(null)
     }
   }
@@ -49,28 +56,28 @@ export default function Login() {
     setErrorMessage('')
     setNotice('')
     if (!supabase) {
-      setErrorMessage('Sign-in is not configured yet. Add your Supabase project URL and publishable key to the frontend environment.')
+      setErrorMessage('Sign-in is unavailable. Contact the project owner.')
       return
     }
     setLoading('email')
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email: accountEmail.trim().toLowerCase(), password: accountPassword })
       if (error) {
-        setErrorMessage(error.message)
+        setErrorMessage(describeAuthError(error, navigator.onLine))
         return
       }
       const user = data.user
       const isAdmin = user.app_metadata.role === 'admin'
       if (demoRole === 'admin' && !isAdmin) {
-        setErrorMessage('The demo admin account does not have administrator access. Ask the project owner to check its role.')
+        setErrorMessage('This account does not have administrator access.')
         return
       }
       const metadataName = user.user_metadata.display_name || user.user_metadata.full_name || user.user_metadata.name
       const fallbackName = user.email?.split('@')[0] || 'Learner'
       signIn({ name: typeof metadataName === 'string' && metadataName.trim() ? metadataName.trim() : fallbackName, email: user.email || accountEmail.trim() })
       navigate(isAdmin ? '/admin' : '/dashboard', { replace: true })
-    } catch {
-      setErrorMessage('We couldn’t connect to sign-in. Check your connection and try again.')
+    } catch (error) {
+      setErrorMessage(describeAuthError(error, navigator.onLine))
     } finally {
       setLoading(null)
     }
@@ -80,18 +87,23 @@ export default function Login() {
     setErrorMessage('')
     setNotice('')
     if (!email.trim()) {
-      setErrorMessage('Enter your email first, then request a reset link.')
+      setErrorMessage('Enter your email to reset your password.')
       return
     }
     if (!supabase) {
-      setErrorMessage('Password recovery is not configured yet. Add your Supabase project settings first.')
+      setErrorMessage('Password reset is unavailable. Contact the project owner.')
       return
     }
     setLoading('reset')
-    const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), { redirectTo: getAuthRedirectUrl('/auth/reset-password') })
-    if (error) setErrorMessage(error.message)
-    else setNotice('If an account exists for that address, a password reset link is on its way.')
-    setLoading(null)
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), { redirectTo: getAuthRedirectUrl('/auth/reset-password') })
+      if (error) setErrorMessage(describeAuthError(error, navigator.onLine))
+      else setNotice('If an account exists for that address, a password reset link is on its way.')
+    } catch (error) {
+      setErrorMessage(describeAuthError(error, navigator.onLine))
+    } finally {
+      setLoading(null)
+    }
   }
 
   return (
@@ -150,7 +162,7 @@ export default function Login() {
                   <button type="button" aria-label={passwordVisible ? 'Hide password' : 'Show password'} onClick={() => setPasswordVisible((visible) => !visible)} className="absolute inset-y-0 right-0 grid w-11 place-items-center rounded-r-xl text-slate-500 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">{passwordVisible ? <EyeOff size={17} /> : <Eye size={17} />}</button>
                 </div>
               </div>
-              {errorMessage && <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-3 text-sm leading-5 text-rose-800">{errorMessage}</p>}
+              {errorMessage && <AuthErrorNotice error={errorMessage} />}
               {notice && <p role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-3 text-sm leading-5 text-emerald-800">{notice}</p>}
               {!supabase && <p role="note" className="rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3 text-xs leading-5 text-amber-900">Supabase isn’t configured yet. You can still try the app without an account.</p>}
               <button type="submit" disabled={loading !== null} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:cursor-wait disabled:opacity-60">

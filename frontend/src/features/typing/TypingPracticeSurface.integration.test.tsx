@@ -32,14 +32,14 @@ beforeEach(() => {
   session = createTypingSession({ targetText: "abc" }, () => 100);
   act(() => root.render(<StrictMode><TypingPracticeSurface session={session} /></StrictMode>));
 });
-afterEach(() => { act(() => root.unmount()); host.remove(); });
+afterEach(() => { act(() => root.unmount()); host.remove(); vi.unstubAllGlobals(); });
 
 describe("Myanmar input guidance", () => {
   const mountMyanmar = (targetText = "နို့ ကာ", layout = "Pa'O") => {
     session = createTypingSession({ targetText, completionPolicy: "target-covered" }, () => 100);
     act(() => root.render(<StrictMode>
       <TypingPracticeSurface session={session} layout={layout} />
-      <TypingKeyboardFeedback session={session} layout={layout} />
+      <TypingKeyboardFeedback session={session} layout={layout} showCompactGuide={false} />
     </StrictMode>));
     act(() => input().focus());
   };
@@ -163,8 +163,189 @@ describe("Myanmar input guidance", () => {
     expect(guide().textContent).toContain("No verified key hint");
     expect(nextCodes()).toEqual([]);
     mountMyanmar("abc", "Pa'O");
-    expect(host.querySelector('[aria-label="Next input guide"]')).toBeNull();
+    expect(guide().textContent).toContain("Select QWERTY in Settings");
+    expect(nextCodes()).toEqual([]);
     expect(host.querySelector('[data-testid="typing-text"]')!.className).toContain("font-mono");
+  });
+});
+
+describe("compact keyboard guide", () => {
+  const mountCompact = (targetText = "နီ ကာ", layout = "Pa'O") => {
+    session = createTypingSession({ targetText, completionPolicy: "target-covered" }, () => 100);
+    act(() => root.render(<StrictMode>
+      <TypingPracticeSurface session={session} layout={layout} showGuide={false} />
+      <TypingKeyboardFeedback session={session} layout={layout} />
+    </StrictMode>));
+  };
+  const compact = () => host.querySelector('[data-guide-mode="compact"]')!;
+  it("follows the active line within the bounded passage, preserves manual page scrolling, and resets on restart", () => {
+    mountCompact("က\nခ\nဂ\nဃ\nင");
+    const viewport = host.querySelector<HTMLElement>('[data-testid="passage-viewport"]')!;
+    expect(viewport.getAttribute("aria-label")).toBe("Scrollable passage");
+    Object.defineProperty(viewport, "clientHeight", { configurable: true, value: 192 });
+    viewport.getBoundingClientRect = () => new DOMRect(0, 100, 900, 192);
+    Array.from(host.querySelectorAll<HTMLElement>('.typing-char')).forEach((unit, index) => {
+      unit.getBoundingClientRect = () => new DOMRect(0, 120 + Math.floor(index / 2) * 56 - viewport.scrollTop, 30, 40);
+    });
+    host.scrollTop = 220;
+    act(() => session.insertText("က\nခ\nဂ\n"));
+    expect(viewport.scrollTop).toBe(48);
+    expect(host.scrollTop).toBe(220);
+    expect(host.querySelector('[data-testid="typing-text"]')!.textContent).toBe("က\nခ\nဂ\nဃ\nင");
+    act(() => session.restart());
+    expect(viewport.scrollTop).toBe(0);
+    expect(host.scrollTop).toBe(220);
+    act(() => host.querySelector<HTMLElement>('[data-testid="typing-text"]')!.click());
+    expect(document.activeElement).toBe(input());
+  });
+  it("reveals the current group after a viewport resize without resetting, scoring, or taking focus", () => {
+    const observers: { callback: () => void; observe: ReturnType<typeof vi.fn>; disconnect: ReturnType<typeof vi.fn> }[] = [];
+    vi.stubGlobal("ResizeObserver", class {
+      observe = vi.fn();
+      disconnect = vi.fn();
+      constructor(callback: () => void) { observers.push({ callback, observe: this.observe, disconnect: this.disconnect }); }
+    });
+    mountCompact("က\nခ\nဂ\nဃ\nင");
+    act(() => session.insertText("က\nခ\n"));
+    const area = host.querySelector<HTMLElement>('[data-testid="passage-viewport"]')!;
+    Object.defineProperty(area, "clientHeight", { value: 128 });
+    area.getBoundingClientRect = () => new DOMRect(0, 100, 280, 128);
+    host.querySelector<HTMLElement>('.typing-char.current')!.getBoundingClientRect = () => new DOMRect(0, 240, 30, 48);
+    const passageObserver = [...observers].reverse().find(observer => observer.observe.mock.calls.some(([element]) => element === area))!;
+    host.scrollTop = 250;
+    const before = session.feedback.getSnapshot();
+    const focus = vi.spyOn(input(), "focus");
+    act(() => passageObserver.callback());
+    expect(area.scrollTop).toBe(72);
+    expect(host.scrollTop).toBe(250);
+    expect(session.feedback.getSnapshot()).toBe(before);
+    expect(focus).not.toHaveBeenCalled();
+    act(() => root.render(<div />));
+    expect(passageObserver.disconnect).toHaveBeenCalledOnce();
+  });
+  it.each(["a\nb\nc\nd\ne", "က\nခ\nဂ\nဃ\nင"])("keeps %s bounded and follows typing with the keyboard hidden", (text) => {
+    mountCompact(text);
+    act(() => root.render(<StrictMode>
+      <TypingPracticeSurface session={session} layout="Pa'O" showGuide />
+    </StrictMode>));
+    const area = host.querySelector<HTMLElement>('[aria-label="Scrollable passage"]')!;
+    Object.defineProperty(area, "clientHeight", { value: 192 });
+    area.getBoundingClientRect = () => new DOMRect(0, 100, 280, 192);
+    Array.from(host.querySelectorAll<HTMLElement>('.typing-char')).forEach((unit, index) => {
+      unit.getBoundingClientRect = () => new DOMRect(0, 120 + Math.floor(index / 2) * 56 - area.scrollTop, 30, 40);
+    });
+    host.scrollTop = 220;
+    act(() => session.insertText(text.slice(0, 6)));
+    expect(area.scrollTop).toBe(48);
+    expect(host.scrollTop).toBe(220);
+    expect(host.querySelector('[data-testid="typing-text"]')!.textContent).toBe(text);
+    act(() => session.insertText(text.slice(6)));
+    expect(session.feedback.getSnapshot().snapshot.status).toBe("completed");
+    expect(host.querySelector('[aria-label="Scrollable passage"]')).toBe(area);
+    expect(area.scrollTop).toBe(48);
+    expect(host.querySelector('[data-testid="typing-text"]')!.textContent).toBe(text);
+    act(() => session.restart());
+    expect(area.scrollTop).toBe(0);
+  });
+  it("shows the same guide for Latin typing, including corrections, Shift and completion", () => {
+    mountCompact("a A!", "QWERTY");
+    const hints = () => Array.from(host.querySelectorAll('[data-next-key="true"]:not([data-key-modifier="true"])'), key => key.textContent!.trim());
+    expect(compact().querySelector('[data-testid="next-input"]')!.textContent).toBe("a");
+    expect(hints()).toEqual(["a"]);
+    act(() => session.insertText("x"));
+    expect(compact().textContent).toContain("Correct previous input");
+    expect(compact().querySelector('[data-testid="next-key-hint"]')!.textContent).toBe("Backspace");
+    expect(hints()).toEqual(["⌫"]);
+    act(() => session.deleteBackward());
+    act(() => session.insertText("a"));
+    expect(compact().querySelector('[data-testid="next-input"]')!.textContent).toBe("Space ␣");
+    act(() => session.insertText(" "));
+    expect(compact().querySelector('[data-testid="next-key-hint"]')!.textContent).toBe("Shift + A");
+    expect(hints()).toEqual(["a"]);
+    expect(host.querySelectorAll('[data-next-key="true"]')).toHaveLength(3);
+    act(() => Array.from(host.querySelectorAll('button')).find(button => button.textContent === "Show details")!.click());
+    expect(host.querySelector('[aria-label="Next input details"]')!.textContent).toContain("US QWERTY");
+    expect(host.querySelectorAll('#typing-next-input')).toHaveLength(1);
+    act(() => session.insertText("A"));
+    expect(compact().querySelector('[data-testid="next-key-hint"]')!.textContent).toBe("Shift + 1");
+    expect(hints()).toEqual(["1"]);
+    act(() => session.insertText("!"));
+    expect(host.querySelector('[aria-label="Next input guide"]')).toBeNull();
+    expect(hints()).toEqual([]);
+    expect(session.result.getSnapshot()!.counts.incorrectInsertionAttempts).toBe(1);
+    expect(host.querySelector('[data-testid="typing-text"]')!.textContent).toBe("a A!");
+  });
+  it("shows a Latin preview with an honest Pa’O layout mismatch and keeps it when the keyboard is hidden", () => {
+    mountCompact("abc", "Pa'O");
+    expect(compact().querySelector('[data-testid="next-input"]')!.textContent).toBe("a");
+    expect(compact().textContent).toContain("Select QWERTY in Settings");
+    expect(host.querySelectorAll('[data-next-key="true"]')).toHaveLength(0);
+    act(() => session.insertText("a"));
+    act(() => root.render(<StrictMode><TypingPracticeSurface session={session} layout="Pa'O" showGuide /></StrictMode>));
+    expect(host.querySelector('[data-testid="next-input"]')!.textContent).toBe("b");
+    expect(host.querySelector('[aria-label="Next input guide"]')!.textContent).toContain("Select QWERTY in Settings");
+    expect(host.querySelectorAll('.typing-char.correct')).toHaveLength(1);
+    expect(host.querySelector('[data-testid="typing-text"]')!.textContent).toBe("abc");
+  });
+  it("keeps Latin composition drafts neutral and guides only committed input", () => {
+    mountCompact("ab", "QWERTY");
+    act(() => {
+      input().dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true }));
+      input().dispatchEvent(new CompositionEvent("compositionupdate", { data: "a", bubbles: true }));
+    });
+    expect(compact().querySelector('[data-testid="composition-preview"]')!.textContent).toBe("a");
+    expect(compact().textContent).toContain("Finish composition");
+    expect(host.querySelectorAll('[data-next-key="true"]')).toHaveLength(0);
+    expect(session.feedback.getSnapshot().snapshot.counts.totalInsertionAttempts).toBe(0);
+    act(() => {
+      input().dispatchEvent(new CompositionEvent("compositionend", { data: "a", bubbles: true }));
+      input().dispatchEvent(new InputEvent("input", { inputType: "insertText", data: "a", bubbles: true }));
+    });
+    expect(session.feedback.getSnapshot().snapshot.counts.totalInsertionAttempts).toBe(1);
+    expect(compact().querySelector('[data-testid="next-input"]')!.textContent).toBe("b");
+  });
+  it("updates next base/combining output and Shift hints without expanding details or changing source text", () => {
+    mountCompact();
+    expect(compact().querySelector('[data-testid="next-input"]')!.textContent).toBe("န");
+    expect(compact().querySelector('[data-testid="next-key-hint"]')!.textContent).toBe("E");
+    act(() => session.insertText("န"));
+    expect(compact().querySelector('[data-testid="next-input"]')!.textContent).toBe("◌ီ");
+    expect(compact().querySelector('[data-testid="next-key-hint"]')!.textContent).toBe("Shift + D");
+    expect(host.querySelector('[aria-label="Next input details"]')).toBeNull();
+    expect(input().getAttribute("aria-describedby")).toContain("typing-next-input");
+    expect(host.querySelectorAll('#typing-next-input')).toHaveLength(1);
+    expect(host.querySelector('[data-testid="typing-text"]')!.textContent).toBe("နီ ကာ");
+    act(() => session.insertText("ီ"));
+    expect(compact().querySelector('[data-testid="next-input"]')!.textContent).toBe("Space ␣");
+  });
+  it("shows correction and neutral drafts while suppressing physical key hints during composition", () => {
+    mountCompact();
+    act(() => input().focus()); commitWithoutMetadata("မ");
+    expect(compact().textContent).toContain("Correct previous input");
+    expect(compact().querySelector('[data-testid="next-key-hint"]')!.textContent).toBe("Backspace");
+    act(() => {
+      input().dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true }));
+      input().dispatchEvent(new CompositionEvent("compositionupdate", { data: "န", bubbles: true }));
+    });
+    expect(compact().textContent).toContain("Draft · not scored yet");
+    expect(compact().querySelector('[data-testid="composition-preview"]')!.textContent).toBe("န");
+    expect(compact().querySelector('[data-testid="next-key-hint"]')!.textContent).toBe("Finish composition");
+    expect(host.querySelector('[data-next-key="true"]')).toBeNull();
+    expect(session.feedback.getSnapshot().snapshot.counts.totalInsertionAttempts).toBe(1);
+    act(() => input().blur());
+    expect(compact().querySelector('[data-testid="composition-preview"]')).toBeNull();
+  });
+  it("provides honest fallback instructions for unknown mappings and Latin layout mismatches", () => {
+    mountCompact("နီ ကာ", "QWERTY");
+    expect(compact().querySelector('[data-testid="next-input"]')!.textContent).toBe("နီ");
+    expect(compact().querySelector('[data-testid="next-key-hint"]')!.textContent).toBe("Use your input method");
+    mountCompact("abc");
+    expect(compact().querySelector('[data-testid="next-input"]')!.textContent).toBe("a");
+    expect(compact().textContent).toContain("Select QWERTY in Settings");
+    expect(host.querySelector('[aria-label="Typing keyboard"]')).not.toBeNull();
+    mountCompact("😀", "Pa'O");
+    expect(compact().textContent).toContain("Use your input method");
+    expect(compact().textContent).not.toContain("Select QWERTY");
   });
 });
 

@@ -461,15 +461,15 @@ function PracticeSession({
   const nextAction = result && !adaptive ? lessonId ? lessonPassed ? onNextLesson : undefined : newText : undefined;
 
   if (showMistakePractice && result) return (
-    <div className="mx-auto max-w-6xl p-5 sm:p-8">
+    <div className="practice-page mx-auto max-w-6xl">
       <MistakePractice original={result} onBack={() => setShowMistakePractice(false)} layout={preferences.keyboardLayout} showKeyboard={showKeyboard} />
     </div>
   );
 
   return (
-    <div ref={surfaceRoot} className="mx-auto max-w-6xl p-5 sm:p-8">
-      <div className="mx-auto w-full max-w-4xl">
-        <header className="mb-7 flex items-center justify-between gap-4">
+    <div ref={surfaceRoot} className="practice-page mx-auto max-w-6xl">
+      <div className="practice-content mx-auto w-full max-w-4xl">
+        <header className="mb-5 flex flex-col items-start justify-between gap-3 sm:mb-7 sm:flex-row sm:items-center">
           <div>
             <h1 className="text-2xl font-semibold text-slate-900">
               {adaptive
@@ -493,7 +493,7 @@ function PracticeSession({
           </div>
           <button
             onClick={() => setShowKeyboard((visible) => !visible)}
-            className="shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-500 transition-colors hover:text-slate-700"
+            className="min-h-11 shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-500 transition-colors hover:text-slate-700"
             aria-expanded={showKeyboard}
           >
             {showKeyboard ? "Hide" : "Show"} keyboard
@@ -582,7 +582,7 @@ function PracticeSession({
                 role="tab"
                 aria-selected={mode === key}
                 onClick={() => changeMode(key)}
-                className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium transition-colors ${mode === key ? "bg-blue-600 text-white" : "border border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}
+                className={`flex min-h-11 items-center gap-1.5 rounded-xl px-3 py-2 sm:px-4 text-sm font-medium transition-colors ${mode === key ? "bg-blue-600 text-white" : "border border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}
               >
                 <span aria-hidden>{icon}</span>
                 {label}
@@ -591,20 +591,18 @@ function PracticeSession({
           </div>
         )}
 
-        <TypingLiveStats session={session} />
-        <TypingPracticeSurface session={session} onNext={nextAction} nextLabel={lessonId ? "Next lesson" : "Next text"} onRestart={restart} layout={preferences.keyboardLayout} />
+        <TypingPracticeSurface session={session} onNext={nextAction} nextLabel={lessonId ? "Next lesson" : "Next text"} onRestart={restart} layout={preferences.keyboardLayout} showGuide={!showKeyboard} showProgress compactPassage={!lessonId && !adaptive} />
 
         {result ? (
-          <div className={`mt-6 rounded-2xl border p-6 text-center ${lessonId && !lessonPassed ? "border-amber-200 bg-amber-50" : "border-emerald-200 bg-emerald-50"}`}>
+          <div role="region" aria-label={lessonId ? "Lesson result" : "Practice result"} className={`mt-6 rounded-2xl border p-4 text-center sm:p-6 ${lessonId && !lessonPassed ? "border-amber-200 bg-amber-50" : "border-emerald-200 bg-emerald-50"}`}>
             <p className="mb-2 text-2xl" aria-hidden>
               {lessonId && !lessonPassed ? "📝" : "🎉"}
             </p>
             <h2 className={`mb-1 text-lg font-semibold ${lessonId && !lessonPassed ? "text-amber-800" : "text-emerald-800"}`}>
               {lessonId ? lessonPassed ? "Lesson passed!" : "Attempt finished — try again" : result.counts.uncorrectedErrors ? "Attempt finished" : "Nice work!"}
             </h2>
+            <TypingLiveStats session={session} />
             <p className="mb-4 text-sm text-emerald-700">
-              {Math.round(result.metrics.correctWpm)} WPM ·{" "}
-              {result.metrics.attemptAccuracy.toFixed(2)}% accuracy ·{" "}
               {result.counts.incorrectInsertionAttempts} {result.counts.incorrectInsertionAttempts === 1 ? "mistake" : "mistakes"} · {result.counts.uncorrectedErrors} uncorrected
             </p>
             {lessonId && <p role="status" className={`mb-4 text-sm ${lessonPassed ? "text-emerald-700" : "text-amber-800"}`}>
@@ -661,7 +659,7 @@ function PracticeSession({
               type="button"
               onClick={restart}
               aria-keyshortcuts="Control+Shift+Enter Meta+Shift+Enter"
-              className="ml-3 rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-white"
+              className="ml-3 mt-2 rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-white"
             >Restart passage</button>}
             {lessonId && onNextLesson && (
               <button
@@ -686,34 +684,33 @@ function PracticeSession({
             )}
           </div>
         ) : (
-          <div className="mt-4 flex items-center justify-between gap-3">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
             <button
               onClick={restart}
               aria-keyshortcuts="Control+Shift+Enter Meta+Shift+Enter"
-              className="text-sm text-slate-500 hover:text-slate-700"
+              className="min-h-11 text-sm text-slate-500 hover:text-slate-700"
             >
               ↺ Restart
             </button>
             {!adaptive && (
               <button
                 onClick={newText}
-                className="text-sm text-slate-500 transition-colors hover:text-slate-700"
+                className="min-h-11 text-sm text-slate-500 transition-colors hover:text-slate-700"
               >
                 {lessonId ? "Practice again" : "↺ New text"}
               </button>
             )}
           </div>
         )}
+        {showKeyboard && (
+          <div className="mx-auto mt-4 w-full">
+            <TypingKeyboardFeedback
+              session={session}
+              layout={preferences.keyboardLayout}
+            />
+          </div>
+        )}
       </div>
-
-      {showKeyboard && (
-        <div className="mx-auto mt-8 w-full max-w-[1100px]">
-          <TypingKeyboardFeedback
-            session={session}
-            layout={preferences.keyboardLayout}
-          />
-        </div>
-      )}
     </div>
   );
 }

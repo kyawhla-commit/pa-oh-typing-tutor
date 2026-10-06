@@ -33,7 +33,7 @@ export function MistakePractice({ original, onBack, layout, showKeyboard }: {
   const host = useRef<HTMLDivElement>(null);
   const [keyboardVisible, setKeyboardVisible] = useState(showKeyboard);
   useEffect(() => { host.current?.querySelector("textarea")?.focus({ preventScroll: true }); }, []);
-  return <div ref={host} className="mx-auto max-w-4xl" aria-label="Mistake practice">
+  return <div ref={host} className="practice-content mx-auto max-w-4xl" aria-label="Mistake practice">
     <header className="mb-5">
       <h1 className="text-2xl font-semibold text-slate-900">Practice mistakes</h1>
       <p className="mt-2 text-sm text-slate-600">Practice the affected words or code lines. Your original score stays saved. To improve that score, retry the full passage.</p>
@@ -44,7 +44,7 @@ export function MistakePractice({ original, onBack, layout, showKeyboard }: {
       <pre className="mt-3 whitespace-pre-wrap break-words text-slate-700">{visibleTypingText(text)}</pre>
     </details>
     <TypingLiveStats session={session} />
-    <TypingPracticeSurface session={session} onNext={result ? onBack : undefined} nextLabel="Back to result" onRestart={() => session.restart()} layout={layout} />
+    <TypingPracticeSurface session={session} onNext={result ? onBack : undefined} nextLabel="Back to result" onRestart={() => session.restart()} layout={layout} showGuide={!keyboardVisible} />
     {!result && <button type="button" onClick={() => session.restart()} aria-keyshortcuts="Control+Shift+Enter Meta+Shift+Enter" className="mt-4 text-sm text-slate-600">Restart drill</button>}
     {result && <div className="mt-5 rounded-xl border border-slate-200 bg-white p-4">
       <p role="status" className="font-medium text-slate-800">Drill finished — {result.metrics.attemptAccuracy.toFixed(2)}% accuracy</p>

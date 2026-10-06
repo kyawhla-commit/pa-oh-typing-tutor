@@ -131,10 +131,11 @@ published content. Catalog removal retains the mounted session's prior target.
 Missing lessons never fall back to an unrelated random exercise. General practice
 mode/text selection intentionally resets the engine; Restart retains its target.
 
-## Myanmar / Pa'O teaching guide
+## Next-input teaching guide
 
-Practice and local mistake drills detect Myanmar script in the frozen source
-target. They use Noto Sans Myanmar at 28px, normal letter spacing and a generous
+Practice and local mistake drills show the same next-input guide for English
+and Myanmar text. They detect Myanmar script in the frozen source target and
+use Noto Sans Myanmar at 24–28px according to content width, normal letter spacing and a generous
 line height; Latin/code passages retain their existing monospace style.
 The next-input panel enlarges the expected engine grapheme and shows unchanged
 source context. Context uses existing whitespace runs, bounded for long unspaced
@@ -168,7 +169,40 @@ wrong input/correction, preserved target/history, composition commit echoes,
 blur/restart cancellation, completion and Latin fallback. Physical keyboard/IME
 event order and final font rendering still require a live Firefox retest.
 
-The hint panel reserves 256px on desktop and 320px on small screens. Longer
+When the virtual keyboard is visible, Practice and mistake drills render a
+compact next-input row for every script immediately above it and omit the large panel above the
+passage. The row shows the next direct key output (with dotted-circle mark
+previews) and the physical key/Shift hint. Unknown mappings keep the expected
+text with an input-method fallback; errors show Backspace, and active IME drafts
+remain neutral. It reserves 112px across input states. On narrow screens the
+disclosure sits below the key hint alongside the enlarged character. Show details explicitly opens the full context/key sequence below
+the keyboard; it never opens automatically during typing. The disclosure has
+aria-expanded/aria-controls and distinct IDs so the input description stays
+unique. Hiding the keyboard shows the full guide above the passage instead.
+Keyboard visibility/disclosure changes are presentation only and preserve the
+mounted session, target, committed progress, results and drill isolation.
+
+Practice passages use a bounded scrollable viewport (128–240px, sized to the
+window height) for both Latin and Myanmar text, whether the virtual keyboard is
+shown or hidden. All original text remains mounted; only the visible portion is
+limited. Finished attempts keep the same compact passage for scrollable review.
+With at least 640px of content width and 1000px of window height,
+an active typing card with its keyboard shown stays sticky within the same
+containing block as the keyboard. Narrow or short windows use normal page scrolling so the pinned card cannot
+cover the keyboard and controls. The current unit (including partial groups and the latest
+incorrect unit) is revealed by changing
+only that viewport's scrollTop when it falls outside the visible bounds. It never
+calls scrollIntoView or scrolls the page. Restart resets the passage viewport;
+keyboard visibility changes retain its scroll position and committed progress.
+The invisible native input no longer covers this viewport, so wheel/scrollbar input can reach the passage,
+while clicking the passage still focuses typing. Finished attempts release
+passage pinning and show their result while retaining the bounded viewport.
+Tests use explicit DOM geometry to verify local scrolling,
+page-scroll preservation, restart and containing-block structure; actual sticky
+positioning still requires a live Firefox check.
+
+The full hint panel reserves 192–256px on wide content and 192–320px on narrow
+content according to window height; its height does not depend on input state. Longer
 key sequences, context and explanations scroll within its keyboard-accessible
 region; partial/error/composition content cannot resize the passage's container.
 The status row also reserves space, and current/partial cursors use an inset
@@ -179,6 +213,72 @@ launch use `focus({ preventScroll: true })`; input updates never request focus.
 Manual page scrolling and hint scrolling remain available. These changes target
 mid-attempt movement; completing an attempt intentionally switches to its result.
 jsdom checks verify focus requests and lifecycle, not real browser scroll geometry.
+
+Words, Sentences, Paragraph and Code modes use a shorter 128–160px passage window
+with 16px padding, both with and without the virtual keyboard. The full text stays mounted
+and scored, including code indentation and line breaks; the current line follows
+within this window instead of moving the page. Restart resets the window, Next
+text and switching between these modes retain compact sizing. Integration checks
+cover full-target completion, local following, keyboard toggles and these resets.
+
+Regular Practice, adaptive activities and catalog lessons hide WPM, accuracy
+and elapsed-time cards before and during an attempt. A lightweight passage-progress bar uses the engine's existing progress
+value and remains distinct from lesson qualification. On completion, the metric
+cards appear inside the finished result, including unsuccessful lesson attempts,
+along with the existing retry/next-text/next-lesson feedback. Restart and Next
+text hide the result cards and restore zero progress. Local mistake drills retain
+live metrics. Lesson scoring, the 95% threshold and persistence are unchanged.
+Lesson/passage validation: 193 targeted tests passed across 15 files, including passed/failed
+result visibility, restart, keyboard toggling and bounded passage following in
+both scripts. Typecheck and production build passed; live visual checks remain
+pending.
+Regular Practice follow-up: 56 checks passed across Practice, adaptive exercise,
+planner and planner-outcome integration suites, including final metric visibility,
+frozen elapsed time, retained keyboard-toggle progress and Restart/Next reset.
+Typecheck and production build passed.
+
+English guides map only direct outputs of the displayed US QWERTY layout,
+including Shift symbols, Space and LF/Enter. Tab remains navigation, and accented
+characters, emoji and unknown layouts use an input-method fallback. If the next
+character has a QWERTY mapping but cannot be produced by the selected Pa’O
+layout, the guide asks for QWERTY in Settings rather than showing a misleading
+Pa’O key. This changes neither the selected preference nor the actual device
+input method. Latin previews/context use monospace, while Myanmar previews keep
+their existing font. Direct-key highlights, correction hints, optional details,
+composition neutrality and completion hiding work for both scripts. Dark mode
+also gives both hint panels a dark blue background matching their text colors.
+Guide extension validation: 201 targeted checks passed across 15 files. After
+refining unsupported-character fallback wording, the 68 affected guide, surface
+and Practice checks passed again. Typecheck and production build passed; live
+font/color rendering remains to be checked in the browser.
+
+## Responsive practice layout
+
+Practice and mistake drills size guides by the available content width, including
+space used by the desktop sidebar. Small screens stack the header and status
+controls, size metric cards when shown, and offer 44px focus/disclosure
+controls. Short landscape windows reduce vertical spacing and avoid pinning the
+passage. The app shell uses dynamic viewport height with a viewport-height
+fallback and keeps its main scroll area shrinkable.
+
+The virtual keyboard keeps a 600px minimum drawing width inside its own
+keyboard-accessible horizontal scroll region rather than shrinking Myanmar
+legends to tiny glyphs. A visible instruction explains scrolling on narrow
+screens. The next character key is revealed locally, preferring it over Shift
+modifiers; the page never scrolls to follow a key. Wide keyboards fit their
+container with key sizes calculated from the actual row gaps. ResizeObserver
+rechecks the active passage unit and keyboard hint after resizing without
+restarting a session, committing input, changing focus, or scoring again.
+Observers disconnect on unmount. All content remains mounted and the existing
+keyboard toggle, lesson progression, scoring and input adapter remain intact.
+
+Responsive validation on 7 October 2026: 188 targeted tests passed across 15
+files, covering local horizontal/vertical scrolling, resize callbacks, observer
+cleanup and existing input/Practice/drill regressions in jsdom. Typecheck and
+the production build passed. CSS layout, touch scrolling,
+mobile browser chrome and physical IME behavior need a live device/browser check.
+Recommended viewports: 320×568, 390×844, 844×390, 768×1024, 1024×768, 1366×600,
+and 1920×1080, including keyboard shown/hidden and an in-progress combining group.
 
 ## Reproducing browser checks
 
