@@ -1,0 +1,15 @@
+# Only declared hosted settings are pushed by the Supabase CLI.
+# Review `supabase config diff` before pushing; preserve existing hosted redirects.
+project_id = "pa-oh-typing-tutor"
+
+[auth]
+enable_signup = true
+site_url = "http://127.0.0.1:5173"
+additional_redirect_urls = ["http://127.0.0.1:5173/**", "http://localhost:5173/**"]
+
+[auth.email]
+enable_signup = true
+
+# Original lessons are seeded by migrations; there is no separate seed.sql.
+[db.seed]
+enabled = false

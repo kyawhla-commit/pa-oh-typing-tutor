@@ -1,0 +1,22 @@
+/** Product contracts, not trained weights. Adjust only with a generator revision. */
+export const EXERCISE = Object.freeze({
+  generatorVersion: "adaptive-exercise-v1",
+  contentVersion: "english-content-v1",
+  minDesiredLength: 80, maxDesiredLength: 300,
+  minLengthRatio: 0.8, maxLengthRatio: 1.25,
+  maxFocusItems: 2, maxFocusUnits: 32, maxIdentityUnits: 512,
+  maxVersionUnits: 63,
+  attemptsPerStrategy: 8, maxChunksPerSection: 24, maxPaddingChunks: 24,
+  grapheme: { total: 12, sections: [3,5,4] as const, contexts: 3 },
+  substitution: { expected: [3,5,4] as const, counterpart: [3,4,3] as const, contexts: 3 },
+  bigram: { total: 10, sections: [2,4,4] as const, contexts: 3 },
+  token: { total: 4, sections: [1,2,1] as const, contexts: 3 },
+  maxBalanceRatio: 1.75,
+  maxTokenShare: 0.25, fallbackMaxTokenShare: 0.4,
+  maxIdenticalTokenRun: 2, maxIsolatedFocusRun: 4,
+  minMixedOrdinaryTokens: 3,
+  minWarmupDensity: 0.15, minContextDensity: 0.08,
+  fallbackMinWarmupDensity: 0.10, fallbackMinContextDensity: 0.06,
+  minBroadDistinctTokens: 10,
+  maxBroadPunctuationRatio: 0.03,
+});

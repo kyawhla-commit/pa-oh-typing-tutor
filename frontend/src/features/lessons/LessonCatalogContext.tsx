@@ -5,7 +5,7 @@ import { defaultLessons, getLessonCatalog, saveLessonCatalog, type LessonRecord,
 type CatalogStatus = "local" | "loading" | "synced" | "error";
 type LessonDraft = Omit<LessonRecord, "id" | "updatedAt">;
 
-interface LessonCatalogValue {
+export interface LessonCatalogValue {
   catalog: LessonRecord[];
   catalogStatus: CatalogStatus;
   catalogError: string | null;
@@ -17,7 +17,7 @@ interface LessonCatalogValue {
   restoreDefaultCatalog: () => Promise<void>;
 }
 
-const CatalogContext = createContext<LessonCatalogValue | null>(null);
+export const CatalogContext = createContext<LessonCatalogValue | null>(null);
 
 type LessonRow = {
   id: number;

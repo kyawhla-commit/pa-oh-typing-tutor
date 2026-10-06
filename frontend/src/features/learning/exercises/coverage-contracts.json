@@ -1,0 +1,225 @@
+{
+  "exercise": {
+    "minDesiredLength": 80,
+    "maxDesiredLength": 300,
+    "minLengthRatio": 0.8,
+    "maxLengthRatio": 1.25,
+    "maxFocusItems": 2,
+    "maxFocusUnits": 32,
+    "maxIdentityUnits": 512,
+    "maxVersionUnits": 63,
+    "attemptsPerStrategy": 8,
+    "maxChunksPerSection": 24,
+    "maxPaddingChunks": 24,
+    "grapheme": {
+      "total": 12,
+      "sections": [
+        3,
+        5,
+        4
+      ],
+      "contexts": 3
+    },
+    "substitution": {
+      "expected": [
+        3,
+        5,
+        4
+      ],
+      "counterpart": [
+        3,
+        4,
+        3
+      ],
+      "contexts": 3
+    },
+    "bigram": {
+      "total": 10,
+      "sections": [
+        2,
+        4,
+        4
+      ],
+      "contexts": 3
+    },
+    "token": {
+      "total": 4,
+      "sections": [
+        1,
+        2,
+        1
+      ],
+      "contexts": 3
+    },
+    "maxBalanceRatio": 1.75,
+    "maxTokenShare": 0.25,
+    "fallbackMaxTokenShare": 0.4,
+    "maxIdenticalTokenRun": 2,
+    "maxIsolatedFocusRun": 4,
+    "minMixedOrdinaryTokens": 3,
+    "minWarmupDensity": 0.15,
+    "minContextDensity": 0.08,
+    "fallbackMinWarmupDensity": 0.1,
+    "fallbackMinContextDensity": 0.06,
+    "minBroadDistinctTokens": 10,
+    "maxBroadPunctuationRatio": 0.03
+  },
+  "composition": {
+    "version": "composition-v1",
+    "cycle": 32,
+    "maxVariants": 64,
+    "maxOrdinal": 1000000000,
+    "attempts": 16,
+    "maxChunks": 48,
+    "tolerance": {
+      "min": 0.9,
+      "max": 1.1
+    },
+    "levels": [
+      {
+        "length": 160,
+        "shares": [
+          0.22,
+          0.38,
+          0.4
+        ],
+        "mixedMin": 0.35,
+        "mixedMax": 0.5,
+        "maxDensity": 0.4,
+        "contexts": 3,
+        "tokenContexts": 3,
+        "ordinary": 3,
+        "identicalShare": 0.25,
+        "identicalRun": 2,
+        "grapheme": [
+          6,
+          7,
+          5
+        ],
+        "counterpart": [
+          5,
+          5,
+          4
+        ],
+        "bigram": [
+          4,
+          5,
+          5
+        ],
+        "token": [
+          2,
+          2,
+          2
+        ]
+      },
+      {
+        "length": 220,
+        "shares": [
+          0.11,
+          0.3,
+          0.59
+        ],
+        "mixedMin": 0.5,
+        "mixedMax": 0.68,
+        "maxDensity": 0.25,
+        "contexts": 4,
+        "tokenContexts": 4,
+        "ordinary": 6,
+        "identicalShare": 0.2,
+        "identicalRun": 1,
+        "grapheme": [
+          4,
+          6,
+          5
+        ],
+        "counterpart": [
+          3,
+          5,
+          4
+        ],
+        "bigram": [
+          3,
+          5,
+          4
+        ],
+        "token": [
+          1,
+          2,
+          2
+        ]
+      },
+      {
+        "length": 300,
+        "shares": [
+          0.06,
+          0.2,
+          0.74
+        ],
+        "mixedMin": 0.65,
+        "mixedMax": 0.85,
+        "maxDensity": 0.16,
+        "contexts": 5,
+        "tokenContexts": 4,
+        "ordinary": 12,
+        "identicalShare": 0.15,
+        "identicalRun": 1,
+        "grapheme": [
+          3,
+          5,
+          4
+        ],
+        "counterpart": [
+          3,
+          4,
+          3
+        ],
+        "bigram": [
+          2,
+          4,
+          4
+        ],
+        "token": [
+          1,
+          2,
+          1
+        ]
+      }
+    ],
+    "assessment": {
+      "length": 300,
+      "shares": [
+        0.06,
+        0.25,
+        0.69
+      ],
+      "mixedMin": 0.6,
+      "mixedMax": 0.85,
+      "maxDensity": 0.1,
+      "contexts": 5,
+      "tokenContexts": 2,
+      "ordinary": 15,
+      "identicalShare": 0.12,
+      "identicalRun": 1,
+      "grapheme": [
+        0,
+        5,
+        5
+      ],
+      "counterpart": [
+        0,
+        4,
+        4
+      ],
+      "bigram": [
+        0,
+        3,
+        3
+      ],
+      "token": [
+        0,
+        1,
+        1
+      ]
+    }
+  }
+}

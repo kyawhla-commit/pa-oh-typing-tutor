@@ -38,7 +38,9 @@ interface LearningData {
 
 type SyncStatus = "local" | "syncing" | "synced" | "error";
 
-interface LearningContextValue extends LearningData {
+export interface LearningContextValue extends LearningData {
+  /** undefined while auth identity resolves; null denotes the local/guest persona. */
+  authenticatedUserId: string | null | undefined;
   syncStatus: SyncStatus;
   syncError: string | null;
   signIn: (learner: Learner) => void;
@@ -200,10 +202,11 @@ async function persistCloudData(userId: string, data: LearningData) {
   operations.forEach((operation) => supabaseError(operation.error));
 }
 
-const LearningContext = createContext<LearningContextValue | null>(null);
+export const LearningContext = createContext<LearningContextValue | null>(null);
 
 export function LearningProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<LearningData>(() => readStoredData(STORAGE_KEY, emptyData));
+  const [authenticatedUserId, setAuthenticatedUserId] = useState<string | null | undefined>(supabase ? undefined : null);
   const [cloudUserId, setCloudUserId] = useState<string | null>(null);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("local");
   const [syncError, setSyncError] = useState<string | null>(null);
@@ -230,6 +233,7 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
     let active = true;
 
     const hydrateUser = async (user: User) => {
+      setAuthenticatedUserId(user.id);
       const sequence = ++syncSequence.current;
       setSyncStatus("syncing");
       setSyncError(null);
@@ -283,6 +287,7 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
     };
 
     const handleSignedOut = () => {
+      setAuthenticatedUserId(null);
       ++syncSequence.current;
       setCloudUserId(null);
       setSyncError(null);
@@ -305,11 +310,13 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       if (sessionData.session?.user) void hydrateUser(sessionData.session.user);
+      else setAuthenticatedUserId(null);
     });
 
     const { data: authListener } = client.auth.onAuthStateChange((event, session) => {
       if (!active) return;
       if (session?.user) {
+        setAuthenticatedUserId(session.user.id);
         // Defer Supabase queries out of the auth callback to avoid holding its internal lock.
         Promise.resolve().then(() => { if (active) void hydrateUser(session.user); });
       } else if (event === "SIGNED_OUT") {
@@ -347,10 +354,12 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<LearningContextValue>(() => ({
     ...data,
+    authenticatedUserId,
     syncStatus,
     syncError,
     signIn: (learner) => setData((current) => ({ ...current, learner })),
     signOut: () => {
+      setAuthenticatedUserId(null);
       setCloudUserId(null);
       setData(readStoredData(STORAGE_KEY, emptyData));
     },
@@ -379,6 +388,7 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
       const currentUserId = userIdRef.current;
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(emptyData));
       if (currentUserId) window.localStorage.removeItem(storageKey(currentUserId));
+      setAuthenticatedUserId(null);
       setCloudUserId(null);
       setData({ ...emptyData });
       if (supabase) void supabase.auth.signOut();
@@ -391,7 +401,7 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
       ...current,
       preferences: { ...current.preferences, ...preferences },
     })),
-  }), [data, syncStatus, syncError]);
+  }), [data, authenticatedUserId, syncStatus, syncError]);
 
   return <LearningContext.Provider value={value}>{children}</LearningContext.Provider>;
 }

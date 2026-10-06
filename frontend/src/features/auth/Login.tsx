@@ -1,9 +1,10 @@
 import ThemeToggle from '../../components/ThemeToggle'
 import { useLearningData } from '../../data/LearningContext'
 import { getAuthRedirectUrl, supabase } from '../../lib/supabase'
-import { ArrowLeft, ArrowRight, BookOpen, Eye, EyeOff, LoaderCircle, LockKeyhole, Mail, UserRound } from 'lucide-react'
+import { ArrowLeft, ArrowRight, BookOpen, Eye, EyeOff, LoaderCircle, LockKeyhole, Mail, ShieldCheck, UserRound } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { demoAccounts } from './demoAccounts'
 
 function GoogleMark() {
   return <svg aria-hidden="true" viewBox="0 0 48 48" className="h-[18px] w-[18px]"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z" transform="translate(0 2) scale(1 .92)"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.76 7.18l7.73 6C44.42 38.06 46.98 31.91 46.98 24.55Z"/><path fill="#FBBC05" d="M10.53 28.59a14.4 14.4 0 0 1-.75-4.59c0-1.59.27-3.13.75-4.59l-7.98-6.2A23.9 23.9 0 0 0 0 24c0 3.89.94 7.57 2.56 10.78l7.97-6.19Z" transform="translate(0 -1)"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.9-5.8l-7.73-6c-2.14 1.44-4.88 2.3-8.17 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z" transform="translate(0 -1)"/></svg>
@@ -41,6 +42,10 @@ export default function Login() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    await passwordLogin(email, password)
+  }
+
+  const passwordLogin = async (accountEmail: string, accountPassword: string, demoRole?: 'user' | 'admin') => {
     setErrorMessage('')
     setNotice('')
     if (!supabase) {
@@ -48,17 +53,27 @@ export default function Login() {
       return
     }
     setLoading('email')
-    const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password })
-    if (error) {
-      setErrorMessage(error.message)
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email: accountEmail.trim().toLowerCase(), password: accountPassword })
+      if (error) {
+        setErrorMessage(error.message)
+        return
+      }
+      const user = data.user
+      const isAdmin = user.app_metadata.role === 'admin'
+      if (demoRole === 'admin' && !isAdmin) {
+        setErrorMessage('The demo admin account does not have administrator access. Ask the project owner to check its role.')
+        return
+      }
+      const metadataName = user.user_metadata.display_name || user.user_metadata.full_name || user.user_metadata.name
+      const fallbackName = user.email?.split('@')[0] || 'Learner'
+      signIn({ name: typeof metadataName === 'string' && metadataName.trim() ? metadataName.trim() : fallbackName, email: user.email || accountEmail.trim() })
+      navigate(isAdmin ? '/admin' : '/dashboard', { replace: true })
+    } catch {
+      setErrorMessage('We couldn’t connect to sign-in. Check your connection and try again.')
+    } finally {
       setLoading(null)
-      return
     }
-    const user = data.user
-    const metadataName = user.user_metadata.display_name || user.user_metadata.full_name || user.user_metadata.name
-    const fallbackName = user.email?.split('@')[0] || 'Learner'
-    signIn({ name: typeof metadataName === 'string' && metadataName.trim() ? metadataName.trim() : fallbackName, email: user.email || email.trim() })
-    navigate('/dashboard', { replace: true })
   }
 
   const sendPasswordReset = async () => {
@@ -101,6 +116,21 @@ export default function Login() {
             <p className="text-sm font-semibold text-blue-700">Welcome back</p>
             <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">Sign in to your account</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">Use Google or sign in with your email and password.</p>
+
+            {supabase && demoAccounts.length > 0 && <section aria-label="Demo accounts" className="mt-5 rounded-2xl border border-blue-100 bg-blue-50/60 p-4">
+              <p className="text-sm font-semibold text-slate-900">Try a demo account</p>
+              <p className="mt-1 text-xs leading-5 text-slate-600">Sign in instantly with the demo user or admin. Changes are saved to this Supabase project.</p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {demoAccounts.map((account) => <button key={account.role} type="button" disabled={loading !== null} onClick={() => {
+                  setEmail(account.email)
+                  setPassword(account.password)
+                  void passwordLogin(account.email, account.password, account.role)
+                }} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-blue-200 bg-white px-3 py-2.5 text-sm font-semibold text-blue-700 transition hover:bg-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-wait disabled:opacity-60">
+                  {account.role === 'admin' ? <ShieldCheck size={17} /> : <UserRound size={17} />}
+                  {account.role === 'admin' ? 'Demo admin login' : 'Demo user login'}
+                </button>)}
+              </div>
+            </section>}
 
             <button type="button" onClick={() => void startGoogleLogin()} disabled={loading !== null} className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-blue-100 disabled:cursor-wait disabled:opacity-60">
               {loading === 'google' ? <LoaderCircle size={18} className="animate-spin" /> : <GoogleMark />}
