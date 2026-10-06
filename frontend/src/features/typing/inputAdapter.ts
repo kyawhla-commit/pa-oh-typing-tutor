@@ -4,7 +4,7 @@ export interface TypingInputSink {
   deleteBackward(): unknown;
 }
 
-export function attachTypingInput(input: HTMLTextAreaElement, sink: TypingInputSink) {
+export function attachTypingInput(input: HTMLTextAreaElement, sink: TypingInputSink, onCompositionDraft?: (text: string | null) => void) {
   let composing = false;
   let backspaceEcho = false;
   let compositionEcho: string | null = null;
@@ -20,7 +20,7 @@ export function attachTypingInput(input: HTMLTextAreaElement, sink: TypingInputS
     }
   };
   const clear = () => { input.value = ""; anchor(); };
-  const reset = () => { composing = false; backspaceEcho = false; compositionEcho = null; handledInput = null; keyboardInsertion = null; clear(); };
+  const reset = () => { composing = false; onCompositionDraft?.(null); backspaceEcho = false; compositionEcho = null; handledInput = null; keyboardInsertion = null; clear(); };
   const listen = (type: string, listener: EventListener) => {
     input.addEventListener(type, listener);
     listeners.push([type, listener]);
@@ -42,12 +42,13 @@ export function attachTypingInput(input: HTMLTextAreaElement, sink: TypingInputS
     && ["insertText", "insertFromComposition", "insertCompositionText"].includes(type)
     && (event.data === compositionEcho || (event.data === null && (input.value === "" || input.value === compositionEcho)));
 
-  listen("compositionstart", () => { reset(); composing = true; });
+  listen("compositionstart", () => { reset(); composing = true; onCompositionDraft?.(""); });
   // Updates are draft text only. Native editing stays enabled throughout composition.
-  listen("compositionupdate", () => {});
+  listen("compositionupdate", (event) => { if (composing) onCompositionDraft?.((event as CompositionEvent).data); });
   listen("compositionend", (raw) => {
     if (!composing) return; // A blur/reset cancelled this composition.
     composing = false;
+    onCompositionDraft?.(null);
     const text = (raw as CompositionEvent).data;
     if (text) sink.insertText(text);
     compositionEcho = text || null;
@@ -91,7 +92,7 @@ export function attachTypingInput(input: HTMLTextAreaElement, sink: TypingInputS
     const event = raw as InputEvent;
     const type = inputTypeOf(event);
     if (!supported(type) && !compositionType(type)) { reset(); return; }
-    if (composing || event.isComposing) return;
+    if (composing || event.isComposing) { if (composing) onCompositionDraft?.(input.value); return; }
     if (isEcho(event, type)) { compositionEcho = null; keyboardInsertion = null; clear(); return; }
     compositionEcho = null;
     if (handledInput?.type === type && handledInput.text === event.data) {
@@ -130,7 +131,7 @@ export function attachTypingInput(input: HTMLTextAreaElement, sink: TypingInputS
   reset();
   return {
     reset,
-    focus: () => { input.focus(); anchor(); },
+    focus: () => { input.focus({ preventScroll: true }); anchor(); },
     dispose: () => { for (const [type, listener] of listeners) input.removeEventListener(type, listener); reset(); },
   };
 }

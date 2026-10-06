@@ -235,7 +235,7 @@ function PracticeSession({
 }) {
   const surfaceRoot = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (activePlan || focusOnMount) surfaceRoot.current?.querySelector("textarea")?.focus();
+    if (activePlan || focusOnMount) surfaceRoot.current?.querySelector("textarea")?.focus({ preventScroll: true });
   }, [activePlan, focusOnMount]);
   const [mode, setMode] = useState<PracticeMode>("words");
   const [launchFailure, setLaunchFailure] = useState<string | null>(null);
@@ -592,7 +592,7 @@ function PracticeSession({
         )}
 
         <TypingLiveStats session={session} />
-        <TypingPracticeSurface session={session} onNext={nextAction} nextLabel={lessonId ? "Next lesson" : "Next text"} onRestart={restart} />
+        <TypingPracticeSurface session={session} onNext={nextAction} nextLabel={lessonId ? "Next lesson" : "Next text"} onRestart={restart} layout={preferences.keyboardLayout} />
 
         {result ? (
           <div className={`mt-6 rounded-2xl border p-6 text-center ${lessonId && !lessonPassed ? "border-amber-200 bg-amber-50" : "border-emerald-200 bg-emerald-50"}`}>

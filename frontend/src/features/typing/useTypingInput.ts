@@ -7,7 +7,7 @@ export function useTypingInput(session: TypingSession, generation: number, focus
   const input = useRef<HTMLTextAreaElement>(null);
   const adapter = useRef<ReturnType<typeof attachTypingInput> | null>(null);
   useLayoutEffect(() => {
-    const attached = attachTypingInput(input.current!, session);
+    const attached = attachTypingInput(input.current!, session, session.setCompositionDraft);
     adapter.current = attached;
     return () => { attached.dispose(); adapter.current = null; };
   }, [session]);

@@ -273,7 +273,9 @@ export default function Settings() {
           </div>
           <p className="mt-2 text-xs text-[#94A3B8]">
             The Practice keyboard follows your selected layout. Pa'O displays
-            both Latin key positions and Myanmar/Pa'O characters.
+            Latin key positions and Myanmar/Pa'O characters, with next-key hints
+            for the Linux PaOh layout. Select the matching keyboard on your device;
+            this setting changes the guide, not your device's input method.
           </p>
         </fieldset>
       </section>

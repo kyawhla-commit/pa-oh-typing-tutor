@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { paoKeyLegends, type KeyHint } from "./keyboardLayouts";
 
 const rowsByLayout: Record<string, string[][]> = {
   QWERTY: [
@@ -22,56 +23,6 @@ const rowsByLayout: Record<string, string[][]> = {
   //   ["Shift", "z", "x", "c", "v", "b", "k", "m", ",", ".", "/", "Shift"],
   //   ["Space"],
   // ],
-};
-
-const paoKeyLegends: Record<string, { shifted: string; unshifted: string }> = {
-  Backquote: { shifted: "ဎ", unshifted: "ၐ" },
-  Digit1: { shifted: "ဍ", unshifted: "၁" },
-  Digit2: { shifted: "ၒ", unshifted: "၂" },
-  Digit3: { shifted: "ဋ", unshifted: "၃" },
-  Digit4: { shifted: "ၓ", unshifted: "၄" },
-  Digit5: { shifted: "ၔ", unshifted: "၅" },
-  Digit6: { shifted: "ၕ", unshifted: "၆" },
-  Digit7: { shifted: "ရ", unshifted: "၇" },
-  Digit8: { shifted: "*", unshifted: "၈" },
-  Digit9: { shifted: "(", unshifted: "၉" },
-  Digit0: { shifted: ")", unshifted: "၀" },
-  Minus: { shifted: "_", unshifted: "−" },
-  Equal: { shifted: "+", unshifted: "=" },
-  KeyQ: { shifted: "ဈ", unshifted: "ဆ" },
-  KeyW: { shifted: "ဝ", unshifted: "တ" },
-  KeyE: { shifted: "ဣ", unshifted: "န" },
-  KeyR: { shifted: "၎င်း", unshifted: "မ" },
-  KeyT: { shifted: "ဤ", unshifted: "အ" },
-  KeyY: { shifted: "၌", unshifted: "ပ" },
-  KeyU: { shifted: "ဥ", unshifted: "က" },
-  KeyI: { shifted: "၍", unshifted: "င" },
-  KeyO: { shifted: "ဿ", unshifted: "သ" },
-  KeyP: { shifted: "ဏ", unshifted: "စ" },
-  BracketLeft: { shifted: "ဧ", unshifted: "ဟ" },
-  BracketRight: { shifted: "ဪ", unshifted: "ဩ" },
-  Backslash: { shifted: "ၑ", unshifted: "၏" },
-  KeyA: { shifted: "ဗ", unshifted: "ေ" },
-  KeyS: { shifted: "ှ", unshifted: "ျ" },
-  KeyD: { shifted: "ီ", unshifted: "ိ" },
-  KeyF: { shifted: "္", unshifted: "်" },
-  KeyG: { shifted: "ွ", unshifted: "ါ" },
-  KeyH: { shifted: "ံ", unshifted: "့" },
-  KeyJ: { shifted: "ဲ", unshifted: "ြ" },
-  KeyK: { shifted: "ဒ", unshifted: "ု" },
-  KeyL: { shifted: "ဓ", unshifted: "ူ" },
-  Semicolon: { shifted: "ဂ", unshifted: "း" },
-  Quote: { shifted: "\"", unshifted: "'" },
-  KeyZ: { shifted: "ဇ", unshifted: "ဖ" },
-  KeyX: { shifted: "ဌ", unshifted: "ထ" },
-  KeyC: { shifted: "ဃ", unshifted: "ခ" },
-  KeyV: { shifted: "ဠ", unshifted: "လ" },
-  KeyB: { shifted: "ယ", unshifted: "ဘ" },
-  KeyN: { shifted: "ဉ", unshifted: "ည" },
-  KeyM: { shifted: "ဦ", unshifted: "ာ" },
-  Comma: { shifted: "၊", unshifted: "ꩻ" },
-  Period: { shifted: "။", unshifted: "ႏ" },
-  Slash: { shifted: "?", unshifted: "/" },
 };
 
 type PaOKey = { code: string; label: string; special?: boolean; space?: boolean };
@@ -116,6 +67,7 @@ interface VirtualKeyboardProps {
   pressedKey?: string;
   errorKey?: string;
   layout?: string;
+  nextKey?: KeyHint | null;
 }
 
 function normalizeKey(key: string) {
@@ -124,7 +76,7 @@ function normalizeKey(key: string) {
   return key.toLowerCase();
 }
 
-export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY" }: VirtualKeyboardProps) {
+export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY", nextKey }: VirtualKeyboardProps) {
   const pressed = pressedKey ? normalizeKey(pressedKey) : "";
   const error = errorKey ? normalizeKey(errorKey) : "";
   const rows = rowsByLayout[layout] || rowsByLayout.QWERTY;
@@ -143,6 +95,7 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
                 const candidates = [typedKey, expectedKey, shiftedKey].filter(Boolean).map(normalizeKey);
                 const isPressed = Boolean(pressed) && candidates.includes(pressed);
                 const isError = Boolean(error) && candidates.includes(error);
+                const isNext = nextKey?.code === key.code || (nextKey?.shift && key.code.startsWith("Shift"));
                 const isWide = key.special || key.space;
                 const keyStyle: CSSProperties = {
                   width: key.space ? "calc(var(--keyboard-key-size) * 5.7)" : isWide ? "calc(var(--keyboard-key-size) * 1.3)" : "var(--keyboard-key-size)",
@@ -153,9 +106,11 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
                 return (
                   <div
                     key={key.code}
+                    data-key-code={key.code}
+                    data-next-key={isNext ? "true" : undefined}
                     aria-hidden="true"
                     style={keyStyle}
-                    className={`relative flex shrink-0 items-center justify-center rounded-sm border font-medium transition-all duration-75
+                    className={`relative flex shrink-0 items-center justify-center rounded-sm border font-medium transition-all duration-75 ${isNext ? "ring-2 ring-blue-500 ring-offset-1" : ""}
                       ${isError
                         ? "bg-red-500 text-white border-red-400 scale-95 shadow-none"
                         : isPressed
@@ -163,13 +118,13 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
                           : "bg-white text-slate-600 border-slate-200 shadow-sm hover:bg-slate-50"}
                     `}
                   >
-                    {key.space ? null : key.special ? (
+                    {key.space ? "Space" : key.special ? (
                       key.label
                     ) : (
                       <>
                         <span style={{ left: "calc(var(--keyboard-key-size) * 0.125)", top: "calc(var(--keyboard-key-size) * 0.09)", fontSize: "clamp(6px, calc(var(--keyboard-key-size) * 0.18), 10px)" }} className={`absolute leading-none ${isPressed || isError ? "text-white" : "text-slate-500"}`}>{key.label}</span>
-                        {legends && <span style={{ right: "calc(var(--keyboard-key-size) * 0.125)", top: "calc(var(--keyboard-key-size) * 0.09)", fontSize: "clamp(6px, calc(var(--keyboard-key-size) * 0.23), 13px)" }} className={`absolute font-myanmar leading-none ${isPressed || isError ? "text-white" : "text-slate-600"}`}>{legends.shifted}</span>}
-                        {legends && <span style={{ bottom: "calc(var(--keyboard-key-size) * 0.11)", fontSize: "clamp(7px, calc(var(--keyboard-key-size) * 0.286), 16px)" }} className={`absolute left-0 right-0 text-center font-myanmar font-medium leading-none ${isPressed || isError ? "text-white" : "text-slate-800"}`}>{legends.unshifted}</span>}
+                        {legends && <span style={{ right: "calc(var(--keyboard-key-size) * 0.125)", top: "calc(var(--keyboard-key-size) * 0.09)", fontSize: "clamp(6px, calc(var(--keyboard-key-size) * 0.23), 13px)" }} className={`absolute font-myanmar leading-relaxed ${isPressed || isError ? "text-white" : "text-slate-600"}`}>{legends.shifted}</span>}
+                        {legends && <span style={{ bottom: "calc(var(--keyboard-key-size) * 0.11)", fontSize: "clamp(7px, calc(var(--keyboard-key-size) * 0.286), 16px)" }} className={`absolute left-0 right-0 text-center font-myanmar font-medium leading-relaxed ${isPressed || isError ? "text-white" : "text-slate-800"}`}>{legends.unshifted}</span>}
                       </>
                     )}
                   </div>
@@ -192,6 +147,7 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
               const isSpace = key === "Space";
               const isPressed = normalized === pressed;
               const isError = normalized === error;
+              const isNext = nextKey?.label === key || (key === "Shift" && nextKey?.shift);
               const isWide = wideKeys.has(key);
               const keyStyle: CSSProperties = {
                 width: isSpace ? "calc(var(--keyboard-key-size) * 5.7)" : isWide ? "calc(var(--keyboard-key-size) * 1.3)" : "var(--keyboard-key-size)",
@@ -202,8 +158,9 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
               return (
                 <div
                   key={`${key}-${keyIndex}`}
+                  data-next-key={isNext ? "true" : undefined}
                   style={keyStyle}
-                  className={`flex items-center justify-center rounded-sm border font-medium transition-all duration-75
+                  className={`flex items-center justify-center rounded-sm border font-medium transition-all duration-75 ${isNext ? "ring-2 ring-blue-500 ring-offset-1" : ""}
                     ${isError
                       ? "bg-red-500 text-white border-red-400 scale-95 shadow-none"
                       : isPressed

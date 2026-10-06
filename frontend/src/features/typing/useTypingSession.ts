@@ -20,12 +20,14 @@ export interface TypingFeedback {
   readonly generation: number;
   readonly pressedKey: string;
   readonly errorKey: string;
+  /** Native IME draft for presentation only; null means no active composition. */
+  readonly compositionDraft: string | null;
 }
 
 /** Feature-owned subscriptions; the domain engine stays synchronous and DOM-independent. */
 export function createTypingSession(config: TypingEngineConfig, now = () => performance.now()) {
   const engine = createTypingEngine(config);
-  const feedback = channel<TypingFeedback>({ snapshot: engine.getSnapshot(), generation: 0, pressedKey: "", errorKey: "" });
+  const feedback = channel<TypingFeedback>({ snapshot: engine.getSnapshot(), generation: 0, pressedKey: "", errorKey: "", compositionDraft: null });
   const stats = channel(engine.getSnapshot());
   const result = channel(engine.getResult());
   // Feature-owned identity survives controller remount/effect replay. It is never
@@ -60,6 +62,10 @@ export function createTypingSession(config: TypingEngineConfig, now = () => perf
   };
   return {
     feedback, stats, result, run,
+    setCompositionDraft: (compositionDraft: string | null) => {
+      const current = feedback.getSnapshot();
+      if (current.compositionDraft !== compositionDraft) feedback.publish({ ...current, compositionDraft });
+    },
     insertText: (text: string) => {
       const outcome = engine.dispatch({ type: "INSERT_TEXT", text, atMs: now() });
       if (outcome.accepted) publishInput(engine.getSnapshot().typedUnits[engine.getSnapshot().typedUnits.length - 1]?.text ?? text);
@@ -87,7 +93,7 @@ export function createTypingSession(config: TypingEngineConfig, now = () => perf
     },
     restart: (next?: TypingEngineConfig) => {
       engine.reset(next);
-      feedback.publish({ snapshot: engine.getSnapshot(), generation: feedback.getSnapshot().generation + 1, pressedKey: "", errorKey: "" });
+      feedback.publish({ snapshot: engine.getSnapshot(), generation: feedback.getSnapshot().generation + 1, pressedKey: "", errorKey: "", compositionDraft: null });
       stats.publish(engine.getSnapshot());
       result.publish(null);
       run.publish({ id: crypto.randomUUID(), result: null, status: engine.getSnapshot().status });

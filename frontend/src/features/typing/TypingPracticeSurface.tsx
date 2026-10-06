@@ -3,13 +3,17 @@ import VirtualKeyboard from "../../components/VirtualKeyboard";
 import { useTypingInput } from "./useTypingInput";
 import { useTypingFeedback, useTypingStats, type TypingSession } from "./useTypingSession";
 import type { ComponentProps } from "react";
+import { MyanmarTypingGuide } from "./MyanmarTypingGuide";
+import { getTypingGuide, hasMyanmarText, nextGuideKey } from "./typingGuide";
 
-export const TypingPracticeSurface = memo(function TypingPracticeSurface({ session, onNext, nextLabel = "Next text", onRestart }: { session: TypingSession; onNext?: () => void; nextLabel?: string; onRestart?: () => void }) {
-  const { snapshot, generation } = useTypingFeedback(session);
+export const TypingPracticeSurface = memo(function TypingPracticeSurface({ session, onNext, nextLabel = "Next text", onRestart, layout = "QWERTY" }: { session: TypingSession; onNext?: () => void; nextLabel?: string; onRestart?: () => void; layout?: string }) {
+  const { snapshot, generation, compositionDraft } = useTypingFeedback(session);
+  const myanmar = hasMyanmarText(snapshot.target.text);
+  const guide = myanmar ? getTypingGuide(snapshot) : null;
   const { input, focus } = useTypingInput(session, generation);
   const [focused, setFocused] = useState(false);
   const needsCorrection = snapshot.status === "running" && snapshot.progress === 1
-    && snapshot.counts.uncorrectedErrors > 0;
+    && snapshot.counts.uncorrectedErrors > 0 && !guide?.partial;
   const focusLabel = needsCorrection ? "Correct mistakes" : snapshot.currentPosition > 0 ? "Continue typing" : "Start typing";
   const statusText = snapshot.status === "completed" ? snapshot.completionPolicy === "target-covered" ? "Attempt finished" : "Practice complete"
     : needsCorrection ? `Passage filled — ${snapshot.counts.uncorrectedErrors} ${snapshot.counts.uncorrectedErrors === 1 ? "mistake" : "mistakes"} left to correct`
@@ -54,30 +58,32 @@ export const TypingPracticeSurface = memo(function TypingPracticeSurface({ sessi
     };
   }, [session, input, focus, onNext, onRestart]);
   return (
-    <div>
-      <div className="mb-3 flex items-center justify-between gap-3">
+    <div className="[overflow-anchor:none]">
+      <div className="mb-3 flex h-20 items-center justify-between gap-3 sm:h-12">
         <p role="status" className={`text-sm ${needsCorrection ? "font-medium text-amber-700" : "text-slate-600"}`}>{statusText}</p>
         {snapshot.status !== "completed" && <button type="button" onClick={focus} aria-keyshortcuts="Control+Enter Meta+Enter" className="shrink-0 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">{focusLabel}</button>}
       </div>
+      {myanmar && <MyanmarTypingGuide snapshot={snapshot} layout={layout} compositionDraft={compositionDraft} />}
       <div className="relative cursor-text rounded-2xl focus-within:ring-2 focus-within:ring-blue-400" onClick={focus}>
-        <textarea ref={input} aria-label="Typing input" aria-describedby="typing-help" spellCheck={false}
+        <textarea ref={input} aria-label="Typing input" aria-describedby={guide ? "typing-help typing-next-input" : "typing-help"} spellCheck={false}
           onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
           autoCorrect="off" autoCapitalize="off" autoComplete="off"
           className="absolute inset-0 z-10 h-full w-full resize-none opacity-0" />
-        <div data-testid="typing-text" className="pointer-events-none min-h-[120px] select-none whitespace-pre-wrap break-words rounded-2xl border border-slate-200 bg-white p-6 font-mono text-lg leading-8 tracking-wide shadow-sm">
+        <div data-testid="typing-text" className={`pointer-events-none min-h-[120px] select-none whitespace-pre-wrap break-words rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ${myanmar ? "font-myanmar text-[28px] leading-[2] tracking-normal" : "font-mono text-lg leading-8 tracking-wide"}`}>
           {snapshot.target.units.map((unit, index) => {
-            const state = index < snapshot.currentPosition
+            const state = guide?.partial && index === guide.position ? "partial" : index < snapshot.currentPosition
               ? snapshot.typedUnits[index].correct ? "correct" : "incorrect"
-              : index === snapshot.currentPosition ? "current" : "pending";
+              : index === (guide?.partial ? guide.position : snapshot.currentPosition) ? "current" : "pending";
             const styles = {
               correct: "text-emerald-700",
               incorrect: "bg-red-50 text-red-700 underline decoration-red-400",
-              current: "border-l-2 border-blue-500 bg-blue-50 text-slate-900",
+              current: "shadow-[inset_2px_0_0_#3b82f6] bg-blue-50 text-slate-900",
               pending: "text-slate-600",
+              partial: "shadow-[inset_2px_0_0_#3b82f6] bg-blue-50 text-blue-800 underline decoration-blue-400 decoration-dotted underline-offset-4",
             };
             return <span key={index} className={`typing-char ${state} ${styles[state]}`}>{unit}</span>;
           })}
-          {snapshot.currentPosition === snapshot.target.units.length && snapshot.status !== "completed" && <span className="ml-0.5 inline-block h-5 w-0.5 animate-pulse bg-blue-500 align-middle" />}
+          {snapshot.currentPosition === snapshot.target.units.length && snapshot.status !== "completed" && !guide?.partial && <span className="ml-0.5 inline-block h-5 w-0.5 animate-pulse bg-blue-500 align-middle" />}
         </div>
       </div>
       <p id="typing-help" className="mt-3 text-xs text-slate-600">
@@ -105,6 +111,10 @@ export const TypingLiveStats = memo(function TypingLiveStats({ session }: { sess
 });
 
 export const TypingKeyboardFeedback = memo(function TypingKeyboardFeedback({ session, layout }: { session: TypingSession; layout: ComponentProps<typeof VirtualKeyboard>["layout"] }) {
-  const { pressedKey, errorKey } = useTypingFeedback(session);
-  return <VirtualKeyboard pressedKey={pressedKey} errorKey={errorKey} layout={layout} />;
+  const { snapshot, pressedKey, errorKey, compositionDraft } = useTypingFeedback(session);
+  const guide = hasMyanmarText(snapshot.target.text) ? getTypingGuide(snapshot) : null;
+  const composing = compositionDraft !== null;
+  const lastOutput = guide && pressedKey !== "Backspace" ? Array.from(pressedKey).at(-1) : pressedKey;
+  return <VirtualKeyboard pressedKey={composing ? "" : lastOutput} errorKey={composing || guide?.partial ? "" : errorKey}
+    nextKey={composing ? null : nextGuideKey(snapshot, layout ?? "QWERTY")} layout={layout} />;
 });

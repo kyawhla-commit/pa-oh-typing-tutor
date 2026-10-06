@@ -131,6 +131,55 @@ published content. Catalog removal retains the mounted session's prior target.
 Missing lessons never fall back to an unrelated random exercise. General practice
 mode/text selection intentionally resets the engine; Restart retains its target.
 
+## Myanmar / Pa'O teaching guide
+
+Practice and local mistake drills detect Myanmar script in the frozen source
+target. They use Noto Sans Myanmar at 28px, normal letter spacing and a generous
+line height; Latin/code passages retain their existing monospace style.
+The next-input panel enlarges the expected engine grapheme and shows unchanged
+source context. Context uses existing whitespace runs, bounded for long unspaced
+text; it does not claim to segment Burmese or Pa'O syllables. Source text, engine
+segmentation, scoring, lesson thresholds and saved history remain unchanged.
+
+A committed trailing prefix of the expected grapheme shows as an unfinished
+group, with the remaining combining marks and keys. This is presentation only:
+the engine still counts each committed revision under its existing policy.
+An incompatible trailing input shows expected/actual values and Backspace
+guidance. Completed/aborted attempts hide the guide; existing coverage-based
+completion remains authoritative. Dotted circles and Space/Enter labels appear
+only in teaching previews, never in the target or scored input.
+
+`components/keyboardLayouts.ts` holds the direct PaOh basic key outputs, checked
+against this machine's `/usr/share/X11/xkb/symbols/pao` on 2026-10-07. All 47
+unshifted/shifted pairs match. Shift+R was corrected from the expanded `၎င်း`
+legend to the actual `၎` output; the minus legend now uses ASCII `-`.
+The guide outlines the next physical key and both Shift keys when needed.
+Hints are for this Linux layout, not a generic Myanmar3/KeyMagic reorder model.
+Unknown text/layouts get no inferred sequence. Tab remains navigation, and
+Enter emits LF, so raw CR/CRLF do not get a guessed physical-key hint.
+Settings and the panel explain that the device's input method must match.
+
+An optional native-adapter callback publishes composition drafts to the feature
+feedback channel only. Drafts show in a neutral preview, suppress keyboard hints,
+and never enter scoring/stats/results. Commit, blur, rejected edits, restart and
+disposal clear them; existing composition commit/echo behavior is retained.
+Automated checks cover direct mapping, split marks, Shift/whitespace hints,
+wrong input/correction, preserved target/history, composition commit echoes,
+blur/restart cancellation, completion and Latin fallback. Physical keyboard/IME
+event order and final font rendering still require a live Firefox retest.
+
+The hint panel reserves 256px on desktop and 320px on small screens. Longer
+key sequences, context and explanations scroll within its keyboard-accessible
+region; partial/error/composition content cannot resize the passage's container.
+The status row also reserves space, and current/partial cursors use an inset
+shadow rather than a width-changing border. The surface excludes its dynamic
+content from scroll anchoring. Explicit adapter focus, lesson launch and drill
+launch use `focus({ preventScroll: true })`; input updates never request focus.
+[Focus scrolling behavior](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus).
+Manual page scrolling and hint scrolling remain available. These changes target
+mid-attempt movement; completing an attempt intentionally switches to its result.
+jsdom checks verify focus requests and lifecycle, not real browser scroll geometry.
+
 ## Reproducing browser checks
 
 Start `pnpm dev`, then open `/tests/browser/typing-session.html`. This standalone

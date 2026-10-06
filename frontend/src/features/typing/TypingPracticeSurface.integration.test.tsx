@@ -2,7 +2,7 @@
 import { act, StrictMode } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { TypingPracticeSurface } from "./TypingPracticeSurface";
+import { TypingKeyboardFeedback, TypingPracticeSurface } from "./TypingPracticeSurface";
 import { createTypingSession, type TypingSession } from "./useTypingSession";
 
 let root: Root, host: HTMLDivElement, session: TypingSession;
@@ -33,6 +33,140 @@ beforeEach(() => {
   act(() => root.render(<StrictMode><TypingPracticeSurface session={session} /></StrictMode>));
 });
 afterEach(() => { act(() => root.unmount()); host.remove(); });
+
+describe("Myanmar input guidance", () => {
+  const mountMyanmar = (targetText = "နို့ ကာ", layout = "Pa'O") => {
+    session = createTypingSession({ targetText, completionPolicy: "target-covered" }, () => 100);
+    act(() => root.render(<StrictMode>
+      <TypingPracticeSurface session={session} layout={layout} />
+      <TypingKeyboardFeedback session={session} layout={layout} />
+    </StrictMode>));
+    act(() => input().focus());
+  };
+  const guide = () => host.querySelector('[aria-label="Next input guide"]')!;
+  const nextCodes = () => Array.from(host.querySelectorAll('[data-next-key="true"]'), key => key.getAttribute("data-key-code"));
+
+  it("shows Myanmar typography, intact context and the next physical key", () => {
+    mountMyanmar();
+    expect(host.querySelector('[data-testid="typing-text"]')!.textContent).toBe("နို့ ကာ");
+    expect(host.querySelector('[data-testid="typing-text"]')!.className).toContain("font-myanmar");
+    expect(host.querySelector('[data-testid="typing-text"]')!.className).toContain("tracking-normal");
+    expect(host.querySelector('[data-testid="next-input"]')!.textContent).toBe("နို့");
+    expect(host.querySelector('[data-testid="next-input-context"]')!.textContent).toBe("နို့");
+    expect(nextCodes()).toEqual(["KeyE"]);
+  });
+
+  it("keeps a partially entered group current and highlights remaining combining keys", () => {
+    mountMyanmar();
+    commitWithoutMetadata("န");
+    expect(guide().textContent).toContain("Continue this character group");
+    expect(guide().textContent).toContain("dotted circle");
+    expect(nextCodes()).toEqual(["KeyD"]);
+    expect(host.querySelectorAll(".typing-char.partial")).toHaveLength(1);
+    expect(host.querySelectorAll(".typing-char.incorrect")).toHaveLength(0);
+    expect(host.querySelectorAll(".typing-char.current")).toHaveLength(0);
+    commitWithoutMetadata("ိ"); expect(nextCodes()).toEqual(["KeyK"]);
+    commitWithoutMetadata("ု"); expect(nextCodes()).toEqual(["KeyH"]);
+    commitWithoutMetadata("့"); expect(nextCodes()).toEqual(["Space"]);
+    expect(host.querySelector('[data-testid="next-input"]')!.textContent).toBe("Space ␣");
+    expect(typed()).toBe(1);
+    expect(session.feedback.getSnapshot().snapshot.counts.totalInsertionAttempts).toBe(4);
+    expect(host.querySelector('[data-testid="typing-text"]')!.textContent).toBe("နို့ ကာ");
+  });
+
+  it("shows Shift with its key and stops guiding once the attempt finishes", () => {
+    mountMyanmar("နီ ကာ");
+    commitWithoutMetadata("န");
+    expect(nextCodes()).toEqual(["KeyD", "ShiftLeft", "ShiftRight"]);
+    expect(guide().textContent).toContain("Shift + D");
+    commitWithoutMetadata("ီ");
+    expect(nextCodes()).toEqual(["Space"]);
+    act(() => session.insertText(" ကာ"));
+    expect(session.result.getSnapshot()).not.toBeNull();
+    expect(host.querySelector('[aria-label="Next input guide"]')).toBeNull();
+    expect(nextCodes()).toEqual([]);
+  });
+
+  it("shows expected versus typed with Backspace guidance and updates after correction", () => {
+    mountMyanmar(); commitWithoutMetadata("မ");
+    expect(guide().textContent).toContain("Correct the previous input");
+    expect(guide().textContent).toContain("Expected နို့");
+    expect(guide().textContent).toContain("You typed မ");
+    expect(nextCodes()).toEqual(["Backspace"]);
+    act(() => input().dispatchEvent(new KeyboardEvent("keydown", { key: "Backspace", bubbles: true, cancelable: true })));
+    expect(nextCodes()).toEqual(["KeyE"]);
+    expect(guide().textContent).not.toContain("You typed");
+  });
+
+  it("keeps the guide mounted while correcting a full strict passage with an earlier mistake", () => {
+    session = createTypingSession({ targetText: "န က", completionPolicy: "require-correct-target" }, () => 100);
+    act(() => root.render(<TypingPracticeSurface session={session} layout="Pa'O" />));
+    const panel = guide();
+    act(() => session.insertText("မ က"));
+    expect(session.feedback.getSnapshot().snapshot.status).toBe("running");
+    expect(guide()).toBe(panel);
+    expect(guide().textContent).toContain("Return to the remaining mistakes");
+    act(() => session.deleteBackward());
+    expect(guide()).toBe(panel);
+    expect(guide().textContent).toContain("Type next");
+  });
+
+  it("renders neutral IME drafts, scores only the commit once, and clears canceled drafts", () => {
+    mountMyanmar("နီ ကာ");
+    act(() => {
+      input().dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true }));
+      input().dispatchEvent(new CompositionEvent("compositionupdate", { data: "န", bubbles: true }));
+    });
+    expect(host.querySelector('[data-testid="composition-preview"]')!.textContent).toBe("န");
+    expect(guide().textContent).toContain("not scored yet");
+    expect(nextCodes()).toEqual([]);
+    expect(session.feedback.getSnapshot().snapshot.counts.totalInsertionAttempts).toBe(0);
+    act(() => {
+      input().value = "နီ";
+      input().dispatchEvent(new InputEvent("input", { inputType: "insertCompositionText", data: "နီ", isComposing: true, bubbles: true }));
+    });
+    expect(host.querySelector('[data-testid="composition-preview"]')!.textContent).toBe("နီ");
+    act(() => {
+      input().dispatchEvent(new CompositionEvent("compositionend", { data: "နီ", bubbles: true }));
+      input().dispatchEvent(new InputEvent("input", { inputType: "insertText", data: "နီ", bubbles: true }));
+    });
+    expect(session.feedback.getSnapshot().snapshot.counts.totalInsertionAttempts).toBe(1);
+    expect(host.querySelector('[data-testid="composition-preview"]')).toBeNull();
+    expect(nextCodes()).toEqual(["Space"]);
+    act(() => {
+      input().dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true }));
+      input().dispatchEvent(new CompositionEvent("compositionupdate", { data: "က", bubbles: true }));
+      input().blur();
+      input().dispatchEvent(new CompositionEvent("compositionend", { data: "က", bubbles: true }));
+    });
+    expect(session.feedback.getSnapshot().compositionDraft).toBeNull();
+    expect(session.feedback.getSnapshot().snapshot.counts.totalInsertionAttempts).toBe(1);
+    act(() => {
+      input().focus();
+      input().dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true }));
+      input().dispatchEvent(new CompositionEvent("compositionupdate", { data: "က", bubbles: true }));
+      session.restart();
+    });
+    expect(host.querySelector('[data-testid="composition-preview"]')).toBeNull();
+    expect(session.feedback.getSnapshot().snapshot.counts.totalInsertionAttempts).toBe(0);
+    expect(nextCodes()).toEqual(["KeyE"]);
+  });
+
+  it("labels Enter and avoids guessed hints for other layouts and unsupported text", () => {
+    mountMyanmar("\nန");
+    expect(host.querySelector('[data-testid="next-input"]')!.textContent).toBe("Enter ↵");
+    expect(nextCodes()).toEqual(["Enter"]);
+    mountMyanmar("န", "QWERTY");
+    expect(guide().textContent).toContain("Select the Pa’O keyboard");
+    expect(nextCodes()).toEqual([]);
+    mountMyanmar("😀 န");
+    expect(guide().textContent).toContain("No verified key hint");
+    expect(nextCodes()).toEqual([]);
+    mountMyanmar("abc", "Pa'O");
+    expect(host.querySelector('[aria-label="Next input guide"]')).toBeNull();
+    expect(host.querySelector('[data-testid="typing-text"]')!.className).toContain("font-mono");
+  });
+});
 
 describe("restart shortcut", () => {
   const mountRestart = () => {
@@ -92,6 +226,20 @@ describe("restart shortcut", () => {
 });
 
 describe("Practice focus and browser input", () => {
+  it("focuses and restarts without requesting page scrolling, and never refocuses per character", () => {
+    const nativeFocus = vi.spyOn(input(), "focus");
+    act(() => button().click());
+    expect(nativeFocus).toHaveBeenLastCalledWith({ preventScroll: true });
+    nativeFocus.mockClear();
+    commitWithoutMetadata("a"); commitWithoutMetadata("b");
+    expect(nativeFocus).not.toHaveBeenCalled();
+    act(() => session.restart());
+    expect(nativeFocus).toHaveBeenCalledTimes(1);
+    expect(nativeFocus).toHaveBeenLastCalledWith({ preventScroll: true });
+    expect(document.activeElement).toBe(input());
+    nativeFocus.mockRestore();
+  });
+
   it("starts only on committed input after the explicit focus button", () => {
     expect(document.activeElement).not.toBe(input());
     act(() => button().click());
