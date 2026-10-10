@@ -1,5 +1,4 @@
-import { useId, useLayoutEffect, useRef, type CSSProperties, type ReactNode } from "react";
-import { revealKeyboardKey } from "./revealKeyboardKey";
+import { type CSSProperties, type ReactNode } from "react";
 import "./virtual-keyboard.css";
 import { paoKeyLegends, type KeyHint } from "./keyboardLayouts";
 
@@ -60,11 +59,6 @@ const wideKeyLabels: Record<string, string> = {
   Shift: "⇧",
 };
 
-const keyboardSizing = {
-  "--keyboard-key-gap": "clamp(1px, 0.55cqw, 6px)",
-  "--keyboard-key-size": "clamp(12px, calc((100cqw - 13 * var(--keyboard-key-gap)) / 14.3), 56px)",
-} as CSSProperties;
-
 interface VirtualKeyboardProps {
   pressedKey?: string;
   errorKey?: string;
@@ -78,23 +72,9 @@ function normalizeKey(key: string) {
   return key.toLowerCase();
 }
 
-function KeyboardViewport({ children, nextKey }: { children: ReactNode; nextKey?: KeyHint | null }) {
-  const viewport = useRef<HTMLDivElement>(null);
-  const hintId = useId();
-  useLayoutEffect(() => {
-    if (viewport.current) revealKeyboardKey(viewport.current);
-  }, [nextKey?.code, nextKey?.shift, nextKey?.label]);
-  useLayoutEffect(() => {
-    const area = viewport.current;
-    if (!area || typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(() => revealKeyboardKey(area));
-    observer.observe(area);
-    return () => observer.disconnect();
-  }, []);
+function KeyboardViewport({ children }: { children: ReactNode }) {
   return <div className="virtual-keyboard">
-    <p id={hintId} className="keyboard-scroll-hint text-slate-600">Scroll sideways to see all keys.</p>
-    <div ref={viewport} role="region" aria-label="Keyboard guide" aria-describedby={hintId} tabIndex={0}
-      className="keyboard-viewport rounded-lg focus-visible:outline-2 focus-visible:outline-blue-500">
+    <div role="region" aria-label="Keyboard guide" className="keyboard-viewport">
       {children}
     </div>
   </div>;
@@ -107,8 +87,8 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
 
   if (layout === "Pa'O") {
     return (
-      <KeyboardViewport nextKey={nextKey}><div className="keyboard-layout" role="img" aria-label="Pa'O Myanmar keyboard layout">
-        <div className="mx-auto w-full space-y-[var(--keyboard-key-gap)] select-none" style={keyboardSizing}>
+      <KeyboardViewport><div className="keyboard-layout" role="img" aria-label="Pa'O Myanmar keyboard layout">
+        <div className="keyboard-keys mx-auto w-full space-y-[var(--keyboard-key-gap)] select-none">
           {paoRows.map((row, rowIndex) => (
             <div key={`pao-row-${rowIndex}`} className="flex justify-center gap-[var(--keyboard-key-gap)]">
               {row.map((key) => {
@@ -123,7 +103,7 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
                 const isWide = key.special || key.space;
                 const keyStyle: CSSProperties = {
                   width: key.space ? "calc(var(--keyboard-key-size) * 5.7)" : isWide ? "calc(var(--keyboard-key-size) * 1.3)" : "var(--keyboard-key-size)",
-                  height: "var(--keyboard-key-size)",
+                  height: "var(--keyboard-key-height)",
                   fontSize: "clamp(8px, calc(var(--keyboard-key-size) * 0.22), 12px)",
                 };
 
@@ -135,7 +115,7 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
                     data-next-key={isNext ? "true" : undefined}
                     aria-hidden="true"
                     style={keyStyle}
-                    className={`relative flex shrink-0 items-center justify-center rounded-sm border font-medium transition-all duration-75 ${isNext ? "ring-2 ring-blue-500 ring-offset-1" : ""}
+                    className={`relative flex shrink-0 items-center justify-center rounded-sm border font-medium transition-colors duration-75 ${isNext ? "ring-2 ring-blue-500 ring-offset-1" : ""}
                       ${isError
                         ? "bg-red-500 text-white border-red-400 scale-95 shadow-none"
                         : isPressed
@@ -147,9 +127,9 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
                       key.label
                     ) : (
                       <>
-                        <span style={{ left: "calc(var(--keyboard-key-size) * 0.125)", top: "calc(var(--keyboard-key-size) * 0.09)", fontSize: "clamp(6px, calc(var(--keyboard-key-size) * 0.18), 10px)" }} className={`absolute leading-none ${isPressed || isError ? "text-white" : "text-slate-500"}`}>{key.label}</span>
+                        <span style={{ left: "calc(var(--keyboard-key-size) * 0.125)", top: "calc(var(--keyboard-key-size) * 0.09)", fontSize: "clamp(6px, calc(var(--keyboard-key-size) * 0.18), 10px)" }} className={`keyboard-key-latin absolute leading-none ${isPressed || isError ? "text-white" : "text-slate-500"}`}>{key.label}</span>
                         {legends && <span style={{ right: "calc(var(--keyboard-key-size) * 0.125)", top: "calc(var(--keyboard-key-size) * 0.09)", fontSize: "clamp(6px, calc(var(--keyboard-key-size) * 0.23), 13px)" }} className={`absolute font-myanmar leading-relaxed ${isPressed || isError ? "text-white" : "text-slate-600"}`}>{legends.shifted}</span>}
-                        {legends && <span style={{ bottom: "calc(var(--keyboard-key-size) * 0.11)", fontSize: "clamp(7px, calc(var(--keyboard-key-size) * 0.286), 16px)" }} className={`absolute left-0 right-0 text-center font-myanmar font-medium leading-relaxed ${isPressed || isError ? "text-white" : "text-slate-800"}`}>{legends.unshifted}</span>}
+                        {legends && <span style={{ bottom: "calc(var(--keyboard-key-size) * 0.11)", fontSize: "clamp(8px, calc(var(--keyboard-key-size) * 0.286), 16px)" }} className={`absolute left-0 right-0 text-center font-myanmar font-medium leading-relaxed ${isPressed || isError ? "text-white" : "text-slate-800"}`}>{legends.unshifted}</span>}
                       </>
                     )}
                   </div>
@@ -163,8 +143,8 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
   }
 
   return (
-    <KeyboardViewport nextKey={nextKey}><div className="keyboard-layout" aria-hidden>
-      <div className="mx-auto w-full space-y-[var(--keyboard-key-gap)] select-none" style={keyboardSizing}>
+    <KeyboardViewport><div className="keyboard-layout" aria-hidden>
+      <div className="keyboard-keys mx-auto w-full space-y-[var(--keyboard-key-gap)] select-none">
         {rows.map((row, rowIndex) => (
           <div key={`${layout}-${rowIndex}`} className="flex justify-center gap-[var(--keyboard-key-gap)]">
             {row.map((key, keyIndex) => {
@@ -176,7 +156,7 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
               const isWide = wideKeys.has(key);
               const keyStyle: CSSProperties = {
                 width: isSpace ? "calc(var(--keyboard-key-size) * 5.7)" : isWide ? "calc(var(--keyboard-key-size) * 1.3)" : "var(--keyboard-key-size)",
-                height: "var(--keyboard-key-size)",
+                height: "var(--keyboard-key-height)",
                 fontSize: "clamp(8px, calc(var(--keyboard-key-size) * 0.22), 12px)",
               };
 
@@ -186,7 +166,7 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
                   data-next-key={isNext ? "true" : undefined}
                   data-key-modifier={key === "Shift" ? "true" : undefined}
                   style={keyStyle}
-                  className={`flex items-center justify-center rounded-sm border font-medium transition-all duration-75 ${isNext ? "ring-2 ring-blue-500 ring-offset-1" : ""}
+                  className={`flex shrink-0 items-center justify-center rounded-sm border font-medium transition-colors duration-75 ${isNext ? "ring-2 ring-blue-500 ring-offset-1" : ""}
                     ${isError
                       ? "bg-red-500 text-white border-red-400 scale-95 shadow-none"
                       : isPressed

@@ -145,8 +145,8 @@ export default function Landing() {
         </div>
 
         {/* Illustration / typing preview */}
-        <div className="relative">
-          <div className="bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0] p-6 shadow-xl">
+        <div className="relative min-w-0">
+          <div className="bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0] p-3 sm:p-6 shadow-xl">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-3 h-3 rounded-full bg-red-400" />
               <div className="w-3 h-3 rounded-full bg-amber-400" />
@@ -165,7 +165,7 @@ export default function Landing() {
                 </div>
               ))}
             </div>
-            <div className="mt-5 px-3 py-3 sm:px-4 sm:py-4">
+            <div className="mt-5 py-3 sm:px-4 sm:py-4">
               <VirtualKeyboard layout="Pa'O" />
             </div>
           </div>

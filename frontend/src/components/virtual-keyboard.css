@@ -1,7 +1,13 @@
 .virtual-keyboard { container: keyboard / inline-size; min-width: 0; width: 100%; }
-.keyboard-scroll-hint { display: none; }
-.keyboard-viewport { width: 100%; overflow-x: auto; overscroll-behavior-x: contain; padding: 4px; }
-.keyboard-layout { width: 100%; min-width: 600px; container-type: inline-size; }
-@container keyboard (max-width: 607px) {
-  .keyboard-scroll-hint { display: block; margin-bottom: .5rem; font-size: .75rem; line-height: 1.5; }
+.keyboard-viewport { width: 100%; min-width: 0; padding: 4px; }
+.keyboard-layout { width: 100%; min-width: 0; container-type: inline-size; }
+.keyboard-keys {
+  --keyboard-key-gap: clamp(1px, 0.55cqw, 6px);
+  /* The longest row has 13 regular keys, one 1.3-unit key, and 13 gaps. */
+  --keyboard-key-size: min(calc((100cqw - 13 * var(--keyboard-key-gap)) / 14.3), 56px);
+  --keyboard-key-height: clamp(32px, var(--keyboard-key-size), 56px);
+}
+@container keyboard (max-width: 280px) {
+  /* Leave room for both Myanmar legends on narrow keys. */
+  .keyboard-key-latin { display: none; }
 }
