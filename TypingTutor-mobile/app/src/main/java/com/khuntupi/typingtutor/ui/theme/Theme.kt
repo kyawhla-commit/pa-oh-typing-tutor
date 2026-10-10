@@ -1,6 +1,5 @@
 package com.khuntupi.typingtutor.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -12,25 +11,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = androidx.compose.ui.graphics.Color(0xFF79D8B0),
+    secondary = androidx.compose.ui.graphics.Color(0xFF79D8B0),
+    secondaryContainer = androidx.compose.ui.graphics.Color(0xFF254C3B),
+    onSecondaryContainer = androidx.compose.ui.graphics.Color(0xFFB7F4D7),
+    surfaceContainer = androidx.compose.ui.graphics.Color(0xFF17291F),
+    primaryContainer = androidx.compose.ui.graphics.Color(0xFF173E30),
+    onPrimaryContainer = androidx.compose.ui.graphics.Color(0xFFB7F4D7),
+    background = androidx.compose.ui.graphics.Color(0xFF101C18),
+    surface = androidx.compose.ui.graphics.Color(0xFF101C18),
+    surfaceVariant = androidx.compose.ui.graphics.Color(0xFF20352C),
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = androidx.compose.ui.graphics.Color(0xFF146B4B),
+    secondary = androidx.compose.ui.graphics.Color(0xFF146B4B),
+    secondaryContainer = androidx.compose.ui.graphics.Color(0xFFD9F0DF),
+    onSecondaryContainer = androidx.compose.ui.graphics.Color(0xFF143B29),
+    surfaceContainer = androidx.compose.ui.graphics.Color(0xFFF0F4EB),
+    primaryContainer = androidx.compose.ui.graphics.Color(0xFFD9F0DF),
+    onPrimaryContainer = androidx.compose.ui.graphics.Color(0xFF143B29),
+    background = androidx.compose.ui.graphics.Color(0xFFF7F9F2),
+    surface = androidx.compose.ui.graphics.Color(0xFFF7F9F2),
+    surfaceVariant = androidx.compose.ui.graphics.Color(0xFFEAF0E5),
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
 )
 
 @Composable
