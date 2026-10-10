@@ -5,14 +5,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.buildAnnotatedString
@@ -72,10 +75,13 @@ fun TutorApp(model: TutorViewModel) {
                 if (session.startedAt != null) confirmExit = true else model.closeSession()
             }
         } else Column(Modifier.fillMaxSize().padding(padding).imePadding()) {
-            Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                Column {
-                    Text("Pa-O · Typing Tutor", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text("A little practice, every day.", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Image(painterResource(R.drawable.app_logo), contentDescription = null, modifier = Modifier.size(32.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text("Pa-O · Typing Tutor", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text("A little practice, every day.", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
                 TextButton(onClick = { model.setDark(!model.darkMode) }) { Text(if (model.darkMode) "Light" else "Dark") }
             }
