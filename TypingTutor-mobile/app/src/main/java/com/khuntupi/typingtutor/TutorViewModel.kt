@@ -35,7 +35,7 @@ class TutorViewModel(application: Application) : AndroidViewModel(application) {
         now = SystemClock.elapsedRealtime()
         session = TypingSession(UUID.randomUUID().toString(), if (duration != null) "$duration second test" else lesson.title,
             if (duration != null) TutorContent.testText else lesson.content,
-            if (isLesson) lesson.id else null, duration)
+            if (isLesson) lesson.id else null, duration, paoh = lesson.paoh)
     }
 
     fun edit(text: String) {
@@ -66,7 +66,7 @@ class TutorViewModel(application: Application) : AndroidViewModel(application) {
         val active = session ?: return
         if (!active.finished || history.any { it.id == active.id }) return
         val result = SessionResult(active.id, active.title, System.currentTimeMillis(), active.wpm(now),
-            active.accuracy, active.elapsedMillis(now) / 1000, active.attempts, active.lessonId)
+            active.accuracy, active.elapsedMillis(now) / 1000, active.attempts, active.lessonId, active.paoh)
         history = (listOf(result) + history).take(100)
         completedLessons = completedLessons + passedLessons(listOf(result))
         val json = JSONArray()
@@ -74,6 +74,7 @@ class TutorViewModel(application: Application) : AndroidViewModel(application) {
             put("id", r.id); put("title", r.title); put("time", r.timestamp)
             put("wpm", r.wpm); put("accuracy", r.accuracy); put("seconds", r.seconds)
             put("attempts", r.attempts); put("lesson", r.lessonId ?: JSONObject.NULL)
+            put("paoh", r.paoh)
         }) }
         preferences.edit().putString("history", json.toString())
             .putStringSet("lessons", completedLessons.map { it.toString() }.toSet()).apply()
@@ -85,7 +86,8 @@ class TutorViewModel(application: Application) : AndroidViewModel(application) {
             val r = entries.getJSONObject(i)
             SessionResult(r.getString("id"), r.getString("title"), r.getLong("time"),
                 r.getDouble("wpm"), r.getDouble("accuracy"), r.getLong("seconds"),
-                r.getInt("attempts"), if (r.isNull("lesson")) null else r.getInt("lesson"))
+                r.getInt("attempts"), if (r.isNull("lesson")) null else r.getInt("lesson"),
+                r.optBoolean("paoh", r.getString("title") == "Pa-O key drill"))
         }.getOrNull() }
     }.getOrDefault(emptyList())
 }

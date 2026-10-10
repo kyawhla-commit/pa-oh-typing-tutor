@@ -61,10 +61,15 @@ class TypingEngineTest {
         assertEquals(100.0, result.accuracy, 0.001)
     }
 
-    @Test fun inputIsCappedAtTargetLengthWithoutSplittingUnicode() {
+    @Test fun excessInputRemainsVisibleAndCountsAgainstAccuracy() {
         val result = session("😀x").edit("😀xyz", 1000)
-        assertEquals("😀x", result.input)
-        assertEquals(2, result.attempts)
+        assertEquals("😀xyz", result.input)
+        assertEquals(4, result.attempts)
+        assertEquals(2, result.correctAttempts)
+        assertFalse(result.finished)
+        val corrected = result.edit("😀x", 2000)
+        assertTrue(corrected.finished)
+        assertEquals(50.0, corrected.accuracy, 0.001)
     }
 
     @Test fun editAtDeadlineIsNotScored() {

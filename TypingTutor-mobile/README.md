@@ -9,7 +9,13 @@ A native Kotlin / Jetpack Compose app for Android 7.0 (API 24) and newer.
 - English, numbers, code, and Pa-O direct-key drills. The built-in Pa-O pad uses
   the same basic key mapping as `frontend/src/components/keyboardLayouts.ts`.
   This is a key-output drill, not a translated language curriculum or an IME.
-- Live passage highlighting, WPM and attempt accuracy, retry, and lesson passes
+- Phone-sized Pa-O keys (at least 48 dp), separate Letters / Marks / More pages,
+  optional next-key hints, automatic page/Shift hints, and light tap feedback.
+  The keypad stays below the practice area in portrait; landscape uses two panes.
+- Cursor-aware insertion, selection replacement, one-key backspace, and a
+  **Fix mistake** shortcut. Combining marks have display-only dotted circles.
+  A second Pa-O drill introduces marks, tone keys, and Shift.
+- English passage highlighting, speed and attempt accuracy, retry, and lesson passes
   at 95% accuracy. Timers start with the first committed input.
 - The latest 100 completed results, permanent lesson passes, and a theme
   preference saved on the device. Resetting progress requires confirmation.
@@ -53,9 +59,14 @@ Java trust store preserves TLS verification through that proxy.
 ## Scoring and input
 
 WPM is correctly matched Unicode code points divided by five per minute, not
-graphemes or Pa-O words. Accuracy is correct insertions divided by all insertions;
+graphemes or Pa-O words. Pa-O drills display matched code points per minute as
+**keys/min**; English drills display WPM. Pa-O results are excluded from Best WPM.
+Accuracy is correct insertions divided by all insertions;
 backspace never erases an incorrect attempt. Composing IME input is scored only
-after commitment. Fixed drills require an exact match. Timed tests finish at
+after commitment. Extra input remains visible and counts as incorrect; it is
+never silently truncated. Accuracy displays one decimal, rounded down so an
+unpassed lesson cannot appear to meet the 95% threshold. Fixed drills require
+an exact match. Timed tests finish at
 their deadline, even if the UI resumes after that time.
 
 Device keyboard, physical keyboard, and paste input are supported. These are
@@ -65,8 +76,10 @@ verified competitive scores. No attempt text is stored in completed history.
 ## Validation
 
 `TypingEngineTest` covers corrected mistakes, deletion and middle edits,
-Unicode, target limits, deadline behavior, timed versus fixed completion,
-lesson thresholds, and Pa-O key coverage. `lintDebug` checks Android API
+Unicode, excess input, deadline behavior, timed versus fixed completion,
+lesson thresholds, and Pa-O key coverage. `PaohInputTest` checks selection edits,
+surrogate pairs, combining marks, next-key hints, and every Pa-O drill key.
+`lintDebug` checks Android API
 compatibility and app resources. Instrumented tests require a connected Android
 device or emulator:
 
@@ -75,8 +88,23 @@ bash gradlew :app:connectedDebugAndroidTest
 ```
 
 Validated in the cloud workspace: debug APK build and signature verification,
-11 unit tests, Android lint with no errors, and two UI tests on an API 29
-software emulator. UI tests cover lesson completion and unlocking, activity
-recreation and storage reload in a fresh activity, and Pa-O pad insertion,
-backspace, space, and leave confirmation. Physical-device testing and release
-signing remain separate steps.
+17 unit tests, Android lint with no errors (nine existing warnings), and four
+UI tests on an API 29 software emulator at 360 × 640 dp. UI tests cover lesson
+completion and unlocking, history reload, activity recreation, minimum 48 dp
+Pa-O key targets, selecting and replacing mistakes without resetting accuracy,
+backspace/space, phone-keyboard switching, and completing the marks drill with
+automatic Shift hints and exact Unicode output.
+
+The cloud emulator stalled on Gradle's streaming APK installation. The same
+instrumentation suite passed after installing the built APKs explicitly:
+
+```sh
+adb install --no-streaming -r app/build/outputs/apk/debug/app-debug.apk
+adb install --no-streaming -r -t app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+adb shell am instrument -w -r -e class com.khuntupi.typingtutor.TutorAppTest \
+  com.khuntupi.typingtutor.test/androidx.test.runner.AndroidJUnitRunner
+```
+
+Physical-device comfort, third-party Myanmar/Pa-O keyboards, and release signing
+still need separate validation. The keypad produces direct Unicode outputs;
+it does not reorder characters like a language IME.

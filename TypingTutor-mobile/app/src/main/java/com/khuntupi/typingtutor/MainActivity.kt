@@ -11,7 +11,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
@@ -37,7 +36,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private fun number(value: Double) = String.format(Locale.getDefault(), "%.0f", value)
+internal fun number(value: Double) = String.format(Locale.getDefault(), "%.0f", value)
+internal fun accuracyLabel(value: Double) = String.format(Locale.getDefault(), "%.1f%%", kotlin.math.floor(value * 10) / 10)
 private val tabs = listOf("Home", "Lessons", "Practice", "Test", "Progress")
 private val symbols = listOf("⌂", "≡", "⌨", "◷", "↗")
 
@@ -67,7 +67,11 @@ fun TutorApp(model: TutorViewModel) {
             ) }
         }
     }) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding).imePadding()) {
+        if (session?.paoh == true && !session.finished) {
+            PaohPracticeScreen(model, session, Modifier.fillMaxSize().padding(padding).imePadding()) {
+                if (session.startedAt != null) confirmExit = true else model.closeSession()
+            }
+        } else Column(Modifier.fillMaxSize().padding(padding).imePadding()) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                 Column {
                     Text("Pa-O · Typing Tutor", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
@@ -127,7 +131,7 @@ private fun HomeScreen(model: TutorViewModel) {
             Button(onClick = { model.start(TutorContent.drills.first()) }) { Text("Start practicing  →") }
         }
     }
-    Stats("${model.history.size}" to "Saved attempts", "${model.completedLessons.size}/8" to "Lessons passed", number(model.history.maxOfOrNull { it.wpm } ?: 0.0) to "Best WPM")
+    Stats("${model.history.size}" to "Saved attempts", "${model.completedLessons.size}/8" to "Lessons passed", number(model.history.filterNot { it.paoh }.maxOfOrNull { it.wpm } ?: 0.0) to "Best WPM")
     Text("Your next step", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
     val next = TutorContent.lessons.firstOrNull { it.id !in model.completedLessons }
     if (next != null) ActionCard(next.title, next.description, "Start lesson") { model.start(next, isLesson = true) }
@@ -179,13 +183,11 @@ private fun TestScreen(model: TutorViewModel) {
 @Composable
 private fun SessionScreen(model: TutorViewModel, session: TypingSession, onExit: () -> Unit) {
     var field by remember(session.id) { mutableStateOf(TextFieldValue(session.input, TextRange(session.input.length))) }
-    var shifted by rememberSaveable(session.id) { mutableStateOf(false) }
-    val paoh = session.title == "Pa-O key drill"
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Text(session.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
         TextButton(onClick = onExit) { Text("Leave") }
     }
-    Stats(number(session.wpm(model.now)) to "WPM", "${number(session.accuracy)}%" to "Accuracy",
+    Stats(number(session.wpm(model.now) * if (session.paoh) 5 else 1) to if (session.paoh) "Keys/min" else "WPM", accuracyLabel(session.accuracy) to "Accuracy",
         (session.remainingSeconds(model.now)?.let { "${it}s" } ?: "${session.elapsedMillis(model.now) / 1000}s") to if (session.durationSeconds != null) "Remaining" else "Elapsed")
     if (session.startedAt == null) Text("The clock starts when you type. Match the passage exactly.", style = MaterialTheme.typography.bodySmall)
     val targetPoints = session.target.codePoints().toArray()
@@ -217,38 +219,11 @@ private fun SessionScreen(model: TutorViewModel, session: TypingSession, onExit:
             if (accepted != next.text) field = TextFieldValue(accepted, TextRange(accepted.length))
         }
     }, label = { Text("Type the passage here") },
-        supportingText = { Text(if (paoh) "Pa-O pad below, or use your own keyboard." else "Backspace to correct mistakes. Corrections still count toward accuracy.") },
+        supportingText = { Text("Backspace to correct mistakes. Corrections still count toward accuracy.") },
         modifier = Modifier.fillMaxWidth(), minLines = 2, maxLines = 4,
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false),
     )
-    if (paoh) {
-        Text("Pa-O basic key pad", style = MaterialTheme.typography.labelLarge)
-        (if (shifted) TutorContent.paohShiftRows else TutorContent.paohRows).forEach { row ->
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                row.codePoints().toArray().forEach { point ->
-                    val key = String(Character.toChars(point))
-                    FilledTonalButton(onClick = {
-                        model.edit(session.input + key)
-                        val text = model.session?.input.orEmpty(); field = TextFieldValue(text, TextRange(text.length))
-                    }, modifier = Modifier.weight(1f).height(44.dp), contentPadding = PaddingValues(0.dp)) { Text(key) }
-                }
-            }
-        }
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = { shifted = !shifted }) { Text(if (shifted) "Shift on" else "Shift") }
-            FilledTonalButton(onClick = {
-                model.edit(session.input + " ")
-                val text = model.session?.input.orEmpty(); field = TextFieldValue(text, TextRange(text.length))
-            }, modifier = Modifier.weight(1f)) { Text("Space") }
-            OutlinedButton(onClick = {
-                val points = session.input.codePoints().toArray()
-                val text = String(points, 0, maxOf(0, points.size - 1))
-                model.edit(text); field = TextFieldValue(text, TextRange(text.length))
-            }) { Text("⌫") }
-        }
-        Text("This pad produces direct Pa-O key outputs; it does not reorder text like an IME.", style = MaterialTheme.typography.bodySmall)
-    }
-    if (session.durationSeconds == null) LinearProgressIndicator(progress = { typedPoints.size.toFloat() / targetPoints.size }, modifier = Modifier.fillMaxWidth())
+    if (session.durationSeconds == null) LinearProgressIndicator(progress = { (typedPoints.size.toFloat() / targetPoints.size).coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth())
 }
 
 @Composable
@@ -256,7 +231,7 @@ private fun ResultScreen(model: TutorViewModel, session: TypingSession) {
     val passed = session.lessonId != null && session.accuracy >= 95
     PageHeading("Attempt saved", if (passed) "Lesson passed!" else "Every attempt counts.",
         if (session.lessonId != null && !passed) "Aim for 95% accuracy to pass this lesson. Take your time and try again." else "Your result is saved on this device. Keep showing up; steady practice makes a difference.")
-    Stats(number(session.wpm(model.now)) to "WPM", "${number(session.accuracy)}%" to "Accuracy", "${session.elapsedMillis(model.now) / 1000}s" to "Duration")
+    Stats(number(session.wpm(model.now) * if (session.paoh) 5 else 1) to if (session.paoh) "Keys/min" else "WPM", accuracyLabel(session.accuracy) to "Accuracy", "${session.elapsedMillis(model.now) / 1000}s" to "Duration")
     Text("${session.attempts - session.correctAttempts} incorrect insertions across ${session.attempts} attempts.", style = MaterialTheme.typography.bodyMedium)
     Button(onClick = { model.retry() }, modifier = Modifier.fillMaxWidth()) { Text("Try again") }
     OutlinedButton(onClick = { model.closeSession(); model.tab = "Progress" }, modifier = Modifier.fillMaxWidth()) { Text("See my progress") }
@@ -269,8 +244,8 @@ private fun ResultScreen(model: TutorViewModel, session: TypingSession) {
 private fun ProgressScreen(model: TutorViewModel) {
     var confirmReset by remember { mutableStateOf(false) }
     PageHeading("Small steps add up", "Look how far\nyou’ve come.", "Your latest 100 completed attempts are stored locally. Lesson passes stay saved even when older attempts roll off.")
-    Stats(number(model.history.maxOfOrNull { it.wpm } ?: 0.0) to "Best WPM",
-        "${number(if (model.history.isEmpty()) 0.0 else model.history.map { it.accuracy }.average())}%" to "Avg. accuracy",
+    Stats(number(model.history.filterNot { it.paoh }.maxOfOrNull { it.wpm } ?: 0.0) to "Best WPM",
+        accuracyLabel(if (model.history.isEmpty()) 0.0 else model.history.map { it.accuracy }.average()) to "Avg. accuracy",
         "${model.completedLessons.size}/8" to "Lessons")
     Text("Recent practice", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
     if (model.history.isEmpty()) ActionCard("Your story starts here", "Complete a practice or test to see your first result.", "Start practicing") { model.tab = "Practice" }
@@ -278,7 +253,7 @@ private fun ProgressScreen(model: TutorViewModel) {
         OutlinedCard(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(result.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Text("${number(result.wpm)} WPM  ·  ${number(result.accuracy)}% accuracy  ·  ${result.seconds}s")
+                Text("${number(result.wpm * if (result.paoh) 5 else 1)} ${if (result.paoh) "keys/min" else "WPM"}  ·  ${accuracyLabel(result.accuracy)} accuracy  ·  ${result.seconds}s")
                 Text(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(Date(result.timestamp)), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }

@@ -14,6 +14,7 @@ data class TypingSession(
     val endedAt: Long? = null,
     val attempts: Int = 0,
     val correctAttempts: Int = 0,
+    val paoh: Boolean = false,
 ) {
     val finished get() = endedAt != null
     val accuracy get() = if (attempts == 0) 100.0 else correctAttempts * 100.0 / attempts
@@ -33,14 +34,14 @@ data class TypingSession(
         val current = tick(now)
         if (current.finished || text == input) return current
         val goal = target.codePoints().toArray()
-        val next = text.codePoints().limit(goal.size.toLong()).toArray()
+        val next = text.codePoints().toArray()
         val previous = input.codePoints().toArray()
         var prefix = 0
         while (prefix < minOf(previous.size, next.size) && previous[prefix] == next[prefix]) prefix++
         var suffix = 0
         while (suffix < minOf(previous.size, next.size) - prefix && previous[previous.lastIndex - suffix] == next[next.lastIndex - suffix]) suffix++
         val added = next.size - prefix - suffix
-        val correct = (prefix until next.size - suffix).count { next[it] == goal[it] }
+        val correct = (prefix until next.size - suffix).count { it < goal.size && next[it] == goal[it] }
         val start = startedAt ?: if (added > 0) now else null
         val updated = copy(
             input = String(next, 0, next.size), startedAt = start,
@@ -51,7 +52,7 @@ data class TypingSession(
     }
 }
 
-data class Lesson(val id: Int, val title: String, val description: String, val content: String)
+data class Lesson(val id: Int, val title: String, val description: String, val content: String, val paoh: Boolean = false)
 
 object TutorContent {
     // The English curriculum is shared with frontend/src/features/lessons/lessonContent.ts.
@@ -70,9 +71,10 @@ object TutorContent {
     val paohShiftRows = listOf("ဈဝဣ၎ဤ၌ဥ၍ဿဏဧဪၑ", "ဗှီ္ွံဲဒဓဂ\"", "ဇဌဃဠယဉဦ၊။?")
     val drills = listOf(
         Lesson(101, "English words", "A short everyday passage", lessons[3].content),
-        Lesson(102, "Pa-O key drill", "Direct key outputs, not a language lesson", "ဆ တ န မ အ ပ က င သ စ ဟ ဩ ဆတ နမ အပ ကင သစ ဟဩ"),
+        Lesson(102, "Pa-O key drill", "Find each key with a guided phone keypad", "ဆ တ န မ အ ပ က င သ စ ဟ ဩ ဆတ နမ အပ ကင သစ ဟဩ", paoh = true),
         Lesson(103, "Numbers & symbols", "Accuracy before speed", lessons[4].content),
         Lesson(104, "Code practice", "Punctuation and capitals", lessons[6].content),
+        Lesson(105, "Pa-O marks", "Short key sequences for marks, tones, and Shift", "ိ ီ ု ူ ေ ဲ ် ꩻ ႏ", paoh = true),
     )
     val testText = (lessons[3].content + " " + lessons[5].content + " ").repeat(200)
 }
@@ -81,6 +83,7 @@ data class SessionResult(
     val id: String, val title: String, val timestamp: Long,
     val wpm: Double, val accuracy: Double, val seconds: Long,
     val attempts: Int, val lessonId: Int?,
+    val paoh: Boolean = false,
 )
 
 fun passedLessons(results: List<SessionResult>): Set<Int> = results
