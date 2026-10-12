@@ -19,6 +19,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    sourceSets.getByName("test").resources.srcDir("../keyboard")
+
     buildTypes {
         release {
             optimization {

@@ -36,13 +36,3 @@ fun targetKey(target: String, input: String, cursor: Int): String {
     val points = target.codePoints().toArray()
     return if (index < points.size) String(Character.toChars(points[index])) else ""
 }
-
-fun keypadLocation(key: String): Pair<Int, Boolean>? {
-    if (key.isEmpty() || key == " ") return null
-    for (shifted in listOf(false, true)) {
-        val rows = if (shifted) TutorContent.paohShiftRows else TutorContent.paohRows
-        val index = rows.indexOfFirst { it.contains(key) }
-        if (index >= 0) return index to shifted
-    }
-    return null
-}

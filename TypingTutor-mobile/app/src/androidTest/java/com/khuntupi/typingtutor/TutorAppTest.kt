@@ -91,7 +91,7 @@ class TutorAppTest {
             compose.onNodeWithContentDescription("Backspace").performClick()
             assertInput("ိ ")
             compose.onNodeWithTag("paoh-key-ီ").performClick()
-            for (key in TutorContent.drills.last().content.drop(3).map { it.toString() }) {
+            for (key in TutorContent.drills.first { it.id == 105 }.content.drop(3).map { it.toString() }) {
                 if (key == " ") compose.onNodeWithText("Space").performClick()
                 else compose.onNodeWithTag("paoh-key-$key").performClick()
             }
@@ -112,4 +112,49 @@ class TutorAppTest {
             assertInput("ဆ တ ")
         }
     }
+    @Test fun numbersAndLatinShiftCanBeUsedWithHintsOff() {
+        ActivityScenario.launch(MainActivity::class.java).use { activity ->
+            startPaoh(5)
+            compose.onNodeWithTag("paoh-key-၁").assertWidthIsAtLeast(48.dp)
+                .assertHeightIsAtLeast(48.dp).performClick()
+            compose.onNodeWithText("Space").performClick()
+            compose.onNodeWithTag("paoh-key-၂").performClick()
+            assertInput("၁ ၂")
+            compose.onNodeWithTag("paoh-input").assertIsDisplayed()
+            compose.waitForIdle()
+            val instrumentation = InstrumentationRegistry.getInstrumentation()
+            val screenshot = instrumentation.uiAutomation.takeScreenshot()
+            java.io.File(instrumentation.targetContext.getExternalFilesDir(null), "keypad-numbers.png").outputStream().use {
+                screenshot.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
+            }
+            screenshot.recycle()
+            compose.onNodeWithText("Hints").performScrollTo().performClick()
+            compose.onNodeWithTag("paoh-language").performClick()
+            compose.onNodeWithTag("paoh-key-1").assertIsDisplayed()
+            compose.onNodeWithTag("paoh-shift").performClick()
+            compose.onNodeWithTag("paoh-key-!").performClick()
+            assertInput("၁ ၂!")
+            activity.recreate()
+            compose.onNodeWithTag("paoh-key-@").assertIsDisplayed().performClick()
+            assertInput("၁ ၂!@")
+            compose.onNodeWithContentDescription("Backspace").assertIsDisplayed().performClick()
+            assertInput("၁ ၂!")
+        }
+    }
+
+    @Test fun hintsFindLatinNumbersAfterPaohNumbers() {
+        ActivityScenario.launch(MainActivity::class.java).use {
+            startPaoh(5)
+            val prefix = TutorContent.drills.first { it.id == 106 }.content.substringBefore("1")
+            compose.onNodeWithText("Use phone keyboard").performScrollTo().performClick()
+            compose.onNodeWithTag("paoh-input").performScrollTo().performTextInput(prefix)
+            compose.onNodeWithText("Use Pa-O keypad").performScrollTo().performClick()
+            compose.onNodeWithTag("paoh-key-1").assertIsDisplayed().performClick()
+            assertInput(prefix + "1")
+            compose.onNodeWithText("Space").performClick()
+            compose.onNodeWithTag("paoh-key-2").assertIsDisplayed().performClick()
+            assertInput(prefix + "1 2")
+        }
+    }
+
 }

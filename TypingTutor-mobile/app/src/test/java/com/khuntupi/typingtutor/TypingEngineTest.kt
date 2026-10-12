@@ -84,9 +84,8 @@ class TypingEngineTest {
         assertEquals(setOf(2), passedLessons(listOf(result(1, 94.99), result(2, 95.0), result(null, 100.0))))
     }
 
-    @Test fun paohRowsHaveMatchingShiftKeysAndDrillIsReachable() {
-        assertEquals(TutorContent.paohRows.map { it.codePointCount(0, it.length) }, TutorContent.paohShiftRows.map { it.codePointCount(0, it.length) })
-        val keys = (TutorContent.paohRows.joinToString("") + " ").codePoints().toArray().toSet()
+    @Test fun basicDrillIsReachableWithoutShift() {
+        val keys = (PaohKeyboard.pages.flatten().joinToString("") { it.plain } + " ").codePoints().toArray().toSet()
         assertTrue(TutorContent.drills[1].content.codePoints().toArray().all { it in keys })
     }
 }

@@ -39,9 +39,10 @@ class PaohInputTest {
         TutorContent.drills.filter { it.paoh }.forEach { drill ->
             drill.content.codePoints().toArray().filter { it != 32 }.forEach {
                 val key = String(Character.toChars(it))
-                assertNotNull("Missing key $key", keypadLocation(key))
+                assertNotNull("Missing key $key", PaohKeyboard.locate(key))
             }
         }
-        assertEquals(1 to true, keypadLocation("ီ"))
+        assertEquals(1, PaohKeyboard.locate("ီ")!!.page)
+        assertTrue(PaohKeyboard.locate("ီ")!!.shifted)
     }
 }

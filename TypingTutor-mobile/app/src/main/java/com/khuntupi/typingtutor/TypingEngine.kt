@@ -66,15 +66,13 @@ object TutorContent {
         Lesson(7, "JavaScript", "Practice punctuation in a real code snippet.", "const greet = (name) => `Hello, \${name}!`; console.log(greet('world'));"),
         Lesson(8, "Python", "Practice code, indentation, and line breaks.", "def greet(name):\n    return f'Hello, {name}!'\n\nprint(greet('world'))"),
     )
-    // Direct outputs match frontend/src/components/keyboardLayouts.ts (PaOh basic).
-    val paohRows = listOf("ဆတနမအပကငသစဟဩ၏", "ေျိ်ါ့ြုူး'", "ဖထခလဘညာꩻႏ/")
-    val paohShiftRows = listOf("ဈဝဣ၎ဤ၌ဥ၍ဿဏဧဪၑ", "ဗှီ္ွံဲဒဓဂ\"", "ဇဌဃဠယဉဦ၊။?")
     val drills = listOf(
         Lesson(101, "English words", "A short everyday passage", lessons[3].content),
         Lesson(102, "Pa-O key drill", "Find each key with a guided phone keypad", "ဆ တ န မ အ ပ က င သ စ ဟ ဩ ဆတ နမ အပ ကင သစ ဟဩ", paoh = true),
         Lesson(103, "Numbers & symbols", "Accuracy before speed", lessons[4].content),
         Lesson(104, "Code practice", "Punctuation and capitals", lessons[6].content),
         Lesson(105, "Pa-O marks", "Short key sequences for marks, tones, and Shift", "ိ ီ ု ူ ေ ဲ ် ꩻ ႏ", paoh = true),
+        Lesson(106, "Pa-O numbers & symbols", "Pa-O digits, Shift symbols, and the ABC layer", "၁ ၂ ၃ ၄ ၅ ၆ ၇ ၈ ၉ ၀ ရ * ( ) - = 1 2 3 ! @ #", paoh = true),
     )
     val testText = (lessons[3].content + " " + lessons[5].content + " ").repeat(200)
 }

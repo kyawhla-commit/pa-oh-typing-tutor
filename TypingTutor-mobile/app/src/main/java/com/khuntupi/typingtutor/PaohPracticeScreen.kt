@@ -3,11 +3,14 @@ package com.khuntupi.typingtutor
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -20,6 +23,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 @Composable
 fun PaohPracticeScreen(model: TutorViewModel, session: TypingSession, modifier: Modifier = Modifier, onExit: () -> Unit) {
@@ -29,16 +33,21 @@ fun PaohPracticeScreen(model: TutorViewModel, session: TypingSession, modifier: 
     var phoneKeyboard by rememberSaveable(session.id) { mutableStateOf(false) }
     var hints by rememberSaveable(session.id) { mutableStateOf(true) }
     var group by rememberSaveable(session.id) { mutableIntStateOf(0) }
+    var latin by rememberSaveable(session.id) { mutableStateOf(false) }
     var shifted by rememberSaveable(session.id) { mutableStateOf(false) }
     val keyboard = LocalSoftwareKeyboardController.current
     val focus = LocalFocusManager.current
     val requester = remember { FocusRequester() }
+    val inputView = remember { BringIntoViewRequester() }
+    val scope = rememberCoroutineScope()
     val haptics = LocalHapticFeedback.current
     val next = targetKey(session.target, field.text, field.selection.min)
     val mismatch = firstMismatch(session.input, session.target)
 
     LaunchedEffect(next, hints) {
-        if (hints) keypadLocation(next)?.let { (page, shift) -> group = page; shifted = shift }
+        if (hints) PaohKeyboard.locate(next, latin)?.let {
+            group = it.page; shifted = it.shifted; latin = it.latin
+        }
     }
     LaunchedEffect(phoneKeyboard) {
         if (phoneKeyboard) { requester.requestFocus(); keyboard?.show() }
@@ -57,6 +66,11 @@ fun PaohPracticeScreen(model: TutorViewModel, session: TypingSession, modifier: 
         val edit = keypadEdit(field.text, field.selection.start, field.selection.end, key)
         commit(TextFieldValue(edit.text, TextRange(edit.cursor)))
         haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        scope.launch {
+            // Wait for the new text to lay out before revealing it above the pinned keypad.
+            withFrameNanos { }
+            inputView.bringIntoView()
+        }
     }
 
     @Composable fun PracticeContent(contentModifier: Modifier) {
@@ -66,14 +80,19 @@ fun PaohPracticeScreen(model: TutorViewModel, session: TypingSession, modifier: 
                 Text("${number(session.wpm(model.now) * 5)} keys/min", style = MaterialTheme.typography.labelLarge)
                 Text("${session.elapsedMillis(model.now) / 1000}s", style = MaterialTheme.typography.labelLarge)
             }
-            if (hints) Text("Next: ${keyLabel(next)}", Modifier.testTag("next-key").semantics { liveRegion = LiveRegionMode.Polite },
-                color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            if (hints) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text("Next: ${keyLabel(next)}", Modifier.weight(1f).testTag("next-key").semantics { liveRegion = LiveRegionMode.Polite },
+                    color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                PaohKeyboard.locate(next, latin)?.let {
+                    Text(it.hint, style = MaterialTheme.typography.labelMedium)
+                }
+            }
             // Keep Myanmar shaping intact: do not split combining sequences into colored spans.
             Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceVariant) {
                 Text(session.target, Modifier.fillMaxWidth().padding(12.dp).testTag("paoh-passage"), fontSize = 22.sp, lineHeight = 34.sp)
             }
             OutlinedTextField(value = field, onValueChange = { commit(it) },
-                modifier = Modifier.fillMaxWidth().focusRequester(requester).testTag("paoh-input"),
+                modifier = Modifier.fillMaxWidth().focusRequester(requester).bringIntoViewRequester(inputView).testTag("paoh-input"),
                 label = { Text("Your typing") }, readOnly = !phoneKeyboard, minLines = 1, maxLines = 2,
                 textStyle = MaterialTheme.typography.titleLarge.copy(lineHeight = 34.sp),
                 isError = mismatch != null && field.composition == null,
@@ -100,44 +119,57 @@ fun PaohPracticeScreen(model: TutorViewModel, session: TypingSession, modifier: 
                 }) { Text(if (phoneKeyboard) "Use Pa-O keypad" else "Use phone keyboard") }
                 FilterChip(selected = hints, onClick = { hints = !hints }, label = { Text("Hints") })
             }
-            Text("Key drills • accuracy before speed", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("Small label: desktop key · corner: Shift alternative", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.height(4.dp))
         }
     }
 
     @Composable fun Pad(padModifier: Modifier) {
         Surface(padModifier.testTag("paoh-pad"), tonalElevation = 2.dp) {
-            Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 12.dp, vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    listOf("Letters", "Marks", "More").forEachIndexed { index, title ->
-                        FilterChip(selected = group == index, onClick = { group = index }, label = { Text(title) }, modifier = Modifier.weight(1f))
+            Column(Modifier.padding(horizontal = 12.dp, vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        PaohKeyboard.pageNames.forEachIndexed { index, title ->
+                            FilterChip(selected = group == index, onClick = { group = index }, label = { Text(title, maxLines = 1, style = MaterialTheme.typography.labelMedium) }, modifier = Modifier.weight(1f).testTag("paoh-page-$index"))
+                        }
                     }
-                }
-                val keys = (if (shifted) TutorContent.paohShiftRows else TutorContent.paohRows)[group].codePoints().toArray().map { String(Character.toChars(it)) }
-                BoxWithConstraints(Modifier.fillMaxWidth()) {
-                    // Each key remains at least 48 dp wide, including on a 320 dp phone.
-                    val columns = (maxWidth.value / 56).toInt().coerceIn(1, 6)
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        keys.chunked(columns).forEach { row ->
-                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                row.forEach { key ->
-                                    val suggested = hints && key == next
-                                    FilledTonalButton(onClick = { press(key) },
-                                        modifier = Modifier.weight(1f).heightIn(min = 52.dp).testTag("paoh-key-$key").semantics { contentDescription = "Type ${keyLabel(key)}" },
-                                        contentPadding = PaddingValues(2.dp), shape = MaterialTheme.shapes.small,
-                                        border = if (suggested) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
-                                        colors = ButtonDefaults.filledTonalButtonColors(containerColor = if (suggested) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface)) {
-                                        Text(keyLabel(key), fontSize = 24.sp, lineHeight = 34.sp)
+                    val keys = PaohKeyboard.pages[group]
+                    BoxWithConstraints(Modifier.fillMaxWidth()) {
+                        // Each key remains at least 48 dp wide, including on a 320 dp phone.
+                        val columns = (maxWidth.value / 56).toInt().coerceIn(1, 6)
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            keys.chunked(columns).forEach { row ->
+                                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    row.forEach { physicalKey ->
+                                        val key = physicalKey.output(shifted, latin)
+                                        val alternate = physicalKey.output(!shifted, latin)
+                                        val suggested = hints && key == next
+                                        FilledTonalButton(onClick = { press(key) },
+                                            modifier = Modifier.weight(1f).heightIn(min = 56.dp).testTag("paoh-key-$key").semantics { contentDescription = "Type ${keyLabel(key)}, ${if (shifted) "Shift + " else ""}${physicalKey.legend}" },
+                                            contentPadding = PaddingValues(2.dp), shape = MaterialTheme.shapes.small,
+                                            border = if (suggested) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
+                                            colors = ButtonDefaults.filledTonalButtonColors(containerColor = if (suggested) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface)) {
+                                            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                                                Row(Modifier.fillMaxWidth().padding(horizontal = 3.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                                                    Text(physicalKey.legend, fontSize = 10.sp, lineHeight = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                                    Text(keyLabel(alternate), fontSize = 12.sp, lineHeight = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                                }
+                                                Text(keyLabel(key), fontSize = 24.sp, lineHeight = 32.sp)
+                                            }
+                                        }
                                     }
+                                    repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
                                 }
-                                repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
                             }
                         }
                     }
                 }
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = { shifted = !shifted }, modifier = Modifier.heightIn(min = 48.dp), contentPadding = PaddingValues(horizontal = 12.dp)) { Text(if (shifted) "Shift on" else "Shift") }
-                    FilledTonalButton(onClick = { press(" ") }, modifier = Modifier.weight(1f).heightIn(min = 48.dp),
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    OutlinedButton(onClick = { shifted = !shifted }, modifier = Modifier.heightIn(min = 48.dp).testTag("paoh-shift").semantics { stateDescription = if (shifted) "On" else "Off" }, contentPadding = PaddingValues(horizontal = 8.dp)) { Text(if (shifted) "Shift on" else "Shift") }
+                    OutlinedButton(onClick = { latin = !latin }, modifier = Modifier.heightIn(min = 48.dp).testTag("paoh-language").semantics {
+                        contentDescription = if (latin) "Switch to Pa-O" else "Switch to ABC"
+                    }, contentPadding = PaddingValues(horizontal = 8.dp)) { Text(if (latin) "Pa-O" else "ABC") }
+                    FilledTonalButton(onClick = { press(" ") }, modifier = Modifier.weight(1f).heightIn(min = 48.dp), contentPadding = PaddingValues(horizontal = 4.dp),
                         border = if (hints && next == " ") BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null) { Text("Space") }
                     OutlinedButton(onClick = { press(null) }, enabled = field.selection.max > 0,
                         modifier = Modifier.heightIn(min = 48.dp).semantics { contentDescription = "Backspace" }, contentPadding = PaddingValues(horizontal = 12.dp)) { Text("⌫") }

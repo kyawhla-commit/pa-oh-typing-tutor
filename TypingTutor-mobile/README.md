@@ -7,14 +7,18 @@ A native Kotlin / Jetpack Compose app for Android 7.0 (API 24) and newer.
 - Home dashboard, eight sequential English lessons from the web curriculum,
   free practice, and 30 / 60 / 120 second English tests.
 - English, numbers, code, and Pa-O direct-key drills. The built-in Pa-O pad uses
-  the same basic key mapping as `frontend/src/components/keyboardLayouts.ts`.
+  the complete 47-key basic mapping supplied in `keyboard/text.txt`.
   This is a key-output drill, not a translated language curriculum or an IME.
-- Phone-sized Pa-O keys (at least 48 dp), separate Letters / Marks / More pages,
+- Phone-sized Pa-O keys (at least 48 dp), separate Keys / Marks / More / 123 pages,
   optional next-key hints, automatic page/Shift hints, and light tap feedback.
+  Desktop key labels and opposite-Shift legends follow the supplied reference.
+  An ABC switch exposes Latin letters, ASCII digits, and symbols from levels 3–4.
   The keypad stays below the practice area in portrait; landscape uses two panes.
+  Space, Shift, ABC/Pa-O, and Backspace stay outside the scrolling key area.
+  Keypad taps bring the typing field into view, including on narrow screens.
 - Cursor-aware insertion, selection replacement, one-key backspace, and a
   **Fix mistake** shortcut. Combining marks have display-only dotted circles.
-  A second Pa-O drill introduces marks, tone keys, and Shift.
+  Additional Pa-O drills introduce marks, tone keys, Shift, numbers, and ABC.
 - English passage highlighting, speed and attempt accuracy, retry, and lesson passes
   at 95% accuracy. Timers start with the first committed input.
 - The latest 100 completed results, permanent lesson passes, and a theme
@@ -79,6 +83,8 @@ verified competitive scores. No attempt text is stored in completed history.
 Unicode, excess input, deadline behavior, timed versus fixed completion,
 lesson thresholds, and Pa-O key coverage. `PaohInputTest` checks selection edits,
 surrogate pairs, combining marks, next-key hints, and every Pa-O drill key.
+`PaohKeyboardTest` compares all 47 key definitions against every supplied XKB
+level in `keyboard/text.txt`, and checks layer-aware hints and punctuation.
 `lintDebug` checks Android API
 compatibility and app resources. Instrumented tests require a connected Android
 device or emulator:
@@ -88,12 +94,15 @@ bash gradlew :app:connectedDebugAndroidTest
 ```
 
 Validated in the cloud workspace: debug APK build and signature verification,
-17 unit tests, Android lint with no errors (nine existing warnings), and four
-UI tests on an API 29 software emulator at 360 × 640 dp. UI tests cover lesson
+20 unit tests, Android lint with no errors, and six UI tests on an API 29
+software emulator at 320 × 568 dp. UI tests cover lesson
 completion and unlocking, history reload, activity recreation, minimum 48 dp
 Pa-O key targets, selecting and replacing mistakes without resetting accuracy,
 backspace/space, phone-keyboard switching, and completing the marks drill with
-automatic Shift hints and exact Unicode output.
+automatic Shift hints and exact Unicode output. They also cover manual ABC/Shift
+choices surviving activity recreation, automatic hints for Latin numbers, and
+the typing field remaining visible after keypad taps. A captured phone preview
+is generated at `app/build/screenshots/keypad-numbers-320dp.png`.
 
 The cloud emulator stalled on Gradle's streaming APK installation. The same
 instrumentation suite passed after installing the built APKs explicitly:
