@@ -54,7 +54,7 @@ const modes: { key: PracticeMode; label: string; icon: string }[] = [
 
 const practiceTexts: Record<PracticeMode, string[]> = {
   words: [
-    "the quick brown fox jumps over the lazy dog and runs away into the forest",
+    "ဒဒꩻ ဒါဒါႏ ဖူးပေႏဆား ဟိဟိꩻ ဟီဟီး ငတသီး",
     "programming is the art of telling another human what one wants the computer to do",
     "success is not final failure is not fatal it is the courage to continue that counts",
   ],

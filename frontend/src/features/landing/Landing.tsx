@@ -154,9 +154,9 @@ export default function Landing() {
               <div className="w-3 h-3 rounded-full bg-green-400" />
             </div>
             <div className="font-mono text-base leading-relaxed mb-4 p-4 bg-white rounded-xl border border-[#E2E8F0]">
-              <span className="text-[#16A34A]">The quick brown fox </span>
-              <span className="bg-[#2563EB] text-white px-0.5 rounded">j</span>
-              <span className="text-[#94A3B8]">umps over the lazy dog.</span>
+              <span className="text-[#16A34A]">ဒ</span>
+              <span className="bg-[#2563EB] text-white px-0.5 rounded">ဒ</span>
+              <span className="text-[#94A3B8]">ꩻ ဒါဒါႏ ဖူးပေႏဆား ဟိဟိꩻ ဟီဟီး ငတသီး</span>
             </div>
             <div className="grid grid-cols-3 gap-3 mb-4">
               {[['72', 'WPM'], ['98%', 'Accuracy'], ['0', 'Errors']].map(([v, l]) => (
