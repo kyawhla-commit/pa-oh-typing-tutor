@@ -1,3 +1,4 @@
+import BuilderCredit from '../../components/BuilderCredit'
 import ThemeToggle from '../../components/ThemeToggle'
 import VirtualKeyboard from '../../components/VirtualKeyboard'
 import { useNavigate } from 'react-router-dom'
@@ -221,7 +222,8 @@ export default function Landing() {
       </section>
 
       <footer className="border-t border-[#E2E8F0] py-8 text-center text-sm text-[#94A3B8]">
-        © 2026 Typing Tutor · Your learning data stays in this browser
+        <p className="mb-2">© 2026 Typing Tutor · Your learning data stays in this browser</p>
+        <BuilderCredit />
       </footer>
     </div>
   )

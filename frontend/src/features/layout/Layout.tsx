@@ -1,3 +1,4 @@
+import BuilderCredit from '../../components/BuilderCredit'
 import { useState, type ReactNode } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useLearningData } from '../../data/LearningContext'
@@ -168,6 +169,9 @@ export default function Layout({ children }: { children: ReactNode }) {
         {/* Page content */}
         <main className="min-h-0 min-w-0 flex-1 overflow-y-auto [scrollbar-gutter:stable]">
           {children}
+          <footer className="mx-4 border-t border-[#E2E8F0] px-4 py-4 sm:mx-6">
+            <BuilderCredit />
+          </footer>
         </main>
       </div>
     </div>
