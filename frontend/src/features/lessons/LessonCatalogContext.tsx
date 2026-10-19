@@ -58,7 +58,7 @@ function toRow(lesson: LessonDraft) {
 }
 
 export function LessonCatalogProvider({ children }: { children: ReactNode }) {
-  const [catalog, setCatalog] = useState<LessonRecord[]>(getLessonCatalog);
+  const [catalog, setCatalog] = useState<LessonRecord[]>(() => supabase ? [] : getLessonCatalog());
   const [catalogStatus, setCatalogStatus] = useState<CatalogStatus>(supabase ? "loading" : "local");
   const [catalogError, setCatalogError] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -93,7 +93,7 @@ export function LessonCatalogProvider({ children }: { children: ReactNode }) {
       if (!active || sequence !== loadSequence) return;
       if (error) {
         setCatalog((current) => {
-          const fallback = current.length ? current : getLessonCatalog();
+          const fallback = current;
           return isAdmin ? fallback : fallback.filter((lesson) => lesson.status === "Published");
         });
         setCatalogStatus("error");
@@ -147,6 +147,7 @@ export function LessonCatalogProvider({ children }: { children: ReactNode }) {
     const ensureCloudAdmin = () => {
       ensureWritable();
       if (catalogStatus !== "local" && !userId) throw new Error("Sign in with an administrator account to edit the shared lesson catalog.");
+      if (catalogStatus === "loading") throw new Error("Wait for the lesson catalog to finish loading.");
       if (catalogStatus === "error") throw new Error(catalogError || "The shared lesson catalog is unavailable.");
     };
     const refreshCloudCatalog = async () => {

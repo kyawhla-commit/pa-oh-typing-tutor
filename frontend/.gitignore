@@ -6,3 +6,6 @@ dist/
 !.env.example
 .learning-evaluation/
 DEMO_ACCOUNTS.local.md
+.wrangler/
+.dev.vars
+.dev.vars.*

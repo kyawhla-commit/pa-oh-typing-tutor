@@ -13,3 +13,4 @@
   /* Leave room for both Myanmar legends on narrow keys. */
   .keyboard-key-latin { display: none; }
 }
+.keyboard-key-mobile { display: none; }

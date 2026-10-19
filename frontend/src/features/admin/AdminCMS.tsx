@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useContext, useMemo, useState, type FormEvent } from "react";
 import {
   Activity,
   Archive,
@@ -20,7 +20,7 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { useLearningData } from "../../data/LearningContext";
+import { LearningContext } from "../../data/LearningContext";
 import { useLessonCatalog } from "../lessons/LessonCatalogContext";
 import {
   type LessonCategory,
@@ -115,8 +115,10 @@ function EmptyState({
   );
 }
 
-export default function AdminCMS() {
-  const { learner, results } = useLearningData();
+export default function AdminCMS({ lessonsOnly = false }: { lessonsOnly?: boolean }) {
+  const learning = useContext(LearningContext);
+  const learner = learning?.learner ?? null;
+  const results = learning?.results ?? [];
   const {
     catalog,
     catalogStatus,
@@ -128,7 +130,7 @@ export default function AdminCMS() {
     deleteLesson: removeLesson,
     restoreDefaultCatalog,
   } = useLessonCatalog();
-  const [view, setView] = useState<AdminView>("overview");
+  const [view, setView] = useState<AdminView>(lessonsOnly ? "lessons" : "overview");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"All" | LessonStatus>("All");
   const [editorOpen, setEditorOpen] = useState(false);
@@ -328,7 +330,7 @@ export default function AdminCMS() {
             {pageTitle}
           </h1>
           <p className="mt-1 text-sm text-slate-500">
-            Manage the shared lesson catalog and review your learner activity.
+            Create, edit, and publish lessons for the practice page.
           </p>
         </div>
         <div
@@ -356,7 +358,7 @@ export default function AdminCMS() {
             aria-label="Admin sections"
             className="flex gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-sm lg:flex-col lg:gap-1"
           >
-            {navItems.map(({ id, label, icon: Icon }) => (
+            {navItems.filter(item => !lessonsOnly || item.id === "lessons").map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
                 onClick={() => setView(id)}

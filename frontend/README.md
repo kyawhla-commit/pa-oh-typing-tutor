@@ -132,3 +132,29 @@ See [outcome semantics](src/features/learning/planner/outcomes/README.md), [futu
 Run `pnpm pilot:dev` and open `http://127.0.0.1:5176/tests/browser/pilot/index.html` for a consent-gated local facilitator workspace. Participant views reuse Practice/Test with isolated synthetic learning scopes; capture stores compact milestones and manual observations, with explicit local JSON export. Normal production builds exclude the study entry points. No real learners have been tested and no feedback is fabricated.
 
 Read [the pilot architecture](src/features/pilot/README.md), [consent and ten-task protocol](src/features/pilot/PROTOCOL.md), [facilitator checklist](src/features/pilot/CHECKLIST.md), [copy audit](src/features/pilot/COPY_AUDIT.md), [unfilled findings template](src/features/pilot/REPORT_TEMPLATE.md), and [engineering validation](src/features/pilot/SLICE13.md). `pnpm pilot:test` verifies capture/privacy/isolation/reset; the development evaluator checks identical learning outputs with passive capture off/on. Conduct a genuine consented 6–8 learner usability pilot next; learning efficacy, threshold calibration and scheduling remain separate work.
+
+### Simple tutor and lesson administration
+
+The public app has Home and Practice pages. Administrators can visit `/admin`
+directly to use Supabase email/password sign-in; no public Admin link is shown. Only an account whose
+server-managed `app_metadata.role` is `admin` can open the existing lesson editor.
+The database RLS policies remain the authority for writes.
+
+The editor and public practice both use `public.lesson_catalog` from the existing
+`202609300002_shared_lesson_catalog.sql` migration. No new table is required.
+Save draft hides a lesson from public practice; Publish makes it available.
+Lessons are ordered by their existing IDs. The practice visit pins its loaded
+catalog so an admin edit cannot replace text during an attempt; returning to
+Practice loads the current catalog. Empty and failed catalogs show explicit
+states rather than substituting built-in lessons when Supabase is configured.
+Pa’O content uses the Pa’O keyboard; English content uses QWERTY.
+
+Use the existing `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` (or
+`VITE_SUPABASE_ANON_KEY`) configuration. Apply the existing migrations if the table
+has not been created. An existing admin account is required; this UI does not
+create or promote administrators.
+
+### Cloudflare deployment
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for Cloudflare Workers setup, build-time
+Supabase configuration, local preview, and publishing commands.

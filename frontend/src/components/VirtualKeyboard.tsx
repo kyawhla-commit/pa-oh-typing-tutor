@@ -144,9 +144,10 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
                       key.label
                     ) : (
                       <>
-                        <span style={{ left: "calc(var(--keyboard-key-size) * 0.125)", top: "calc(var(--keyboard-key-size) * 0.09)", fontSize: "clamp(6px, calc(var(--keyboard-key-size) * 0.18), 10px)" }} className={`keyboard-key-latin absolute leading-none ${isPressed || isError ? "text-white" : "text-slate-500"}`}>{key.label}</span>
-                        {legends && <span style={{ right: "calc(var(--keyboard-key-size) * 0.125)", top: "calc(var(--keyboard-key-size) * 0.09)", fontSize: "clamp(6px, calc(var(--keyboard-key-size) * 0.23), 13px)" }} className={`absolute font-myanmar leading-relaxed ${isPressed || isError ? "text-white" : "text-slate-600"}`}>{legends.shifted}</span>}
-                        {legends && <span style={{ bottom: "calc(var(--keyboard-key-size) * 0.11)", fontSize: "clamp(8px, calc(var(--keyboard-key-size) * 0.286), 16px)" }} className={`absolute left-0 right-0 text-center font-myanmar font-medium leading-relaxed ${isPressed || isError ? "text-white" : "text-slate-800"}`}>{legends.unshifted}</span>}
+                        <span style={{ left: "8%", top: "7%", width: "40%", fontSize: "clamp(6px, calc(var(--keyboard-key-size) * 0.18), 10px)" }} className={`keyboard-key-latin absolute overflow-hidden whitespace-nowrap leading-none ${isPressed || isError ? "text-white" : "text-slate-500"}`}>{key.label}</span>
+                        {legends && <span style={{ right: "8%", top: "3%", textAlign: "right", fontSize: "clamp(6px, calc(var(--keyboard-key-size) * 0.21), 12px)" }} className={`keyboard-key-shifted absolute whitespace-nowrap font-myanmar leading-relaxed ${isPressed || isError ? "text-white" : "text-slate-600"}`}>{legends.shifted}</span>}
+                        {legends && <span style={{ bottom: "3%", fontSize: "clamp(8px, calc(var(--keyboard-key-size) * 0.27), 16px)" }} className={`keyboard-key-unshifted absolute left-0 right-0 whitespace-nowrap text-center font-myanmar font-medium leading-relaxed ${isPressed || isError ? "text-white" : "text-slate-800"}`}>{legends.unshifted}</span>}
+                        {legends && <span className="keyboard-key-mobile font-myanmar">{nextKey?.shift ? legends.shifted : legends.unshifted}</span>}
                       </>
                     )}
                   </div>

@@ -165,3 +165,282 @@
 :root[data-theme='dark'] .key-legend i { background: #75a7ff; }
 @media (max-width: 640px) { .header-actions { gap: 12px; } .header-actions .theme-toggle { width: 76px; height: 38px; } .header-actions .theme-toggle svg { width: 18px; height: 18px; } }
 @media (max-width: 380px) { .header-actions { gap: 8px; } .header-actions .header-link { font-size: 10px; gap: 4px; } .header-actions .theme-toggle { width: 64px; } .tutor-brand { gap: 7px; } }
+
+/* Reflow the layout while keeping the physical keyboard legible. */
+.simple-tutor { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); padding-bottom: env(safe-area-inset-bottom); }
+.tutor-header { gap: 20px; padding-block: 16px; }
+.tutor-brand, .brand-icon, .header-actions .theme-toggle, .header-link svg { flex-shrink: 0; }
+.header-actions { flex-wrap: wrap; justify-content: flex-end; }
+.header-link { min-height: 44px; }
+.hero-copy, .hero-art, .home-overview > div, .practice-heading > div, .lesson-title, .practice-card, .keyboard-panel { min-width: 0; }
+.home-hero { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); }
+.practice-heading, .practice-card-top, .classic-bottom, .keyboard-panel-heading, .tutor-footer { flex-wrap: wrap; }
+.lesson-toolbar { flex-shrink: 0; }
+.lesson-toolbar button, .lesson-toolbar select, .lesson-toolbar .tutor-start { min-height: 44px; }
+.lesson-toolbar button:not(.tutor-start) { min-width: 44px; }
+.lesson-toolbar .tutor-start { display: inline-flex; }
+.classic-input-shell textarea { font-size: 16px; }
+.input-placeholder { display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; vertical-align: top; }
+.keyboard-scroll { max-width: 100%; overscroll-behavior-inline: contain; scrollbar-width: thin; }
+.keyboard-scroll-hint { display: none; color: var(--muted); font-size: 11px; margin: 10px 0 0; }
+.classic-metrics { flex-wrap: wrap; }
+.tutor-footer { line-height: 1.7; }
+@media (max-width: 960px) {
+  .home-hero { gap: 30px; }
+  .practice-card-top { align-items: flex-start; }
+  .lesson-toolbar { flex: 1 1 340px; justify-content: flex-end; }
+}
+@media (max-width: 780px) {
+  .home-hero { grid-template-columns: minmax(0, 1fr); padding-block: 48px; }
+  .hero-copy { max-width: 600px; }
+  .tutor-home h1 { font-size: clamp(36px, 7.6vw, 60px); letter-spacing: -1.7px; }
+  .home-description { max-width: 500px; }
+  .hero-art { min-height: 320px; }
+  .home-overview { gap: 24px; }
+  .keyboard-scroll-hint { display: block; }
+  .lesson-toolbar { width: 100%; }
+}
+@media (max-width: 480px) {
+  .tutor-header, .tutor-home, .tutor-footer, .classic-practice { width: calc(100% - 32px); }
+  .tutor-header { gap: 12px; }
+  .header-actions { gap: 8px; }
+  .practice-heading { gap: 12px; }
+  .practice-heading h1 { font-size: 27px; }
+  .home-eyebrow { font-size: 9px; letter-spacing: 1.2px; }
+  .practice-card { padding: 18px 14px; }
+  .lesson-toolbar { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 8px; flex-basis: 100%; }
+  .lesson-toolbar select { width: 100%; min-height: 44px; font-size: 16px; }
+  .lesson-toolbar .tutor-start { grid-column: 1 / -1; margin-left: 0; width: 100%; }
+  .classic-metrics { gap: 20px; }
+  .classic-metrics > div + div { padding-left: 20px; }
+  .hero-art { padding: 20px 16px; }
+  .hero-key { width: clamp(73px, 23vw, 100px); height: 100px; }
+  .hero-key > span { font-size: 36px; }
+  .art-caption { gap: 12px; letter-spacing: .8px; }
+  .art-caption svg { flex-shrink: 0; }
+  .art-bottom { gap: 10px; }
+  .art-bottom p { font-size: 11px; }
+  .art-line { width: 18px; flex-shrink: 0; }
+  .home-reassurance { flex-wrap: wrap; font-size: 11px; }
+  .completion-actions .tutor-start { width: 100%; }
+}
+@media (max-width: 400px) {
+  .tutor-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
+  .header-actions { display: contents; }
+  .header-actions .theme-toggle { justify-self: end; width: 76px; height: 44px; }
+  .header-actions .header-link { grid-column: 1 / -1; justify-self: end; font-size: 12px; padding: 4px 0; }
+  .practice-badge { font-size: 10px; }
+  .keyboard-panel-heading { align-items: flex-start; gap: 12px; }
+  .tutor-footer { gap: 8px; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .tutor-header { min-height: 64px; padding-block: 10px; }
+  .classic-practice { margin-top: 22px; }
+  .practice-heading { margin-bottom: 18px; }
+  .home-hero { padding-block: 30px; }
+}
+
+/* Focused practice workspace: one toolbar, passage, then the shared keyboard. */
+.practice-page .tutor-header { width: min(1080px, calc(100% - 40px)); min-height: 76px; padding-block: 12px; gap: 24px; }
+.practice-page .tutor-header .lesson-toolbar { flex: 0 1 auto; width: auto; margin-left: auto; }
+.practice-page .tutor-header .lesson-toolbar select { max-width: 150px; }
+.practice-page .header-actions { gap: 18px; flex-wrap: nowrap; }
+.practice-page .classic-practice { width: min(1000px, calc(100% - 40px)); margin: 24px auto; }
+.practice-page .practice-card { padding: 18px 24px; }
+.practice-page .lesson-title { display: flex; align-items: baseline; gap: 15px; flex-wrap: wrap; }
+.practice-page .lesson-title h1 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -.4px; }
+.practice-page .lesson-title > span { font-size: 10px; }
+.practice-page .lesson-progress { margin: 14px 0; }
+.practice-page .passage-label { margin-bottom: 4px; font-size: 10px; }
+.practice-page .classic-passage { font-size: clamp(25px, 2.4vw, 32px); line-height: 1.9; padding: 8px 0 14px; }
+.practice-page .classic-input-shell { height: 58px; margin-top: 4px; }
+.practice-page .classic-typed-line { font-size: 24px; padding-block: 9px; }
+.practice-page .classic-bottom { margin-top: 16px; gap: 22px; }
+.practice-page .classic-metrics { gap: 24px; }
+.practice-page .classic-metrics > div + div { padding-left: 24px; }
+.practice-page .classic-metrics strong { font-size: 23px; line-height: 1.4; }
+.practice-page .classic-status { margin-left: auto; font-size: 11px; max-width: 240px; }
+.practice-page .keyboard-panel { margin-top: 18px; }
+.practice-page .keyboard-panel-heading { margin-bottom: 10px; font-size: 10px; }
+.practice-page .keyboard-scroll { padding: 12px; }
+.practice-page .virtual-keyboard { min-width: 0; }
+.practice-page .keyboard-keys {
+  --keyboard-key-size: min(calc((100cqw - 13 * var(--keyboard-key-gap)) / 14.3), 64px);
+  --keyboard-key-height: clamp(44px, calc(var(--keyboard-key-size) + 8px), 64px);
+}
+.practice-page .virtual-keyboard [data-key-code] { border-radius: 7px; border-bottom-width: 3px; }
+.practice-page .virtual-keyboard [data-next-key='true'] { background: #dbeafe; border-color: #3b82f6; }
+.practice-page .virtual-keyboard [data-key-state='pressed'] { background: #2563eb; border-color: #60a5fa; color: white; }
+.practice-page .virtual-keyboard [data-key-state='error'] { background: #dc2626; border-color: #f87171; color: white; }
+.practice-page .keyboard-note { margin-top: 8px; font-size: 10px; }
+.practice-page .tutor-footer { width: min(1000px, calc(100% - 40px)); padding-block: 14px; }
+:root[data-theme='dark'] .practice-page .virtual-keyboard [data-key-code] { background: #142137; border-color: #30415c; color: #cbd5e1; }
+:root[data-theme='dark'] .practice-page .virtual-keyboard [data-key-code] span { color: #cbd5e1; }
+:root[data-theme='dark'] .practice-page .virtual-keyboard [data-next-key='true'] { background: #264d87; border-color: #75a7ff; --tw-ring-color: #75a7ff; --tw-ring-offset-color: #1b2b43; }
+:root[data-theme='dark'] .practice-page .virtual-keyboard [data-key-state='pressed'] { background: #2563eb; border-color: #75a7ff; }
+:root[data-theme='dark'] .practice-page .virtual-keyboard [data-key-state='error'] { background: #a52e40; border-color: #fca5a5; }
+.practice-page .virtual-keyboard [data-key-state] span { color: white; }
+@media (max-width: 700px) {
+  .practice-page .tutor-header { flex-wrap: wrap; gap: 12px; }
+  .practice-page .header-actions { margin-left: auto; }
+  .practice-page .tutor-header .lesson-toolbar { order: 3; flex-basis: 100%; display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; }
+  .practice-page .tutor-header .lesson-toolbar select { max-width: none; width: 100%; }
+  .practice-page .classic-practice { margin-top: 16px; }
+  .practice-page .practice-card { padding: 16px; }
+  .practice-page .classic-bottom { align-items: center; flex-direction: row; gap: 16px; }
+  .practice-page .classic-status { flex-basis: 100%; max-width: none; margin-left: 0; text-align: left; }
+  .practice-page .classic-metrics { margin-left: auto; gap: 16px; }
+  .practice-page .classic-metrics > div + div { padding-left: 16px; }
+  .practice-page .keyboard-scroll-hint { display: block; }
+}
+@media (max-width: 400px) {
+  .practice-page .tutor-header { display: flex; }
+  .practice-page .header-actions { display: flex; gap: 10px; }
+  .practice-page .header-actions .header-link { font-size: 11px; }
+  .practice-page .header-actions .theme-toggle { width: 64px; }
+  .practice-page .classic-bottom > .tutor-start { width: 100%; }
+  .practice-page .classic-metrics { margin-left: 0; }
+}
+
+.practice-page .lesson-toolbar .lesson-picker-trigger { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 0 14px; white-space: nowrap; }
+.lesson-modal { margin: auto; width: min(760px, calc(100% - 32px)); max-height: calc(100dvh - 40px); padding: 28px; overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--line); border-radius: 20px; background: #f8fafc; color: var(--ink); box-shadow: 0 24px 80px #02061755; }
+.lesson-modal::backdrop { background: #020617a6; backdrop-filter: blur(5px); }
+.lesson-modal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.lesson-modal-header .home-eyebrow { margin-bottom: 8px; font-size: 10px; }
+.lesson-modal-header h2 { font-size: 26px; font-weight: 600; letter-spacing: -.6px; margin: 0; }
+.lesson-modal-close { display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; border-radius: 10px; border: 1px solid var(--line); background: transparent; color: var(--ink); }
+#lesson-modal-description, .lesson-modal-note { color: var(--muted); font-size: 12px; line-height: 1.8; margin: 14px 0 20px; }
+.lesson-modal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.lesson-choice { display: flex; flex-direction: column; min-width: 0; gap: 12px; padding: 18px; text-align: left; border: 1px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink); }
+.lesson-choice:hover { border-color: var(--accent); background: #eff6ff; }
+.lesson-choice.is-selected { border-color: var(--accent); background: #eff6ff; }
+.lesson-choice-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--accent); font-size: 10px; letter-spacing: .6px; }
+.lesson-current { display: inline-flex; align-items: center; gap: 4px; letter-spacing: 0; }
+.lesson-choice strong { font-size: 15px; font-weight: 600; }
+.lesson-preview { display: block; width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 16px/2 'Noto Sans Myanmar', sans-serif; color: var(--muted); }
+.lesson-modal-note { margin-bottom: 0; font-size: 11px; }
+:root[data-theme='dark'] .lesson-modal { background: #0b1220; }
+:root[data-theme='dark'] .lesson-choice { background: #142137; }
+:root[data-theme='dark'] .lesson-choice:hover, :root[data-theme='dark'] .lesson-choice.is-selected { background: #182f53; }
+@media (max-width: 520px) {
+  .lesson-modal { padding: 20px; max-height: calc(100dvh - 24px); border-radius: 14px; }
+  .lesson-modal-grid { grid-template-columns: minmax(0, 1fr); }
+  .lesson-modal-header h2 { font-size: 23px; }
+  .lesson-choice { gap: 8px; padding: 15px; }
+}
+
+.practice-page .classic-bottom { justify-content: space-between; gap: 24px; }
+.practice-page .classic-metrics { margin-left: auto; gap: 28px; }
+.practice-page .classic-metrics > div > span { font-size: 12px; letter-spacing: 0; font-weight: 400; }
+.practice-page .classic-metrics strong { font-size: 22px; font-weight: 600; }
+.practice-page .classic-metrics > div + div { padding-left: 0; border-left: none; }
+.practice-feedback { color: var(--muted); font-size: 12px; line-height: 1.6; margin: 12px 0 0; }
+.practice-feedback:empty { display: none; }
+.shortcut-help { margin-top: 14px; color: var(--muted); font-size: 11px; }
+.shortcut-help summary { cursor: pointer; width: fit-content; padding: 6px 0; }
+.shortcut-help summary:hover { color: var(--accent); }
+.shortcut-help dl { display: grid; gap: 12px; margin: 10px 0 0; padding: 14px 0 0; border-top: 1px solid var(--line); max-width: 450px; }
+.shortcut-help dl > div { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px 16px; }
+.shortcut-help dd { margin: 0; }
+.shortcut-help kbd { display: inline-block; padding: 3px 6px; border: 1px solid var(--line); border-radius: 4px; font: inherit; color: var(--ink); }
+@media (max-width: 400px) {
+  .practice-page .classic-bottom { gap: 18px; }
+  .practice-page .classic-bottom > .tutor-start { width: auto; }
+  .practice-page .classic-metrics { margin-left: 0; gap: 18px; }
+}
+
+/* Keep long lessons inside a two-line reading window. */
+.practice-page .classic-passage {
+  height: calc(2 * 1.9em + 24px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding-block: 12px;
+  overscroll-behavior: contain;
+  overflow-anchor: none;
+  scrollbar-gutter: stable;
+}
+
+/* Like f729d06, size the complete keyboard from its available container width. */
+@media (max-width: 700px) {
+  .practice-page .keyboard-scroll { padding: 6px 3px; }
+  .practice-page .keyboard-keys { --keyboard-key-gap: clamp(1px, .5cqw, 4px); }
+  .practice-page .virtual-keyboard [data-key-code] { border-radius: 4px; border-bottom-width: 2px; }
+  .practice-page .keyboard-panel-heading { font-size: 9px; letter-spacing: .3px; }
+}
+
+.mobile-next-key { display: none; }
+@media (max-width: 480px) {
+  .practice-page .classic-practice { width: calc(100% - 24px); margin-top: 12px; }
+  .practice-page .practice-card { padding: 16px 14px; border-radius: 14px; }
+  .practice-page .lesson-title { gap: 6px 12px; }
+  .practice-page .lesson-title h1 { font-size: 17px; }
+  .practice-page .lesson-title > span { font-size: 9px; letter-spacing: 1px; }
+  .practice-page .lesson-progress { margin-block: 12px; }
+  .practice-page .classic-passage { font-size: 24px; line-height: 2; height: calc(2 * 2em + 24px); padding-block: 12px; scrollbar-width: none; }
+  .practice-page .classic-input-shell { height: 50px; }
+  .practice-page .classic-typed-line { font-size: 22px; line-height: 30px; }
+  .practice-page .input-placeholder { line-height: 30px; font-size: 10px; }
+  .practice-page .classic-bottom { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; margin-top: 14px; }
+  .practice-page .classic-bottom > .tutor-start { width: auto; min-width: 0; padding: 10px 12px; font-size: 11px; gap: 6px; }
+  .practice-page .classic-metrics { margin-left: auto; gap: 14px; flex-wrap: nowrap; }
+  .practice-page .classic-metrics > div > span { font-size: 10px; }
+  .practice-page .classic-metrics strong { font-size: 19px; }
+  .practice-page .classic-metrics b { font-size: 8px; }
+  .practice-page .shortcut-help { margin-top: 8px; }
+  .practice-page .keyboard-panel { margin-top: 18px; }
+  .practice-page .keyboard-panel-heading { display: none; }
+  .mobile-next-key { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 4px 12px; }
+  .mobile-next-key > div > span { display: block; color: var(--muted); font-size: 11px; }
+  .mobile-next-key strong { display: block; margin-top: 3px; font-size: 17px; font-weight: 600; }
+  .mobile-key-preview { display: grid; place-items: center; min-width: 52px; min-height: 54px; padding: 4px 10px; border: 1px solid var(--accent); border-bottom-width: 3px; border-radius: 10px; color: var(--accent); background: #eff6ff; font: 24px/1.8 'Noto Sans Myanmar', sans-serif; }
+  :root[data-theme='dark'] .mobile-key-preview { background: #182f53; }
+  .practice-page .keyboard-scroll { padding: 8px 2px; border-radius: 12px; }
+  .practice-page .keyboard-keys { --keyboard-key-height: 34px; --keyboard-key-gap: 2px; }
+  .practice-page .virtual-keyboard .keyboard-key-latin,
+  .practice-page .virtual-keyboard .keyboard-key-shifted,
+  .practice-page .virtual-keyboard .keyboard-key-unshifted { display: none; }
+  .practice-page .virtual-keyboard .keyboard-key-mobile { display: block; font-size: clamp(9px, 3.3cqw, 13px); line-height: 1.8; }
+  .practice-page .virtual-keyboard [data-key-code] { border-bottom-width: 2px; border-radius: 5px; }
+  .practice-page .keyboard-note { font-size: 10px; line-height: 1.6; }
+  .practice-page .keyboard-note > span { display: none; }
+}
+
+/* On phones, let the individual keys define the keyboard surface. */
+@media (max-width: 480px) {
+  .practice-page .keyboard-scroll,
+  :root[data-theme='dark'] .practice-page .keyboard-scroll {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+  .practice-page .keyboard-viewport { padding: 3px; }
+}
+.simple-tutor .keyboard-visibility-toggle { display: inline-flex; align-items: center; gap: 4px; min-height: 24px; padding: 2px 0; margin-bottom: 4px; border: 0; border-radius: 3px; color: var(--muted); background: transparent; font-size: 10px; line-height: 16px; }
+.keyboard-visibility-toggle svg { width: 11px; height: 11px; }
+.simple-tutor .keyboard-visibility-toggle:hover { color: var(--accent); }
+#practice-keyboard[hidden] { display: none; }
+
+.practice-page .classic-passage {
+  height: calc(1.9em + 24px);
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-gutter: auto;
+}
+@media (max-width: 480px) {
+  .practice-page .classic-passage { height: calc(2em + 24px); }
+}
+
+/* Compact practice controls and feedback. */
+.practice-page .classic-bottom { margin-top: 10px; gap: 12px; }
+.practice-page .classic-bottom > .tutor-start { min-height: 32px; padding: 6px 10px; gap: 6px; border-radius: 6px; font-size: 11px; line-height: 18px; }
+.practice-page .classic-bottom > .tutor-start svg { width: 13px; height: 13px; }
+.practice-page .classic-metrics { gap: 18px; }
+.practice-page .classic-metrics > div > span { font-size: 10px; line-height: 1.4; }
+.practice-page .classic-metrics strong { font-size: 18px; line-height: 1.3; }
+.practice-page .classic-metrics b { font-size: 8px; }
+.practice-page .practice-feedback { margin-top: 6px; font-size: 11px; line-height: 1.5; }
