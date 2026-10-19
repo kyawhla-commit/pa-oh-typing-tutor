@@ -1,6 +1,8 @@
-import { type CSSProperties, type ReactNode } from "react";
+import { useRef, type CSSProperties, type ReactNode } from "react";
 import "./virtual-keyboard.css";
-import { paoKeyLegends, type KeyHint } from "./keyboardLayouts";
+import { paoKeyLegends, qwertyKeyLegends, type KeyHint } from "./keyboardLayouts";
+import { GlassHandGuide } from "./hand-guide/GlassHandGuide";
+import { fingerGuidance } from "./hand-guide/fingerMapping";
 
 const rowsByLayout: Record<string, string[][]> = {
   QWERTY: [
@@ -50,6 +52,7 @@ const paoRows: PaOKey[][] = [
 ];
 
 const wideKeys = new Set(["Backspace", "Tab", "Caps", "Enter", "Shift", "Space"]);
+const qwertyCodesByKey = new Map(Object.entries(qwertyKeyLegends).map(([code, legends]) => [legends.unshifted, code]));
 
 const wideKeyLabels: Record<string, string> = {
   Backspace: "⌫",
@@ -64,6 +67,8 @@ interface VirtualKeyboardProps {
   errorKey?: string;
   layout?: string;
   nextKey?: KeyHint | null;
+  showHandGuide?: boolean;
+  reserveHandSpace?: boolean;
 }
 
 function normalizeKey(key: string) {
@@ -72,22 +77,30 @@ function normalizeKey(key: string) {
   return key.toLowerCase();
 }
 
-function KeyboardViewport({ children }: { children: ReactNode }) {
+function KeyboardViewport({ children, layout, nextKey, showHandGuide, reserveHandSpace }: {
+  children: ReactNode; layout: string; nextKey?: KeyHint | null; showHandGuide: boolean; reserveHandSpace: boolean;
+}) {
+  const keyboard = useRef<HTMLDivElement>(null);
   return <div className="virtual-keyboard">
-    <div role="region" aria-label="Keyboard guide" className="keyboard-viewport">
+    <div ref={keyboard} role="region" aria-label="Keyboard guide" className="keyboard-viewport">
       {children}
+      {(reserveHandSpace || showHandGuide) && <div className="keyboard-hand-clearance" aria-hidden="true" />}
+      {showHandGuide && <GlassHandGuide keyboard={keyboard} layout={layout} nextKey={nextKey ?? null} />}
     </div>
   </div>;
 }
 
-export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY", nextKey }: VirtualKeyboardProps) {
+export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY", nextKey, showHandGuide = false, reserveHandSpace = false }: VirtualKeyboardProps) {
   const pressed = pressedKey ? normalizeKey(pressedKey) : "";
   const error = errorKey ? normalizeKey(errorKey) : "";
   const rows = rowsByLayout[layout] || rowsByLayout.QWERTY;
+  const guidance = showHandGuide ? fingerGuidance(nextKey) : null;
+  const guidedFinger = (code: string) => code === nextKey?.code ? guidance?.finger
+    : code === guidance?.shiftCode ? guidance.shiftFinger : null;
 
   if (layout === "Pa'O") {
     return (
-      <KeyboardViewport><div className="keyboard-layout" role="img" aria-label="Pa'O Myanmar keyboard layout">
+      <KeyboardViewport layout={layout} nextKey={nextKey} showHandGuide={showHandGuide} reserveHandSpace={reserveHandSpace}><div className="keyboard-layout" role="img" aria-label="Pa'O Myanmar keyboard layout">
         <div className="keyboard-keys mx-auto w-full space-y-[var(--keyboard-key-gap)] select-none">
           {paoRows.map((row, rowIndex) => (
             <div key={`pao-row-${rowIndex}`} className="flex justify-center gap-[var(--keyboard-key-gap)]">
@@ -101,7 +114,9 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
                 const isError = Boolean(error) && candidates.includes(error);
                 const isNext = nextKey?.code === key.code || (nextKey?.shift && key.code.startsWith("Shift"));
                 const isWide = key.special || key.space;
+                const finger = guidedFinger(key.code);
                 const keyStyle: CSSProperties = {
+                  ...(finger ? { "--finger-color": finger.color } : {}),
                   width: key.space ? "calc(var(--keyboard-key-size) * 5.7)" : isWide ? "calc(var(--keyboard-key-size) * 1.3)" : "var(--keyboard-key-size)",
                   height: "var(--keyboard-key-height)",
                   fontSize: "clamp(8px, calc(var(--keyboard-key-size) * 0.22), 12px)",
@@ -113,9 +128,11 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
                     data-key-code={key.code}
                     data-key-modifier={key.code.startsWith("Shift") ? "true" : undefined}
                     data-next-key={isNext ? "true" : undefined}
+                    data-guide-finger={finger?.id}
+                    data-key-state={isError ? "error" : isPressed ? "pressed" : undefined}
                     aria-hidden="true"
                     style={keyStyle}
-                    className={`relative flex shrink-0 items-center justify-center rounded-sm border font-medium transition-colors duration-75 ${isNext ? "ring-2 ring-blue-500 ring-offset-1" : ""}
+                    className={`relative flex shrink-0 items-center justify-center rounded-sm border font-medium transition-colors duration-75 ${isNext && !guidance ? "ring-2 ring-blue-500 ring-offset-1" : ""}
                       ${isError
                         ? "bg-red-500 text-white border-red-400 scale-95 shadow-none"
                         : isPressed
@@ -143,7 +160,7 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
   }
 
   return (
-    <KeyboardViewport><div className="keyboard-layout" aria-hidden>
+    <KeyboardViewport layout={layout} nextKey={nextKey} showHandGuide={showHandGuide} reserveHandSpace={reserveHandSpace}><div className="keyboard-layout" aria-hidden>
       <div className="keyboard-keys mx-auto w-full space-y-[var(--keyboard-key-gap)] select-none">
         {rows.map((row, rowIndex) => (
           <div key={`${layout}-${rowIndex}`} className="flex justify-center gap-[var(--keyboard-key-gap)]">
@@ -154,7 +171,11 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
               const isError = normalized === error;
               const isNext = !!nextKey && (normalizeKey(nextKey.label) === normalized || (key === "Shift" && nextKey.shift));
               const isWide = wideKeys.has(key);
+              const code = key === "Shift" ? keyIndex === 0 ? "ShiftLeft" : "ShiftRight"
+                : qwertyCodesByKey.get(key) ?? key;
+              const finger = guidedFinger(code);
               const keyStyle: CSSProperties = {
+                ...(finger ? { "--finger-color": finger.color } : {}),
                 width: isSpace ? "calc(var(--keyboard-key-size) * 5.7)" : isWide ? "calc(var(--keyboard-key-size) * 1.3)" : "var(--keyboard-key-size)",
                 height: "var(--keyboard-key-height)",
                 fontSize: "clamp(8px, calc(var(--keyboard-key-size) * 0.22), 12px)",
@@ -163,10 +184,13 @@ export default function VirtualKeyboard({ pressedKey, errorKey, layout = "QWERTY
               return (
                 <div
                   key={`${key}-${keyIndex}`}
+                  data-key-code={code}
                   data-next-key={isNext ? "true" : undefined}
+                  data-guide-finger={finger?.id}
+                  data-key-state={isError ? "error" : isPressed ? "pressed" : undefined}
                   data-key-modifier={key === "Shift" ? "true" : undefined}
                   style={keyStyle}
-                  className={`flex shrink-0 items-center justify-center rounded-sm border font-medium transition-colors duration-75 ${isNext ? "ring-2 ring-blue-500 ring-offset-1" : ""}
+                  className={`flex shrink-0 items-center justify-center rounded-sm border font-medium transition-colors duration-75 ${isNext && !guidance ? "ring-2 ring-blue-500 ring-offset-1" : ""}
                     ${isError
                       ? "bg-red-500 text-white border-red-400 scale-95 shadow-none"
                       : isPressed

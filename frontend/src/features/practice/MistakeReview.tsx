@@ -23,9 +23,10 @@ export function MistakeReview({ result }: { result: SessionResult }) {
 }
 
 /** Local review drill: never marks a lesson passed or replaces its saved result. */
-export function MistakePractice({ original, onBack, layout, showKeyboard }: {
+export function MistakePractice({ original, onBack, layout, showKeyboard, showHandGuide, onHandGuideChange }: {
   original: SessionResult; onBack: () => void;
   layout: ComponentProps<typeof VirtualKeyboard>["layout"]; showKeyboard: boolean;
+  showHandGuide?: boolean; onHandGuideChange?: (enabled: boolean) => void;
 }) {
   const text = useMemo(() => mistakePracticeText(original), [original]);
   const session = useTypingSession({ targetText: text, completionPolicy: "target-covered" });
@@ -44,6 +45,7 @@ export function MistakePractice({ original, onBack, layout, showKeyboard }: {
       <pre className="mt-3 whitespace-pre-wrap break-words text-slate-700">{visibleTypingText(text)}</pre>
     </details>
     <TypingLiveStats session={session} />
+    <div className="practice-workspace" data-keyboard-visible={keyboardVisible} data-session-finished={!!result}>
     <TypingPracticeSurface session={session} onNext={result ? onBack : undefined} nextLabel="Back to result" onRestart={() => session.restart()} layout={layout} showGuide={!keyboardVisible} />
     {!result && <button type="button" onClick={() => session.restart()} aria-keyshortcuts="Control+Shift+Enter Meta+Shift+Enter" className="mt-4 text-sm text-slate-600">Restart drill</button>}
     {result && <div className="mt-5 rounded-xl border border-slate-200 bg-white p-4">
@@ -54,6 +56,8 @@ export function MistakePractice({ original, onBack, layout, showKeyboard }: {
       <p className="mt-3 text-xs text-slate-600">Ctrl + Enter / ⌘ + Enter to return to your result.</p>
     </div>}
     <button type="button" onClick={() => setKeyboardVisible((visible) => !visible)} className="mt-5 text-sm text-slate-600">{keyboardVisible ? "Hide" : "Show"} keyboard</button>
-    {keyboardVisible && <div className="mt-4"><TypingKeyboardFeedback session={session} layout={layout} /></div>}
+    {keyboardVisible && <div className="mt-4"><TypingKeyboardFeedback session={session} layout={layout}
+      showHandGuide={showHandGuide} onHandGuideChange={onHandGuideChange} /></div>}
+    </div>
   </div>;
 }

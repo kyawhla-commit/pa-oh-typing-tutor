@@ -43,6 +43,7 @@ export function StudyProviders({
         sounds: true,
         targetWpm: 100,
         dailyGoal: 600,
+        showHandGuide: true,
         difficulty: "Medium",
         keyboardLayout: "QWERTY",
       },

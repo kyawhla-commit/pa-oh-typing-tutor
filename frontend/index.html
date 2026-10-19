@@ -3,18 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f8fafc" />
-    <meta name="description" content="Practice typing, follow lessons, take speed tests, and track your progress." />
-    <title>Typing Tutor</title>
-    <script>
-      // Apply the saved appearance before the first paint.
-      try {
-        const saved = JSON.parse(localStorage.getItem('typing-tutor.unified-data.v2') || 'null');
-        const dark = saved?.preferences?.darkMode === true;
-        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-        document.querySelector('meta[name="theme-color"]').content = dark ? '#0b1220' : '#f8fafc';
-      } catch { document.documentElement.dataset.theme = 'light'; }
-    </script>
+    <meta name="theme-color" content="#181b21" />
+    <meta name="description" content="Practice the Pa’O keyboard with simple lessons, live typing speed, and error feedback." />
+    <title>Pa’O Typing Tutor</title>
   </head>
   <body>
     <div id="root"></div>

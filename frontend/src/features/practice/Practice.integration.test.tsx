@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Practice from "./Practice";
 import { createLearningService, type LearningService } from "../learning/service";
 import type { LessonRecord } from "../lessons/lessonCatalog";
+import { prepareTypingText } from "../../engine/typing";
 
 const control = vi.hoisted(() => ({
   service: null as LearningService | null,
@@ -64,6 +65,8 @@ const flush = () => act(() => { while (jobs.length) jobs.shift()!(); });
 beforeEach(() => {
   (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
   vi.useFakeTimers(); clock = 100;
+  // Regular-practice assertions below intentionally use a Latin passage.
+  vi.spyOn(Math, "random").mockReturnValue(.5);
   vi.spyOn(performance, "now").mockImplementation(() => clock);
   const values = new Map<string, string>(); jobs = [];
   control.service = createLearningService({
@@ -85,6 +88,10 @@ describe("Myanmar guide placement", () => {
     control.keyboardLayout = "Pa'O";
     render();
     const passage = host.querySelector('[data-testid="typing-text"]')!;
+    const workspace = host.querySelector<HTMLElement>(".practice-workspace")!;
+    expect(workspace.dataset.keyboardVisible).toBe("true");
+    expect(workspace.dataset.sessionFinished).toBe("false");
+    expect(workspace.contains(passage.closest(".typing-passage-shell"))).toBe(true);
     const guide = () => host.querySelector('[aria-label="Next input guide"]')!;
     const keyboard = () => host.querySelector('[aria-label="Pa\'O Myanmar keyboard layout"]')!;
     expect(guide().getAttribute("data-guide-mode")).toBe("compact");
@@ -109,6 +116,7 @@ describe("Myanmar guide placement", () => {
     act(() => button("Hide details")!.click());
     expect(host.querySelector('[aria-label="Next input details"]')).toBeNull();
     act(() => button("Hide keyboard")!.click());
+    expect(workspace.dataset.keyboardVisible).toBe("false");
     expect(host.querySelector('[aria-label="Typing keyboard"]')).toBeNull();
     expect(guide().getAttribute("data-guide-mode")).toBeNull();
     expect(guide().compareDocumentPosition(passage) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
@@ -118,10 +126,12 @@ describe("Myanmar guide placement", () => {
     expect(viewport.scrollTop).toBe(40);
     expect(host.querySelectorAll('.typing-char.partial')).toHaveLength(1);
     act(() => button("Show keyboard")!.click());
+    expect(workspace.dataset.keyboardVisible).toBe("true");
     expect(guide().getAttribute("data-guide-mode")).toBe("compact");
     expect(guide().nextElementSibling!.contains(keyboard())).toBe(true);
     expect(host.querySelectorAll('.typing-char.partial')).toHaveLength(1);
     commit("ီ ကာ");
+    expect(workspace.dataset.sessionFinished).toBe("true");
     expect(control.saved).toHaveBeenCalledTimes(1);
     expect(control.saved.mock.calls[0][0]).toMatchObject({ accuracy: 80, errors: 1 });
     expect(host.querySelector('[aria-label="Next input guide"]')).toBeNull();
@@ -133,6 +143,9 @@ describe("Myanmar guide placement", () => {
     expect(control.saved).toHaveBeenCalledTimes(1);
     act(() => button("Practice mistakes")!.click());
     expect(host.querySelector('[aria-label="Mistake practice"]')).not.toBeNull();
+    const workspace = host.querySelector<HTMLElement>(".practice-workspace")!;
+    expect(workspace.dataset.keyboardVisible).toBe("true");
+    expect(workspace.dataset.sessionFinished).toBe("false");
     expect(host.querySelector('[data-guide-mode="compact"]')).not.toBeNull();
     const drillText = target();
     act(() => button("Hide keyboard")!.click());
@@ -142,6 +155,7 @@ describe("Myanmar guide placement", () => {
     act(() => button("Show keyboard")!.click());
     expect(host.querySelector('[data-guide-mode="compact"]')).not.toBeNull();
     commit(drillText!);
+    expect(workspace.dataset.sessionFinished).toBe("true");
     expect(control.saved).toHaveBeenCalledTimes(1);
     expect(control.completed).not.toHaveBeenCalled();
   });
@@ -166,15 +180,11 @@ describe("regular Practice guide", () => {
 });
 
 describe("compact regular practice", () => {
-  it.each(["Words", "Sentences", "Paragraph", "Code"])("follows the current line in %s, retains the full target across keyboard toggles, and resets on Restart/Next", (mode) => {
+  it("follows the current line, retains the full target across keyboard toggles, and resets on Restart/Next", () => {
     render("/practice");
-    const tab = (label: string) => Array.from(host.querySelectorAll<HTMLButtonElement>('[role="tab"]'))
-      .find((item) => item.textContent?.includes(label))!;
-    act(() => tab(mode).click());
+    expect(host.querySelector('[aria-label="Practice text type"]')).toBeNull();
     const passage = target()!;
     expect(passage.length).toBeGreaterThan(30);
-    if (mode === "Paragraph") expect(passage.length).toBeGreaterThan(300);
-    if (mode === "Code") expect(passage).toContain("\n  ");
     const typedCount = Math.min(90, passage.length - 1);
     const viewport = host.querySelector<HTMLElement>('[aria-label="Scrollable passage"]')!;
     expect(viewport.classList.contains("typing-passage-window-compact")).toBe(true);
@@ -204,13 +214,11 @@ describe("compact regular practice", () => {
     expect(control.saved).toHaveBeenCalledTimes(1);
     expect(control.saved.mock.calls[0][0]).toMatchObject({ accuracy: 100, errors: 0 });
     act(() => button("Next text →")!.click());
-    expect(tab(mode).getAttribute("aria-selected")).toBe("true");
+    expect(host.querySelector('[aria-label="Practice text type"]')).toBeNull();
     expect(viewport.classList.contains("typing-passage-window-compact")).toBe(true);
     expect(target()).not.toBe(passage);
     expect(target()!.length).toBeGreaterThan(30);
     expect(viewport.scrollTop).toBe(0);
-    act(() => tab(mode === "Code" ? "Words" : "Code").click());
-    expect(viewport.classList.contains("typing-passage-window-compact")).toBe(true);
     expect(control.saved).toHaveBeenCalledTimes(1);
   });
 });
@@ -222,9 +230,10 @@ describe("practice feedback timing", () => {
       render();
       const progress = () => host.querySelector<HTMLProgressElement>('progress[aria-label="Passage progress"]');
       expect(host.querySelector('.typing-stats')).toBeNull();
-      expect(progress()!.value).toBe(0);
+      expect(progress()).toBeNull();
       commit(first);
-      expect(progress()!.value).toBeCloseTo(1 / 3);
+      expect(progress()).toBeNull();
+      expect(host.querySelectorAll('.typing-char.correct, .typing-char.incorrect')).toHaveLength(1);
       expect(host.querySelector('.typing-stats')).toBeNull();
       clock += 2000; commit("bc");
       const result = host.querySelector('[aria-label="Lesson result"]')!;
@@ -236,24 +245,32 @@ describe("practice feedback timing", () => {
       act(() => button(passed ? "Practice again" : "Retry lesson")!.click());
       expect(host.querySelector('.typing-stats')).toBeNull();
       expect(host.querySelector('[aria-label="Lesson result"]')).toBeNull();
-      expect(progress()!.value).toBe(0);
+      expect(progress()).toBeNull();
+      expect(host.querySelectorAll('.typing-char.correct, .typing-char.incorrect')).toHaveLength(0);
       expect(control.saved).toHaveBeenCalledTimes(1);
     },
   );
-  it.each(["Restart passage", "Next text →"])("uses progress during regular Practice, final metrics on completion, and resets feedback with %s", (action) => {
+  it.each([
+    ["Restart passage", "Latin", .5], ["Next text →", "Latin", .5],
+    ["Restart passage", "Pa-Oh", 0], ["Next text →", "Pa-Oh", 0],
+  ] as const)("keeps the progress panel absent and resets typing feedback with %s (%s)", (action, _language, selection) => {
+    vi.mocked(Math.random).mockReturnValue(selection);
     render("/practice");
     const passage = target()!;
+    const units = prepareTypingText(passage).units;
     const progress = () => host.querySelector<HTMLProgressElement>('progress[aria-label="Passage progress"]');
     expect(host.querySelector('.typing-stats')).toBeNull();
-    expect(progress()!.value).toBe(0);
-    commit(passage[0]);
+    expect(progress()).toBeNull();
+    commit(units[0]);
     expect(host.querySelector('.typing-stats')).toBeNull();
-    expect(progress()!.value).toBeCloseTo(1 / passage.length);
+    expect(progress()).toBeNull();
+    expect(host.querySelectorAll('.typing-char.correct')).toHaveLength(1);
     act(() => button("Hide keyboard")!.click());
     expect(target()).toBe(passage);
-    expect(progress()!.value).toBeCloseTo(1 / passage.length);
+    expect(progress()).toBeNull();
+    expect(host.querySelectorAll('.typing-char.correct')).toHaveLength(1);
     expect(host.querySelector('[aria-label="Scrollable passage"]')).not.toBeNull();
-    clock += 2000; commit(passage.slice(1));
+    clock += 2000; commit(units.slice(1).join(""));
     const result = host.querySelector('[aria-label="Practice result"]')!;
     const metrics = result.querySelector('.typing-stats')!;
     expect(metrics.textContent).toContain("100%");
@@ -266,7 +283,8 @@ describe("practice feedback timing", () => {
     act(() => button(action)!.click());
     expect(host.querySelector('.typing-stats')).toBeNull();
     expect(host.querySelector('[aria-label="Practice result"]')).toBeNull();
-    expect(progress()!.value).toBe(0);
+    expect(progress()).toBeNull();
+    expect(host.querySelectorAll('.typing-char.correct')).toHaveLength(0);
     expect(document.activeElement).toBe(input());
     if (action === "Restart passage") expect(target()).toBe(passage);
     expect(control.saved).toHaveBeenCalledTimes(1);

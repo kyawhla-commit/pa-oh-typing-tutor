@@ -1,0 +1,56 @@
+.hand-guide-toggle {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 2.75rem; padding: .4rem .65rem; border: 1px solid #dbe7fc; border-radius: .8rem;
+  background: #ffffffb3; color: #2457cb; font-size: .7rem; font-weight: 600; cursor: pointer;
+}
+.hand-guide-toggle:focus-visible { outline: 3px solid #5289ff; outline-offset: 3px; }
+.hand-guide-toggle:hover { background: #edf5ff; }
+.hand-guide-toggle-track { display: block; width: 2.1rem; height: 1.2rem; padding: 2px; border-radius: 2rem; background: #a9b6cb; flex-shrink: 0; transition: background 180ms ease; }
+.hand-guide-toggle-track > span { display: block; height: .95rem; width: .95rem; border-radius: 50%; background: white; box-shadow: 0 1px 4px #123a7040; transition: transform 180ms ease; }
+.hand-guide-toggle[aria-checked='true'] .hand-guide-toggle-track { background: #2563ff; }
+.hand-guide-toggle[aria-checked='true'] .hand-guide-toggle-track > span { transform: translateX(.9rem); }
+.finger-instruction { min-width: 0; }
+.finger-instruction-caption { margin: 0; font-size: .75rem; color: #64748b; }
+.finger-instruction-name { display: flex; gap: .5rem; align-items: center; margin-top: .4rem; font-size: .85rem; font-weight: 650; line-height: 1.4; color: #17243e; }
+.finger-instruction-detail { margin-top: .3rem; font-size: .65rem; line-height: 1.5; color: #64748b; }
+.finger-color-dot { display: inline-block; flex: 0 0 auto; width: .7rem; height: .7rem; border-radius: 50%; background: var(--finger-color); box-shadow: inset 0 1px 2px #ffffff60; }
+.finger-color-legend { display: flex; justify-content: center; flex-wrap: wrap; gap: .6rem 1.1rem; padding: .5rem .75rem; color: #64748b; font-size: .65rem; }
+.finger-color-legend > span { display: inline-flex; align-items: center; gap: .35rem; }
+.finger-color-legend .finger-color-dot { width: .5rem; height: .5rem; }
+.hand-guide-footer { min-height: 2.5rem; }
+.hand-guide-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: .75rem; }
+.glass-hand-guide { min-width: 0; pointer-events: none; height: 0; }
+.glass-hands { position: absolute; top: 4px; left: 4px; width: calc(100% - 8px); z-index: 2; overflow: hidden; pointer-events: none; }
+.glass-hands * { pointer-events: none; }
+.glass-palm-art { opacity: .27; }
+.glass-finger-art { opacity: .4; transition: opacity 200ms ease; }
+.glass-finger-tint { opacity: 0; transition: opacity 200ms ease; }
+.glass-finger[data-active='true'] .glass-finger-tint { opacity: .19; }
+.glass-finger[data-active='true'] .glass-finger-art { opacity: .48; }
+.glass-finger[data-active='true'] .glass-finger-surface { filter: drop-shadow(0 0 5px color-mix(in srgb, var(--finger-color) 30%, transparent)); }
+.keyboard-keys [data-guide-finger]:not([data-key-state='error']):not([data-key-state='pressed']) {
+  background: linear-gradient(150deg, white, color-mix(in srgb, var(--finger-color) 15%, white));
+  border-color: color-mix(in srgb, var(--finger-color) 60%, white);
+  box-shadow: 0 0 0 1.5px var(--finger-color), 0 3px 12px color-mix(in srgb, var(--finger-color) 22%, transparent);
+}
+@container keyboard (max-width: 559px) {
+  /* Compact mode keeps opaque key legends foremost and removes reaching motion. */
+  .glass-hands { opacity: .55; }
+}
+@container keyboard (max-width: 359px) {
+  .glass-hands { opacity: .38; }
+  .finger-color-legend { gap: .4rem .7rem; }
+}
+:root[data-theme='dark'] .hand-guide-toggle { color: #a9c7ff; border-color: #36537b; background: #172944; }
+:root[data-theme='dark'] .hand-guide-toggle:hover { background: #213959; }
+:root[data-theme='dark'] .finger-instruction-name { color: #e5edf9; }
+:root[data-theme='dark'] :is(.finger-instruction-caption, .finger-instruction-detail, .finger-color-legend) { color: #a9b8cd; }
+:root[data-theme='dark'] .glass-hands { opacity: .7; }
+:root[data-theme='dark'] .keyboard-keys [data-guide-finger]:not([data-key-state='error']):not([data-key-state='pressed']) {
+  background: linear-gradient(150deg, #142137, color-mix(in srgb, var(--finger-color) 22%, #142137));
+  border-color: var(--finger-color);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hand-guide-toggle-track, .hand-guide-toggle-track > span, .glass-finger-tint, .glass-finger-art { transition: none; }
+  .keyboard-keys [data-next-key] { transition: none; }
+}

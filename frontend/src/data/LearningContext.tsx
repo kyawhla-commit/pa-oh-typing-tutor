@@ -27,6 +27,8 @@ export interface Preferences {
   dailyGoal: number;
   difficulty: string;
   keyboardLayout: string;
+  /** Device-local teaching aid, stored with this learner's existing preferences. */
+  showHandGuide: boolean;
 }
 
 interface LearningData {
@@ -61,6 +63,7 @@ const defaultPreferences: Preferences = {
   dailyGoal: 600,
   difficulty: "Medium",
   keyboardLayout: "QWERTY",
+  showHandGuide: true,
 };
 
 const emptyData: LearningData = {
@@ -146,6 +149,7 @@ async function readCloudData(user: User): Promise<LearningData> {
   return {
     learner: { name: profile?.display_name || getUserName(user), email: user.email || "" },
     preferences: preference ? {
+      ...defaultPreferences,
       darkMode: preference.dark_mode,
       sounds: preference.sounds,
       targetWpm: preference.target_wpm,
@@ -257,11 +261,14 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
             ...cachedAccount.completedLessons,
             ...(mayImportGuest ? guestData.completedLessons : []),
           ])],
-          preferences: cloudPreference
+          preferences: { ...(cloudPreference
             ? cloudData.preferences
             : cachedAccount.learner
               ? cachedAccount.preferences
-              : mayImportGuest ? guestData.preferences : cloudData.preferences,
+              : mayImportGuest ? guestData.preferences : cloudData.preferences),
+            // This visual preference needs no server schema change. Preserve it on rehydration.
+            showHandGuide: readStoredData(storageKey(user.id), mayImportGuest ? guestData : emptyData).preferences.showHandGuide,
+          },
         };
         await persistCloudData(user.id, merged);
         if (!active || sequence !== syncSequence.current) return;

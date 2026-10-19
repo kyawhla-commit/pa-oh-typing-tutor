@@ -34,7 +34,7 @@ export default function Settings() {
   >(null);
 
   const changed = (Object.keys(preferences) as (keyof Preferences)[]).some(
-    (key) => key !== "darkMode" && draft[key] !== preferences[key],
+    (key) => key !== "darkMode" && key !== "showHandGuide" && draft[key] !== preferences[key],
   );
   const setPreference = <K extends keyof Preferences>(
     key: K,
@@ -47,7 +47,7 @@ export default function Settings() {
 
   const save = () => {
     if (!changed) return;
-    updatePreferences({ ...draft, darkMode: preferences.darkMode });
+    updatePreferences({ ...draft, darkMode: preferences.darkMode, showHandGuide: preferences.showHandGuide });
     setSaved(true);
     window.setTimeout(() => setSaved(false), 2500);
   };

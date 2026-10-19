@@ -23,16 +23,12 @@ import {
   useLearningScope,
   useSessionLearning,
 } from "../learning/useLearningProfile";
-import { LearningRecommendations } from "../learning/Recommendations";
 import type { AdaptiveSelection } from "../learning/exercises/selection";
 import { getLearningService } from "../learning/service";
 import { recommendationIdentity, weaknessKey } from "../learning/transfer";
 import { recommendationText } from "../learning/recommendations";
 
-import {
-  SessionPlanCard,
-  planTitle,
-} from "../learning/planner/SessionPlanCard";
+import { planTitle } from "../learning/planner/SessionPlanCard";
 import {
   usePlannerOutcomes,
   usePlannedAttempt,
@@ -237,7 +233,7 @@ function PracticeSession({
   useEffect(() => {
     if (activePlan || focusOnMount) surfaceRoot.current?.querySelector("textarea")?.focus({ preventScroll: true });
   }, [activePlan, focusOnMount]);
-  const [mode, setMode] = useState<PracticeMode>("words");
+  const mode: PracticeMode = "words";
   const [launchFailure, setLaunchFailure] = useState<string | null>(null);
   const [showKeyboard, setShowKeyboard] = useState(true);
   const [showReview, setShowReview] = useState(false);
@@ -326,7 +322,7 @@ function PracticeSession({
       : undefined,
   );
   const saved = useRef(new WeakSet<SessionResult>());
-  const { addResult, completeLesson, preferences } = useLearningData();
+  const { addResult, completeLesson, preferences, updatePreferences } = useLearningData();
 
   useEffect(() => {
     if (!result || saved.current.has(result)) return;
@@ -407,16 +403,6 @@ function PracticeSession({
       onDetachPlan?.();
     } else declineOffer();
   };
-  const changeMode = (nextMode: PracticeMode) => {
-    detachToNormal();
-    setMode(nextMode);
-    const nextText = pickText(
-      nextMode,
-      mode === nextMode ? passage : undefined,
-    );
-    setPassage(nextText);
-    session.restart(configFor(nextText, nextMode, false));
-  };
   const newText = () => {
     if (adaptive) {
       const next = learningScope
@@ -462,14 +448,15 @@ function PracticeSession({
 
   if (showMistakePractice && result) return (
     <div className="practice-page mx-auto max-w-6xl">
-      <MistakePractice original={result} onBack={() => setShowMistakePractice(false)} layout={preferences.keyboardLayout} showKeyboard={showKeyboard} />
+      <MistakePractice original={result} onBack={() => setShowMistakePractice(false)} layout={preferences.keyboardLayout} showKeyboard={showKeyboard}
+        showHandGuide={preferences.showHandGuide} onHandGuideChange={enabled => updatePreferences({ showHandGuide: enabled })} />
     </div>
   );
 
   return (
     <div ref={surfaceRoot} className="practice-page mx-auto max-w-6xl">
       <div className="practice-content mx-auto w-full max-w-4xl">
-        <header className="mb-5 flex flex-col items-start justify-between gap-3 sm:mb-7 sm:flex-row sm:items-center">
+        <header className="practice-header mb-5 flex flex-col items-start justify-between gap-3 sm:mb-7 sm:flex-row sm:items-center">
           <div>
             <h1 className="text-2xl font-semibold text-slate-900">
               {adaptive
@@ -552,9 +539,6 @@ function PracticeSession({
             {launchFailure}
           </p>
         )}
-        {!lessonId && !adaptive && (!activePlan || result) && onStartPlan && (
-          <SessionPlanCard onStart={onStartPlan} />
-        )}
         {activePlan && (
           <p
             className="mb-3 text-sm text-blue-700"
@@ -565,33 +549,8 @@ function PracticeSession({
               : planTitle[activePlan.plan.purpose]}
           </p>
         )}
-        <LearningRecommendations
-          onStart={chooseAdaptive}
-          onNormal={exitActivity}
-        />
-
-        {!lessonId && !adaptive && (
-          <div
-            className="mb-6 flex flex-wrap gap-2"
-            role="tablist"
-            aria-label="Practice text type"
-          >
-            {modes.map(({ key, label, icon }) => (
-              <button
-                key={key}
-                role="tab"
-                aria-selected={mode === key}
-                onClick={() => changeMode(key)}
-                className={`flex min-h-11 items-center gap-1.5 rounded-xl px-3 py-2 sm:px-4 text-sm font-medium transition-colors ${mode === key ? "bg-blue-600 text-white" : "border border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}
-              >
-                <span aria-hidden>{icon}</span>
-                {label}
-              </button>
-            ))}
-          </div>
-        )}
-
-        <TypingPracticeSurface session={session} onNext={nextAction} nextLabel={lessonId ? "Next lesson" : "Next text"} onRestart={restart} layout={preferences.keyboardLayout} showGuide={!showKeyboard} showProgress compactPassage={!lessonId && !adaptive} />
+        <div className="practice-workspace" data-keyboard-visible={showKeyboard} data-session-finished={!!result}>
+        <TypingPracticeSurface session={session} onNext={nextAction} nextLabel={lessonId ? "Next lesson" : "Next text"} onRestart={restart} layout={preferences.keyboardLayout} showGuide={!showKeyboard} compactPassage={!lessonId && !adaptive} />
 
         {result ? (
           <div role="region" aria-label={lessonId ? "Lesson result" : "Practice result"} className={`mt-6 rounded-2xl border p-4 text-center sm:p-6 ${lessonId && !lessonPassed ? "border-amber-200 bg-amber-50" : "border-emerald-200 bg-emerald-50"}`}>
@@ -707,9 +666,12 @@ function PracticeSession({
             <TypingKeyboardFeedback
               session={session}
               layout={preferences.keyboardLayout}
+              showHandGuide={preferences.showHandGuide}
+              onHandGuideChange={enabled => updatePreferences({ showHandGuide: enabled })}
             />
           </div>
         )}
+        </div>
       </div>
     </div>
   );

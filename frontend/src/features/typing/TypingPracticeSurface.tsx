@@ -8,8 +8,9 @@ import { CompactMyanmarTypingGuide } from "./CompactMyanmarTypingGuide";
 import { getTypingGuide, hasMyanmarText, nextGuideKey } from "./typingGuide";
 import { revealTypingPosition } from "./revealTypingPosition";
 import "./typing-layout.css";
+import { FingerColorLegend, FingerInstruction, HandGuideToggle } from "../../components/hand-guide/HandGuideControls";
 
-export const TypingPracticeSurface = memo(function TypingPracticeSurface({ session, onNext, nextLabel = "Next text", onRestart, layout = "QWERTY", showGuide = true, showProgress = false, compactPassage = false }: { session: TypingSession; onNext?: () => void; nextLabel?: string; onRestart?: () => void; layout?: string; showGuide?: boolean; showProgress?: boolean; compactPassage?: boolean }) {
+export const TypingPracticeSurface = memo(function TypingPracticeSurface({ session, onNext, nextLabel = "Next text", onRestart, layout = "QWERTY", showGuide = true, compactPassage = false }: { session: TypingSession; onNext?: () => void; nextLabel?: string; onRestart?: () => void; layout?: string; showGuide?: boolean; compactPassage?: boolean }) {
   const { snapshot, generation, compositionDraft } = useTypingFeedback(session);
   const myanmar = hasMyanmarText(snapshot.target.text);
   const guide = getTypingGuide(snapshot);
@@ -82,18 +83,12 @@ export const TypingPracticeSurface = memo(function TypingPracticeSurface({ sessi
   }, [session, input, focus, onNext, onRestart]);
   return (
     <div data-testid="typing-surface" className={`[overflow-anchor:none] ${pinnedPassage ? "typing-surface-bounded" : ""}`}>
-      {showProgress && !finished && <div className="mb-3">
-        <div className="mb-1 flex items-center justify-between text-xs text-slate-600">
-          <span>Passage progress</span><span>{Math.floor(snapshot.progress * 100)}%</span>
-        </div>
-        <progress aria-label="Passage progress" value={snapshot.progress} max={1} className="block h-2 w-full accent-blue-600" />
-      </div>}
       <div className="typing-status">
         <p role="status" className={`text-sm ${needsCorrection ? "font-medium text-amber-700" : "text-slate-600"}`}>{statusText}</p>
         {snapshot.status !== "completed" && <button type="button" onClick={focus} aria-keyshortcuts="Control+Enter Meta+Enter" className="shrink-0 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">{focusLabel}</button>}
       </div>
       {showGuide && <MyanmarTypingGuide snapshot={snapshot} layout={layout} compositionDraft={compositionDraft} />}
-      <div className="relative cursor-text rounded-2xl focus-within:ring-2 focus-within:ring-blue-400" onClick={focus}>
+      <div className="typing-passage-shell relative cursor-text rounded-2xl focus-within:ring-2 focus-within:ring-blue-400" onClick={focus}>
         <textarea ref={input} aria-label="Typing input" aria-describedby={guide ? "typing-help typing-next-input" : "typing-help"} spellCheck={false}
           onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
           autoCorrect="off" autoCapitalize="off" autoComplete="off"
@@ -122,11 +117,13 @@ export const TypingPracticeSurface = memo(function TypingPracticeSurface({ sessi
         </div>
       </div>
       <p id="typing-help" className="typing-help mt-3 text-xs text-slate-600">
-        {snapshot.status === "completed" ? onNext ? `Use ${nextLabel} to continue.` : "You finished this passage." : needsCorrection
+        <span className="typing-help-instructions">{snapshot.status === "completed" ? onNext ? `Use ${nextLabel} to continue.` : "You finished this passage." : needsCorrection
           ? "Use Backspace to return to the red characters, then retype that part correctly to finish."
-          : "Click the text to type · Backspace to correct · Paste is disabled"}
-        {snapshot.status !== "completed" && <> · <kbd>Ctrl + Enter</kbd> / <kbd>⌘ + Enter</kbd> to focus typing</>}
-        {onRestart && <> · <kbd>Ctrl + Shift + Enter</kbd> / <kbd>⌘ + Shift + Enter</kbd> to restart</>}
+          : "Click the text to type · Backspace to correct · Paste is disabled"}</span>
+        {(snapshot.status !== "completed" || onRestart) && <span className="typing-help-shortcuts">
+          {snapshot.status !== "completed" && <span>Start typing: <kbd>Ctrl + Enter</kbd> (or <kbd>⌘ + Enter</kbd>)</span>}
+          {onRestart && <span>Restart passage: <kbd>Ctrl + Shift + Enter</kbd> (or <kbd>⌘ + Shift + Enter</kbd>)</span>}
+        </span>}
       </p>
     </div>
   );
@@ -145,18 +142,31 @@ export const TypingLiveStats = memo(function TypingLiveStats({ session }: { sess
   </div>;
 });
 
-export const TypingKeyboardFeedback = memo(function TypingKeyboardFeedback({ session, layout, showCompactGuide = true }: { session: TypingSession; layout: ComponentProps<typeof VirtualKeyboard>["layout"]; showCompactGuide?: boolean }) {
+export const TypingKeyboardFeedback = memo(function TypingKeyboardFeedback({ session, layout, showCompactGuide = true, showHandGuide, onHandGuideChange }: {
+  session: TypingSession; layout: ComponentProps<typeof VirtualKeyboard>["layout"]; showCompactGuide?: boolean;
+  showHandGuide?: boolean; onHandGuideChange?: (enabled: boolean) => void;
+}) {
   const { snapshot, pressedKey, errorKey, compositionDraft } = useTypingFeedback(session);
   const guide = getTypingGuide(snapshot);
   const [expanded, setExpanded] = useState(false);
   const detailsId = useId();
   const composing = compositionDraft !== null;
+  const [localHandGuide, setLocalHandGuide] = useState(true);
+  const handsEnabled = showHandGuide ?? localHandGuide;
+  const setHandsEnabled = (enabled: boolean) => { setLocalHandGuide(enabled); onHandGuideChange?.(enabled); };
+  const nextKey = composing ? null : nextGuideKey(snapshot, layout ?? "QWERTY");
+  const finished = snapshot.status === "completed" || snapshot.status === "aborted";
+  const instruction = handsEnabled && !finished ? <FingerInstruction nextKey={nextKey} composing={composing} /> : null;
+  const toggle = <HandGuideToggle enabled={handsEnabled} onChange={setHandsEnabled} />;
   const lastOutput = guide && pressedKey !== "Backspace" ? Array.from(pressedKey).at(-1) : pressedKey;
   return <div aria-label="Typing keyboard" className="[overflow-anchor:none]">
     {showCompactGuide && <CompactMyanmarTypingGuide snapshot={snapshot} layout={layout ?? "QWERTY"}
-      compositionDraft={compositionDraft} expanded={expanded} detailsId={detailsId} onToggle={() => setExpanded(value => !value)} />}
+      compositionDraft={compositionDraft} expanded={expanded} detailsId={detailsId} onToggle={() => setExpanded(value => !value)}
+      fingerInstruction={instruction} handGuideControl={toggle} />}
+    {(!showCompactGuide || finished) && <div className="hand-guide-toolbar">{instruction}{toggle}</div>}
     <VirtualKeyboard pressedKey={composing ? "" : lastOutput} errorKey={composing || guide?.partial ? "" : errorKey}
-      nextKey={composing ? null : nextGuideKey(snapshot, layout ?? "QWERTY")} layout={layout} />
+      nextKey={nextKey} layout={layout} showHandGuide={handsEnabled} reserveHandSpace />
+    <div className="hand-guide-footer">{handsEnabled && <FingerColorLegend />}</div>
     {showCompactGuide && <div id={detailsId} hidden={!expanded} className={expanded ? "mt-4" : undefined}>
       {expanded && <MyanmarTypingGuide snapshot={snapshot} layout={layout ?? "QWERTY"} compositionDraft={compositionDraft}
         inputId={`${detailsId}-input`} label="Next input details" />}
