@@ -3,8 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#181b21" />
+    <meta name="theme-color" content="#f7f8f2" />
     <meta name="description" content="Practice the Pa’O keyboard with simple lessons, live typing speed, and error feedback." />
+    <script>
+      // Set appearance before paint to avoid a light flash on returning visits.
+      try {
+        const saved = localStorage.getItem('typing-tutor.theme');
+        const legacy = JSON.parse(localStorage.getItem('typing-tutor.unified-data.v2') || 'null');
+        const dark = saved ? saved === 'dark' : (legacy?.preferences?.darkMode ?? matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+        document.querySelector('meta[name="theme-color"]').content = dark ? '#151e1a' : '#f7f8f2';
+      } catch { document.documentElement.dataset.theme = 'light'; }
+    </script>
     <title>Pa’O Typing Tutor</title>
   </head>
   <body>

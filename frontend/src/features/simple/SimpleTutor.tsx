@@ -1,5 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import TutorThemeToggle from './TutorThemeToggle';
+import { ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Keyboard as KeyboardIcon, RotateCcw, Play, Check, Leaf } from 'lucide-react';
 import { paoKeyLegends, qwertyKeyLegends } from '../../components/keyboardLayouts';
 import { useTypingFeedback, useTypingSession, useTypingStats } from '../typing/useTypingSession';
 import { useTypingInput } from '../typing/useTypingInput';
@@ -15,6 +17,8 @@ const lessons = [
   '၁ ၂ ၃ ၄ ၅ ၆ ၇ ၈ ၉ ၀ ၁၂ ၃၄ ၅၆ ၇၈ ၉၀',
   'ဒ ဒꩻ ဒါဒါႏ ဖူးပေႏဆား ဟိဟိꩻ ဟီဟီး ငတသီး',
 ];
+const lessonNames = ['First letters', 'Upper row', 'Lower row', 'Vowel foundations', 'Vowel combinations', 'Pa’O tone marks', 'Numbers', 'Words & rhythm'];
+
 type Key = { code: string; label?: string; width?: number };
 const keys = (codes: string): Key[] => codes.split(' ').map(code => ({ code }));
 const rows: Key[][] = [
@@ -25,10 +29,10 @@ const rows: Key[][] = [
   [{ code: 'ControlLeft', label: 'CTRL', width: 1.3 }, { code: 'AltLeft', label: 'ALT', width: 1.3 }, { code: 'Space', label: ' ', width: 10.1 }, { code: 'ControlRight', label: 'CTRL', width: 1.3 }, { code: 'AltRight', label: 'ALT', width: 1.3 }],
 ];
 function Brand() {
-  return <Link className="tutor-brand" to="/" aria-label="Pa’O Typing Tutor home">PA’O<span>TYPING TUTOR</span></Link>;
+  return <Link className="tutor-brand" to="/" aria-label="Pa’O Typing Tutor home"><span className="brand-icon"><KeyboardIcon size={22} /></span><span>pa’o<span className="brand-caption">typing tutor</span></span></Link>;
 }
 function Keyboard({ active = 'KeyR', shift = false }: { active?: string; shift?: boolean }) {
-  return <div className="classic-keyboard" aria-label="Pa’O keyboard. The orange key is the next key to type.">
+  return <div className="classic-keyboard" aria-label="Pa’O keyboard. The green key is the next key to type.">
     {rows.map((row, i) => <div className="classic-key-row" key={i}>
       {row.map(({ code, label, width = 1 }) => {
         const legend = paoKeyLegends[code];
@@ -43,20 +47,35 @@ function Keyboard({ active = 'KeyR', shift = false }: { active?: string; shift?:
 }
 export function Home() {
   return <div className="simple-tutor home-page">
-    <header className="tutor-header"><Brand /></header>
-    <main className="tutor-home">
-      <p className="home-eyebrow">PA’O LANGUAGE · TYPING PRACTICE</p>
-      <h1>A little practice.<br /><span>A better rhythm.</span></h1>
-      <p className="home-description">Learn the Pa’O keyboard, one lesson at a time.</p>
-      <Link to="/practice" className="tutor-start home-start">START TYPING <span aria-hidden="true">→</span></Link>
-      <div className="home-keyboard" aria-hidden="true"><Keyboard /></div>
+    <header className="tutor-header"><Brand /><div className="header-actions"><TutorThemeToggle /><Link className="header-link" to="/practice">Let’s practice <ArrowRight size={16} /></Link></div></header>
+    <main id="main-content" className="tutor-home">
+      <section className="home-hero">
+        <div className="hero-copy">
+          <p className="home-eyebrow"><span /> MADE FOR THE PA’O LANGUAGE</p>
+          <h1>Your language.<br />Your keyboard.<br /><em>Your rhythm.</em></h1>
+          <p className="home-description">Make every keystroke feel a little more natural. A quiet place to learn the Pa’O keyboard, one small lesson at a time.</p>
+          <Link to="/practice" className="tutor-start home-start">Start practicing <ArrowRight size={19} /></Link>
+          <p className="home-reassurance"><Check size={14} /> Free to use <span>·</span> No account needed</p>
+        </div>
+        <div className="hero-art" aria-hidden="true">
+          <div className="art-caption"><span>SMALL STEPS. LASTING HABITS.</span><Leaf size={20} /></div>
+          <div className="floating-keys"><div className="hero-key"><span>ပ</span><small>Y</small></div><div className="hero-key"><span>အ</span><small>T</small></div><div className="hero-key"><span>မ</span><small>R</small></div></div>
+          <div className="art-bottom"><span className="art-line" /><p>A language worth<br /><strong>putting into words.</strong></p><span className="art-number">01 — 08</span></div>
+        </div>
+      </section>
+      <section className="home-overview" aria-label="How practice works">
+        <div><span className="step-number">01</span><h2>Find your starting point.</h2><p>Eight focused lessons, from first letters to a comfortable typing rhythm.</p></div>
+        <div><span className="step-number">02</span><h2>Follow the next key.</h2><p>A clear keyboard guide helps your fingers find their way, at your own pace.</p></div>
+        <div><span className="step-number">03</span><h2>Let accuracy lead.</h2><p>See your speed and errors as you type. Take your time. Try again.</p></div>
+      </section>
     </main>
-    <footer className="tutor-footer">PA’O TYPING TUTOR</footer>
+    <footer className="tutor-footer"><span>Made for the words that matter.</span><span>PA’O TYPING TUTOR</span></footer>
   </div>;
 }
 export function SimplePractice() {
   const [lesson, setLesson] = useState(0);
   const [started, setStarted] = useState(false);
+  const [focused, setFocused] = useState(false);
   const session = useTypingSession({ targetText: lessons[0] });
   const { snapshot, generation, compositionDraft } = useTypingFeedback(session);
   const stats = useTypingStats(session);
@@ -67,7 +86,12 @@ export function SimplePractice() {
   const typedLine = useRef<HTMLDivElement>(null);
   const complete = snapshot.status === 'completed';
   useLayoutEffect(() => {
-    current.current?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    const active = current.current;
+    const passage = active?.parentElement;
+    if (active && passage) {
+      const left = active.getBoundingClientRect().left - passage.getBoundingClientRect().left;
+      if (left < 0 || left + active.offsetWidth > passage.clientWidth) passage.scrollLeft += left - passage.clientWidth / 2;
+    }
     if (typedLine.current) typedLine.current.scrollLeft = typedLine.current.scrollWidth;
   }, [snapshot.typedUnits, compositionDraft]);
   const changeLesson = (index: number) => {
@@ -80,27 +104,34 @@ export function SimplePractice() {
     setStarted(true);
   };
   return <div className="simple-tutor practice-page">
-    <header className="tutor-header"><Brand /></header>
-    <Link className="tutor-close" to="/" aria-label="Close practice and return home">×</Link>
+    <header className="tutor-header"><Brand /><div className="header-actions"><TutorThemeToggle /><Link className="header-link" to="/"><ArrowLeft size={16} /> Back to home</Link></div></header>
     <main className="classic-practice" aria-label="Typing practice">
+      <div className="practice-heading"><div><p className="home-eyebrow">A LITTLE BETTER, ONE KEY AT A TIME</p><h1>Find your rhythm.</h1></div><span className="practice-badge"><span /> Pa’O keyboard</span></div>
+      <section className="practice-card">
+      <div className="practice-card-top"><div className="lesson-title"><span>LESSON {String(lesson + 1).padStart(2, '0')} / 08</span><h2>{lessonNames[lesson]}</h2></div>
       <div className="lesson-toolbar">
-        <button onClick={() => changeLesson(lesson - 1)} disabled={lesson === 0} aria-label="Previous lesson">≪</button>
+        <button onClick={() => changeLesson(lesson - 1)} disabled={lesson === 0} aria-label="Previous lesson"><ChevronLeft size={18} /></button>
         <select aria-label="Select lesson" value={lesson} onChange={event => changeLesson(Number(event.target.value))}>
           {lessons.map((_, i) => <option value={i} key={i}>Lesson {i + 1}</option>)}
         </select>
-        <button onClick={() => changeLesson(lesson + 1)} disabled={lesson === lessons.length - 1} aria-label="Next lesson">≫</button>
-        <button className="tutor-start" onClick={start}>{started ? 'RESTART' : 'START'}</button>
+        <button onClick={() => changeLesson(lesson + 1)} disabled={lesson === lessons.length - 1} aria-label="Next lesson"><ChevronRight size={18} /></button>
+        <button className="tutor-start" onClick={start}>{started ? <RotateCcw size={15} /> : <Play size={15} />}{started ? 'Restart' : 'Start lesson'}</button>
       </div>
+      </div>
+      <div className="lesson-progress" role="progressbar" aria-label="Lesson progress" aria-valuenow={Math.round(snapshot.progress * 100)} aria-valuemin={0} aria-valuemax={100}><span style={{ width: `${snapshot.progress * 100}%` }} /></div>
+      <div className="passage-label"><span>TEXT TO TYPE</span><span>{Math.round(snapshot.progress * 100)}% complete</span></div>
       <div className="classic-passage" aria-label="Lesson text" lang="blk">
         {snapshot.target.units.map((unit, i) => <span key={i} ref={i === guide?.position ? current : undefined}
           className={snapshot.typedUnits[i]?.correct ? 'typed-correct' : i === guide?.position ? 'current-unit' : ''}>{unit}</span>)}
       </div>
-      <div className="classic-input-shell" onClick={() => { if (started && !complete) focus(); }}>
+      <div className={`classic-input-shell${focused ? " is-focused" : ""}`} onClick={() => { if (started && !complete) focus(); }}>
         <div className="classic-typed-line" ref={typedLine} aria-hidden="true" lang="blk">
           {snapshot.typedUnits.map((unit, i) => <span className={unit.correct ? '' : 'typed-error'} key={i}>{unit.text}</span>)}
+          {!snapshot.typedUnits.length && !compositionDraft && <span className="input-placeholder">{started ? "Type here. Follow the highlighted key…" : "Ready when you are. Start your lesson above."}</span>}
           {compositionDraft}<span className={started && !complete ? 'typing-caret' : ''} />
         </div>
         <textarea ref={input} aria-label="Type the lesson here" disabled={!started || complete}
+          onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
           spellCheck={false} autoCapitalize="off" autoCorrect="off" autoComplete="off"
           onKeyDownCapture={event => {
             if (event.nativeEvent.isComposing || event.keyCode === 229 || event.ctrlKey || event.metaKey || event.altKey) return;
@@ -112,14 +143,20 @@ export function SimplePractice() {
             }
           }} />
       </div>
-      <div className="keyboard-scroll"><Keyboard active={nextKey?.code ?? ''} shift={nextKey?.shift} /></div>
+
       <div className="classic-bottom">
         <div className="classic-metrics">
-          <div><span>YOUR TYPING SPEED</span><strong>{Math.round(stats.metrics.correctWpm).toString().padStart(3, '0')} <b>WPM</b></strong></div>
-          <div><span>ERROR</span><strong>{Math.round(stats.counts.totalInsertionAttempts ? 100 - stats.metrics.attemptAccuracy : 0).toString().padStart(2, '0')} <b>%</b></strong></div>
+          <div><span>TYPING SPEED</span><strong>{Math.round(stats.metrics.correctWpm).toString().padStart(3, '0')} <b>WPM</b></strong></div>
+          <div><span>ERROR RATE</span><strong>{Math.round(stats.counts.totalInsertionAttempts ? 100 - stats.metrics.attemptAccuracy : 0).toString().padStart(2, '0')} <b>%</b></strong></div>
         </div>
-        <p className="classic-status" role="status">{complete ? 'Lesson complete. Choose the next lesson or restart.' : !started ? 'Press START to begin.' : guide?.mistake ? 'Press Backspace to correct the highlighted mistake.' : ''}</p>
+        <p className="classic-status" role="status">{complete ? 'Nicely done. You’ve completed this lesson.' : !started ? 'Focus on accuracy. Speed will follow.' : guide?.mistake ? 'Press Backspace to correct the highlighted mistake.' : focused ? 'Keep going. One key at a time.' : 'Click the input area to continue.'}</p>
       </div>
+      {complete && <div className="completion-actions"><span><Check size={18} /> {lesson === lessons.length - 1 ? 'All eight lessons explored. Keep practicing at your own pace.' : 'Ready for the next step?'}</span>{lesson < lessons.length - 1 && <button className="tutor-start" onClick={() => changeLesson(lesson + 1)}>Next lesson <ArrowRight size={16} /></button>}</div>}
+      </section>
+      <section className="keyboard-panel" aria-label="Keyboard guide"><div className="keyboard-panel-heading"><span><KeyboardIcon size={17} /> YOUR KEYBOARD GUIDE</span><span className="key-legend"><i /> Next key{nextKey ? ` · ${nextKey.shift ? 'Shift + ' : ''}${nextKey.label}` : ''}</span></div>
+      <div className="keyboard-scroll" tabIndex={0} aria-label="Pa’O keyboard, scroll horizontally on small screens"><Keyboard active={nextKey?.code ?? ''} shift={nextKey?.shift} /></div>
+      <p className="keyboard-note">Use your keyboard to type. The green key shows what comes next.<span>English keyboards work too — letters map to Pa’O automatically.</span></p></section>
     </main>
+    <footer className="tutor-footer"><span>Small steps. Steady progress.</span><span>PA’O TYPING TUTOR</span></footer>
   </div>;
 }
