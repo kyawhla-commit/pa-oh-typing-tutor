@@ -7,7 +7,7 @@ export default function TutorThemeToggle() {
   useEffect(() => {
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
     document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#151e1a' : '#f7f8f2');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0b1220' : '#f8fafc');
   }, [dark]);
   useEffect(() => {
     const sync = (event: StorageEvent) => {

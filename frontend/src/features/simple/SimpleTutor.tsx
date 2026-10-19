@@ -32,7 +32,7 @@ function Brand() {
   return <Link className="tutor-brand" to="/" aria-label="Pa’O Typing Tutor home"><span className="brand-icon"><KeyboardIcon size={22} /></span><span>pa’o<span className="brand-caption">typing tutor</span></span></Link>;
 }
 function Keyboard({ active = 'KeyR', shift = false }: { active?: string; shift?: boolean }) {
-  return <div className="classic-keyboard" aria-label="Pa’O keyboard. The green key is the next key to type.">
+  return <div className="classic-keyboard" aria-label="Pa’O keyboard. The blue key is the next key to type.">
     {rows.map((row, i) => <div className="classic-key-row" key={i}>
       {row.map(({ code, label, width = 1 }) => {
         const legend = paoKeyLegends[code];
@@ -155,7 +155,7 @@ export function SimplePractice() {
       </section>
       <section className="keyboard-panel" aria-label="Keyboard guide"><div className="keyboard-panel-heading"><span><KeyboardIcon size={17} /> YOUR KEYBOARD GUIDE</span><span className="key-legend"><i /> Next key{nextKey ? ` · ${nextKey.shift ? 'Shift + ' : ''}${nextKey.label}` : ''}</span></div>
       <div className="keyboard-scroll" tabIndex={0} aria-label="Pa’O keyboard, scroll horizontally on small screens"><Keyboard active={nextKey?.code ?? ''} shift={nextKey?.shift} /></div>
-      <p className="keyboard-note">Use your keyboard to type. The green key shows what comes next.<span>English keyboards work too — letters map to Pa’O automatically.</span></p></section>
+      <p className="keyboard-note">Use your keyboard to type. The blue key shows what comes next.<span>English keyboards work too — letters map to Pa’O automatically.</span></p></section>
     </main>
     <footer className="tutor-footer"><span>Small steps. Steady progress.</span><span>PA’O TYPING TUTOR</span></footer>
   </div>;
