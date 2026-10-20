@@ -266,8 +266,8 @@
 .practice-page .keyboard-scroll { padding: 12px; }
 .practice-page .virtual-keyboard { min-width: 0; }
 .practice-page .keyboard-keys {
-  --keyboard-key-size: min(calc((100cqw - 13 * var(--keyboard-key-gap)) / 14.3), 64px);
-  --keyboard-key-height: clamp(44px, calc(var(--keyboard-key-size) + 8px), 64px);
+  --keyboard-key-size: min(calc((100cqw - 13 * var(--keyboard-key-gap)) / 14.3), 72px);
+  --keyboard-key-height: clamp(48px, calc(var(--keyboard-key-size) * 1.4), 76px);
 }
 .practice-page .virtual-keyboard [data-key-code] { border-radius: 4px; border-bottom-width: 3px; }
 .practice-page .virtual-keyboard [data-next-key='true'] { background: #dbeafe; border-color: #3b82f6; }
@@ -398,7 +398,7 @@
   .mobile-key-preview { display: grid; place-items: center; min-width: 52px; min-height: 54px; padding: 4px 10px; border: 1px solid var(--accent); border-bottom-width: 3px; border-radius: 10px; color: var(--accent); background: #eff6ff; font: 24px/1.8 'Noto Sans Myanmar', sans-serif; }
   :root[data-theme='dark'] .mobile-key-preview { background: #182f53; }
   .practice-page .keyboard-scroll { padding: 8px 2px; border-radius: 12px; }
-  .practice-page .keyboard-keys { --keyboard-key-height: clamp(28px, calc(var(--keyboard-key-size) * 1.2), 40px); --keyboard-key-gap: 2px; }
+  .practice-page .keyboard-keys { --keyboard-key-height: clamp(34px, calc(var(--keyboard-key-size) * 1.4), 50px); --keyboard-key-gap: 2px; }
   .practice-page .virtual-keyboard .keyboard-key-latin,
   .practice-page .virtual-keyboard .keyboard-key-shifted,
   .practice-page .virtual-keyboard .keyboard-key-unshifted { display: none; }
