@@ -423,6 +423,18 @@
 .simple-tutor .keyboard-visibility-toggle:hover { color: var(--accent); }
 #practice-keyboard[hidden] { display: none; }
 
+.practice-page .classic-passage {
+  height: calc(1.9em + 24px);
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-gutter: auto;
+}
+@media (max-width: 480px) {
+  .practice-page .classic-passage { height: calc(2em + 24px); }
+}
+
 /* Compact practice controls and feedback. */
 .practice-page .classic-bottom { margin-top: 10px; gap: 12px; }
 .practice-page .classic-bottom > .tutor-start { min-height: 32px; padding: 6px 10px; gap: 6px; border-radius: 6px; font-size: 11px; line-height: 18px; }

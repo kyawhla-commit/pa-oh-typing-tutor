@@ -143,6 +143,9 @@ function PracticeSession({ availableLessons }: { availableLessons: LessonRecord[
     const reveal = () => {
       if (passage && current.current) {
         revealTypingPosition(passage, current.current);
+        const marker = current.current.getBoundingClientRect();
+        const area = passage.getBoundingClientRect();
+        if (marker.left < area.left || marker.right > area.right - 12) passage.scrollLeft += marker.left - area.left - 12;
       }
     };
     reveal();
