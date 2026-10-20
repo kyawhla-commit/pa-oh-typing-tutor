@@ -10,6 +10,7 @@ import { useTypingFeedback, useTypingSession, useTypingStats } from '../typing/u
 import { useTypingInput } from '../typing/useTypingInput';
 import { revealTypingPosition } from '../typing/revealTypingPosition';
 import { getTypingGuide, nextGuideKey } from '../typing/typingGuide';
+import dakkhindaLogo from '../../assets/dakkhinda-logo.webp';
 
 function Brand() {
   return <Link className="tutor-brand" to="/" aria-label="Pa’O Typing Tutor home"><span className="brand-icon"><KeyboardIcon size={22} /></span><span>pa’o<span className="brand-caption">typing tutor</span></span></Link>;
@@ -58,7 +59,7 @@ export function Home() {
         <div><span className="step-number">03</span><h2>Let accuracy lead.</h2><p>See your speed and errors as you type. Take your time. Try again.</p></div>
       </section>
     </main>
-    <footer className="tutor-footer"><span>Made for the words that matter.</span><span>PA’O TYPING TUTOR</span></footer>
+    <footer className="tutor-footer"><span>Made for the words that matter.</span><a className="tutor-credit" href="https://github.com/kyawhla-commit/dakkhinda" target="_blank" rel="noopener noreferrer"><span>Built by</span><img src={dakkhindaLogo} alt="Dakkhinda Technologies" /></a></footer>
   </div>;
 }
 export function SimplePractice() {
@@ -281,6 +282,6 @@ function PracticeSession({ availableLessons }: { availableLessons: LessonRecord[
       <div className="keyboard-scroll" aria-label={`${layout} keyboard`}><VirtualKeyboard layout={layout} nextKey={nextKey} pressedKey={pressedKey} errorKey={errorKey} /></div>
       <p className="keyboard-note">Use your keyboard to type. The blue key shows what comes next.<span>{layout === "Pa'O" ? "English keyboards work too — letters map to Pa’O automatically." : "Type the lesson using your English keyboard."}</span></p></div></section>
     </main>
-    <footer className="tutor-footer"><span>Small steps. Steady progress.</span><span>PA’O TYPING TUTOR</span></footer>
+    <footer className="tutor-footer"><span>Small steps. Steady progress.</span><a className="tutor-credit" href="https://github.com/kyawhla-commit/dakkhinda" target="_blank" rel="noopener noreferrer"><span>Built by</span><img src={dakkhindaLogo} alt="Dakkhinda Technologies" /></a></footer>
   </div>;
 }
