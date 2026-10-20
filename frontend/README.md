@@ -135,7 +135,7 @@ Read [the pilot architecture](src/features/pilot/README.md), [consent and ten-ta
 
 ### Frontend lesson catalog
 
-Home and Practice use the 10 published lessons in
+Home and Practice use the 2 published Pa’O lessons in
 `src/features/lessons/bundledLessons.ts`. The running app does not fetch lessons
 from Supabase or browser storage. The admin route is removed.
 
