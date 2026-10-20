@@ -150,8 +150,8 @@ function PracticeSession({ availableLessons }: { availableLessons: LessonRecord[
     };
     reveal();
     if (typedLine.current) {
-      typedLine.current.scrollTop = typedLine.current.scrollHeight;
-      typedLine.current.scrollLeft = 0;
+      typedLine.current.scrollLeft = typedLine.current.scrollWidth;
+      typedLine.current.scrollTop = 0;
     }
     if (!passage || typeof ResizeObserver === 'undefined') return;
     const observer = new ResizeObserver(reveal);
