@@ -236,7 +236,7 @@ function PracticeSession({ availableLessons }: { availableLessons: LessonRecord[
       </div>
       <div className={`classic-input-shell${focused ? " is-focused" : ""}`} onClick={() => { if (started && !complete) focus(); }}>
         <div className="classic-typed-line" ref={typedLine} aria-hidden="true" lang={layout === "Pa'O" ? "blk" : "en"}>
-          {snapshot.typedUnits.map((unit, i) => <span className={unit.correct ? '' : 'typed-error'} key={i}>{unit.text}</span>)}
+          {snapshot.typedUnits.map((unit, i) => <span className={unit.correct ? '' : 'typed-error'} key={i}>{/[\n\r]/u.test(unit.text) ? '↵' : unit.text}</span>)}
           {!focused && !snapshot.typedUnits.length && !compositionDraft && <span className="input-placeholder">{started ? "Type here. Follow the highlighted key…" : "Press Start lesson below to begin."}</span>}
           {compositionDraft}<span className={started && !complete ? 'typing-caret' : ''} />
         </div>

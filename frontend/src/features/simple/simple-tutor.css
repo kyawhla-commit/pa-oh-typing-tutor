@@ -254,7 +254,7 @@
 .practice-page .passage-label { margin-bottom: 4px; font-size: 10px; }
 .practice-page .classic-passage { font-size: clamp(25px, 2.4vw, 32px); line-height: 1.9; padding: 8px 0 14px; }
 .practice-page .classic-input-shell { height: 58px; margin-top: 4px; overflow: hidden; }
-.practice-page .classic-typed-line { height: 100%; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; white-space: pre; font-size: 24px; padding-block: 9px; }
+.practice-page .classic-typed-line { height: 100%; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; white-space: nowrap; font-size: 24px; padding-block: 9px; }
 .practice-page .classic-typed-line::-webkit-scrollbar { display: none; }
 .practice-page .classic-bottom { margin-top: 16px; gap: 22px; }
 .practice-page .classic-metrics { gap: 24px; }
