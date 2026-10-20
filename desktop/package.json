@@ -1,0 +1,22 @@
+{
+  "name": "pa-oh-typing-tutor-desktop",
+  "version": "1.0.1",
+  "private": true,
+  "description": "Pa’O Typing Tutor for Windows and Ubuntu, built with Rust and Tauri.",
+  "type": "module",
+  "packageManager": "pnpm@11.25.0",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "build:ubuntu": "tauri build --bundles deb -- --locked",
+    "build:windows": "tauri build --bundles nsis -- --locked",
+    "ui:dev": "node scripts/copy-font-licenses.mjs && pnpm --dir ../frontend dev --mode desktop --port 1420 --strictPort",
+    "ui:build": "pnpm --dir ../frontend build --mode desktop --outDir ../desktop/dist --emptyOutDir && node scripts/copy-font-licenses.mjs",
+    "check": "node scripts/copy-font-licenses.mjs && cargo fmt --manifest-path src-tauri/Cargo.toml --check && cargo check --manifest-path src-tauri/Cargo.toml --locked",
+    "tauri": "tauri",
+    "icons": "tauri icon \"../TypingTutor-mobile/logo/Keyboard Progress Key Icon.png\" --output src-tauri/icons"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.12.3"
+  }
+}

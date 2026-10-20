@@ -4,7 +4,7 @@ import VirtualKeyboard from '../../components/VirtualKeyboard';
 import { useLessonCatalog } from '../lessons/LessonCatalogContext';
 import type { LessonRecord } from '../lessons/lessonCatalog';
 import TutorThemeToggle from './TutorThemeToggle';
-import { ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Keyboard as KeyboardIcon, RotateCcw, Play, Check, Leaf, X, BookOpen } from 'lucide-react';
+import { ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Keyboard as KeyboardIcon, RotateCcw, Play, Check, X, BookOpen } from 'lucide-react';
 import { paoKeyLegends } from '../../components/keyboardLayouts';
 import { useTypingFeedback, useTypingSession, useTypingStats } from '../typing/useTypingSession';
 import { useTypingInput } from '../typing/useTypingInput';
@@ -26,10 +26,30 @@ export function Home() {
           <Link to="/practice" className="tutor-start home-start">Start practicing <ArrowRight size={19} /></Link>
           <p className="home-reassurance"><Check size={14} /> Free to use <span>·</span> No account needed</p>
         </div>
-        <div className="hero-art" aria-hidden="true">
-          <div className="art-caption"><span>SMALL STEPS. LASTING HABITS.</span><Leaf size={20} /></div>
-          <div className="floating-keys"><div className="hero-key"><span>ပ</span><small>Y</small></div><div className="hero-key"><span>အ</span><small>T</small></div><div className="hero-key"><span>မ</span><small>R</small></div></div>
-          <div className="art-bottom"><span className="art-line" /><p>A language worth<br /><strong>putting into words.</strong></p><span className="art-number">PA’O</span></div>
+        <div className="home-original-preview relative min-w-0">
+          <div className="p-3 sm:p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-3 h-3 rounded-full bg-red-400" />
+              <div className="w-3 h-3 rounded-full bg-amber-400" />
+              <div className="w-3 h-3 rounded-full bg-green-400" />
+            </div>
+            <div className="font-mono text-base leading-relaxed mb-4 p-4 bg-white rounded-xl border border-[#E2E8F0]">
+              <span className="text-[#16A34A]">ဒဒꩻ </span>
+              <span className="bg-[#2563EB] text-white px-0.5 rounded">ဒါ</span>
+              <span className="text-[#94A3B8]">ဒါႏ ဖူးပေႏဆား ဟိဟိꩻ ဟီဟီး ငတသီး</span>
+            </div>
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              {[['72', 'WPM'], ['98%', 'Accuracy'], ['0', 'Errors']].map(([v, l]) => (
+                <div key={l} className="bg-white rounded-xl border border-[#E2E8F0] p-3 text-center">
+                  <div className="text-xl font-bold text-[#0F172A]">{v}</div>
+                  <div className="text-xs text-[#64748B]">{l}</div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-5 py-3 sm:px-4 sm:py-4">
+              <VirtualKeyboard layout="Pa'O" />
+            </div>
+          </div>
         </div>
       </section>
       <section className="home-overview" aria-label="How practice works">

@@ -397,7 +397,7 @@
   .mobile-key-preview { display: grid; place-items: center; min-width: 52px; min-height: 54px; padding: 4px 10px; border: 1px solid var(--accent); border-bottom-width: 3px; border-radius: 10px; color: var(--accent); background: #eff6ff; font: 24px/1.8 'Noto Sans Myanmar', sans-serif; }
   :root[data-theme='dark'] .mobile-key-preview { background: #182f53; }
   .practice-page .keyboard-scroll { padding: 8px 2px; border-radius: 12px; }
-  .practice-page .keyboard-keys { --keyboard-key-height: 34px; --keyboard-key-gap: 2px; }
+  .practice-page .keyboard-keys { --keyboard-key-height: clamp(28px, calc(var(--keyboard-key-size) * 1.2), 40px); --keyboard-key-gap: 2px; }
   .practice-page .virtual-keyboard .keyboard-key-latin,
   .practice-page .virtual-keyboard .keyboard-key-shifted,
   .practice-page .virtual-keyboard .keyboard-key-unshifted { display: none; }
@@ -444,3 +444,19 @@
 .practice-page .classic-metrics strong { font-size: 18px; line-height: 1.3; }
 .practice-page .classic-metrics b { font-size: 8px; }
 .practice-page .practice-feedback { margin-top: 6px; font-size: 11px; line-height: 1.5; }
+
+/* Original landing preview from f729d06, using the current dark palette. */
+:root[data-theme='dark'] .home-original-preview .bg-\[\#F8FAFC\] { background-color: #142137; }
+:root[data-theme='dark'] .home-original-preview .bg-white { background-color: #0b1220; }
+:root[data-theme='dark'] .home-original-preview .border-\[\#E2E8F0\] { border-color: #30415c; }
+:root[data-theme='dark'] .home-original-preview .text-\[\#0F172A\] { color: #e5edf9; }
+:root[data-theme='dark'] .home-original-preview .text-\[\#64748B\] { color: #a9b8cd; }
+:root[data-theme='dark'] .home-original-preview [data-key-code] {
+  background: linear-gradient(155deg, #121f33, #0e1929);
+  border-color: #293b52;
+  color: #e5f4ff;
+  box-shadow: inset 0 1px #ffffff0a, 0 2px 5px #02061755;
+}
+:root[data-theme='dark'] .home-original-preview [data-key-code] span { color: #a9d8ed; }
+:root[data-theme='dark'] .home-original-preview [data-key-code] .keyboard-key-unshifted { color: #f2f8ff; }
+:root[data-theme='dark'] .home-original-preview :is(.bg-blue-50, .bg-amber-50) { background-color: #1b2b43; }

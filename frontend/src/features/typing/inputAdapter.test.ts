@@ -29,6 +29,30 @@ function setup(targetText = "Hello, world!\n😀é", durationMs?: number) {
 }
 
 describe("browser committed-text adapter", () => {
+  it.each([true, false])("accepts WebKitGTK native commits without compositionstart (beforeinput: %s)", withBeforeInput => {
+    const { send, input, engine } = setup("ဒဒꩻ !");
+    for (const text of ["ဒ", "ဒ", "ꩻ"]) {
+      const attempts = engine.getSnapshot().counts.totalInsertionAttempts;
+      send("keydown", { key: "Unidentified", keyCode: 229 });
+      if (withBeforeInput) send("beforeinput", { inputType: "insertFromComposition", data: text, isComposing: true });
+      input.value = text;
+      send("input", { inputType: "insertFromComposition", data: text, isComposing: true });
+      expect(engine.getSnapshot().counts.totalInsertionAttempts).toBe(attempts);
+      send("compositionend", { data: text });
+      expect(input.value).toBe("");
+    }
+    send("keydown", { key: " " });
+    send("beforeinput", { inputType: "insertText", data: " " });
+    expect(engine.getSnapshot().typedUnits.map(unit => unit.text).join("")).toBe("ဒဒꩻ ");
+    expect(engine.getSnapshot().typedUnits.every(unit => unit.correct)).toBe(true);
+  });
+  it("cancels an implicit native composition on blur", () => {
+    const { send, engine } = setup("ဒ!");
+    send("beforeinput", { inputType: "insertFromComposition", data: "ဒ", isComposing: true });
+    send("blur");
+    send("compositionend", { data: "ဒ" });
+    expect(engine.getSnapshot().counts.totalInsertionAttempts).toBe(0);
+  });
   it("does not retrigger selection indefinitely when setSelectionRange emits select", () => {
     class SelectingInput extends Input {
       selectionUpdates = 0;

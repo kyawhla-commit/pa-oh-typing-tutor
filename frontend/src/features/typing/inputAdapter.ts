@@ -27,6 +27,15 @@ export function attachTypingInput(input: HTMLTextAreaElement, sink: TypingInputS
   };
   const supported = (type: string) => ["insertText", "insertLineBreak", "insertParagraph", "deleteContentBackward"].includes(type);
   const compositionType = (type: string) => ["insertCompositionText", "deleteCompositionText", "insertFromComposition", "deleteByComposition"].includes(type);
+  const recognizeNativeCommit = (event: InputEvent, type: string) => {
+    // WebKitGTK/IBus can commit a character with insertFromComposition and
+    // compositionend, without ever sending compositionstart. Keep the native
+    // edit as a draft until that end event, just like an explicit composition.
+    if (!composing && compositionEcho === null && type === "insertFromComposition" && event.isComposing) {
+      composing = true;
+      onCompositionDraft?.("");
+    }
+  };
   // A missing inputType is usable only after a text/Enter key, or as a known
   // commit echo. Named unsupported edits never receive this fallback.
   const inputTypeOf = (event: InputEvent) => event.inputType || keyboardInsertion
@@ -61,6 +70,7 @@ export function attachTypingInput(input: HTMLTextAreaElement, sink: TypingInputS
     if (!supported(type) && !compositionType(type)) {
       event.preventDefault(); reset(); handledInput = { type, text: event.data }; return;
     }
+    recognizeNativeCommit(event, type);
     if (composing || event.isComposing) return;
     if (isEcho(event, type)) {
       event.preventDefault(); compositionEcho = null;
@@ -92,6 +102,7 @@ export function attachTypingInput(input: HTMLTextAreaElement, sink: TypingInputS
     const event = raw as InputEvent;
     const type = inputTypeOf(event);
     if (!supported(type) && !compositionType(type)) { reset(); return; }
+    recognizeNativeCommit(event, type);
     if (composing || event.isComposing) { if (composing) onCompositionDraft?.(input.value); return; }
     if (isEcho(event, type)) { compositionEcho = null; keyboardInsertion = null; clear(); return; }
     compositionEcho = null;
@@ -105,8 +116,8 @@ export function attachTypingInput(input: HTMLTextAreaElement, sink: TypingInputS
   });
   listen("keydown", (raw) => {
     const event = raw as KeyboardEvent;
-    if (composing || event.isComposing || event.keyCode === 229) { keyboardInsertion = null; return; }
     compositionEcho = null; handledInput = null; backspaceEcho = false;
+    if (composing || event.isComposing || event.keyCode === 229) { keyboardInsertion = null; return; }
     const modifier = event.ctrlKey || event.metaKey || event.altKey;
     keyboardInsertion = !modifier && event.key === "Enter" ? "insertLineBreak"
       : !modifier && Array.from(event.key).length === 1 ? "insertText" : null;

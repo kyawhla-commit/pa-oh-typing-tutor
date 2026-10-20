@@ -5,12 +5,17 @@
   --keyboard-key-gap: clamp(1px, 0.55cqw, 6px);
   /* The longest row has 13 regular keys, one 1.3-unit key, and 13 gaps. */
   --keyboard-key-size: min(calc((100cqw - 13 * var(--keyboard-key-gap)) / 14.3), 56px);
-  --keyboard-key-height: clamp(32px, var(--keyboard-key-size), 56px);
+  --keyboard-key-height: clamp(28px, var(--keyboard-key-size), 56px);
 }
 /* Keep the wrist clearance when switched off so the page cannot jump at the bottom. */
 .keyboard-hand-clearance { height: max(0px, calc(var(--keyboard-key-size) * 5.982 - var(--keyboard-key-height) * 2.5 - var(--keyboard-key-gap) * 2)); }
-@container keyboard (max-width: 280px) {
-  /* Leave room for both Myanmar legends on narrow keys. */
+.keyboard-key-mobile { display: none; }
+@container keyboard (max-width: 420px) {
+  /* Drop the Latin hint before the Myanmar legends become cramped. */
   .keyboard-key-latin { display: none; }
 }
-.keyboard-key-mobile { display: none; }
+@container keyboard (max-width: 340px) {
+  /* Show one readable Pa'O legend when the available keyboard is very narrow. */
+  .keyboard-key-shifted, .keyboard-key-unshifted { display: none; }
+  .keyboard-key-mobile { display: block; font-size: clamp(9px, 3.3cqw, 13px); line-height: 1.5; }
+}

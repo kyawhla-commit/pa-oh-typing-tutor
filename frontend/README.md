@@ -135,9 +135,9 @@ Read [the pilot architecture](src/features/pilot/README.md), [consent and ten-ta
 
 ### Frontend lesson catalog
 
-Home and Practice use the 9 published lessons copied from the existing database
-into `src/features/lessons/bundledLessons.ts`. The running app does not fetch
-lessons from Supabase or browser storage. The admin route is removed.
+Home and Practice use the 10 published lessons in
+`src/features/lessons/bundledLessons.ts`. The running app does not fetch lessons
+from Supabase or browser storage. The admin route is removed.
 
 To change lessons, edit that file and redeploy. Keep IDs unique and set
 `status: "Published"` for visible lessons. Do not include private draft content
@@ -147,3 +147,9 @@ in the bundle. Existing Supabase data is untouched.
 
 See [DEPLOYMENT.md](DEPLOYMENT.md) for build, preview, and publishing commands.
 No Supabase environment variables are required for this frontend.
+
+### Windows and Ubuntu apps
+
+The Rust/Tauri desktop project is in [`../desktop`](../desktop/README.md). It
+packages this same interface and lesson catalog with offline fonts. Follow its
+README to run the desktop app, build installers, or use the GitHub build workflow.
