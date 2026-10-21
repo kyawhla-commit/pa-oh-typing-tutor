@@ -1,0 +1,105 @@
+/* Scenic homepage: shared geometry in both themes. */
+.home-page {
+  --ink: #123f38; --accent: #096557; --muted: #66746e; --line: #e5e2d6;
+  --surface: #fffaf0f5; background: #08483f;
+}
+.home-page .tutor-header {
+  width: min(1160px, calc(100% - 80px)); min-height: 64px; margin: 0 auto;
+  padding: 8px 56px; gap: 28px; border: 0; border-radius: 40px;
+  background: var(--surface); box-shadow: 0 4px 20px #163c2b20;
+}
+.home-page .brand-icon { background: linear-gradient(145deg, #12564a, #063d35); border-radius: 11px; }
+.home-page .tutor-brand { font-size: 28px; }
+.home-page .brand-caption { letter-spacing: .2px; }
+.home-page .header-actions { margin-left: auto; gap: 16px; }
+.home-page .header-link { min-height: 38px; padding: 8px 19px; border: 1px solid #c9aa5a; border-radius: 24px; background: linear-gradient(120deg, #084f44, #087764); color: #fff; box-shadow: 0 3px 8px #10473925; }
+.home-page .theme-toggle { border-color: #f0e6cc; background: #f8efd6; }
+.home-page .theme-toggle__thumb { background: #d0a348; box-shadow: 0 2px 7px #b0924f30; }
+.home-page .theme-toggle__sun { color: #fff8e2; }
+.home-page .theme-toggle__moon { color: #c19a46; }
+.home-page .tutor-home { width: min(1140px, calc(100% - 80px)); }
+.home-page .home-hero { display: flex; align-items: flex-start; min-height: 530px; padding: 48px 0 90px; }
+.home-page .hero-copy { position: relative; z-index: 1; max-width: 610px; color: #fffbed; text-shadow: 0 2px 16px #032c3280; }
+.home-page .home-eyebrow { margin-bottom: 12px; color: #e2c46f; font-size: 12px; font-weight: 550; letter-spacing: 2.7px; }
+.home-page .tutor-home h1 { margin: 0; font: 700 clamp(50px, 5.6vw, 72px)/.98 Georgia, serif; letter-spacing: -1.7px; }
+.home-page .tutor-home h1 em { font: inherit; font-size: .82em; color: #f4d37b; letter-spacing: -1.6px; white-space: nowrap; }
+.home-page .home-description { max-width: 375px; margin: 20px 0 21px; font-size: 18px; line-height: 1.38; color: #fff9ee; }
+.home-page .home-start { min-height: 54px; padding: 13px 23px; gap: 13px; border: 1px solid #d0ac53; border-radius: 23px; background: linear-gradient(120deg, #07554b, #087764); font-size: 14px; box-shadow: inset 0 1px 1px #fff2, 0 4px 15px #003c3c50; text-shadow: none; }
+.home-page .home-reassurance { display: flex; flex-wrap: wrap; gap: 14px; padding: 0; margin: 16px 0 0; list-style: none; color: #fff9ee; font-size: 12px; }
+.home-page .home-reassurance li { display: inline-flex; align-items: center; gap: 7px; }
+.home-page .home-reassurance svg { color: #f3cf65; flex-shrink: 0; }
+.home-page .scenery-landscape { height: 740px; background: linear-gradient(90deg, #06373799, #173e2c08 70%), url('../../assets/scenery/pao-learner.jpg') left 43% / 160% auto no-repeat; }
+.home-page .scenery-portrait { left: auto; right: -5px; width: 790px; height: 740px; background: url('../../assets/scenery/pao-learner.jpg') right top -28px / auto 760px no-repeat; mask-image: linear-gradient(90deg, transparent, #000 27%); }
+.home-page .scenery-portrait::after { display: none; }
+.home-page .scenery-ribbons { top: 430px; height: calc(100% - 430px); min-height: 330px; }
+.home-page .home-overview { position: relative; width: calc(100% - 28px); margin: 0 auto; padding: 25px 54px 27px; gap: 35px; border: 1px solid #fff5; border-radius: 40px 40px 14px 14px; background: var(--surface); box-shadow: 0 8px 30px #093c3020; scroll-margin-top: 24px; }
+.home-page .home-overview > div { gap: 18px; }
+.home-page .overview-icon { width: 51px; height: 51px; border-radius: 50%; background: #d9f3e5; color: #0c6a54; }
+.home-page .home-overview > div:nth-child(2) .overview-icon { background: #e5e1fc; color: #6255d8; }
+.home-page .home-overview > div:nth-child(3) .overview-icon { background: #ddf5df; color: #2a9b69; }
+.home-page .home-overview h2 { margin: 6px 0 5px; font-size: 13px; letter-spacing: -.3px; }
+.home-page .home-overview p { font-size: 11px; line-height: 1.65; }
+.home-page .step-number { font-size: 9px; }
+.home-page .tutor-footer { width: min(1030px, calc(100% - 80px)); margin-top: 18px; color: #c1d4c7; border-color: #b9cdb32b; }
+.home-page .tutor-credit img { filter: brightness(0) invert(1); }
+:root[data-theme='dark'] .home-page .tutor-header { background: #121725f5; }
+:root[data-theme='dark'] .home-page .header-link { background: linear-gradient(110deg, #5149f2, #a72cdb); border-color: #a38cda; }
+:root[data-theme='dark'] .home-page .theme-toggle { border-color: #34374d; background: #101523; }
+:root[data-theme='dark'] .home-page .theme-toggle__thumb { background: linear-gradient(120deg, #4b58ff, #a22ce9); border-color: #9b80ff; box-shadow: 0 0 12px #7757ff88; }
+:root[data-theme='dark'] .home-page .theme-toggle__sun { color: #cbd0dd; }
+:root[data-theme='dark'] .home-page .theme-toggle__moon { color: #fff; }
+:root[data-theme='dark'] .home-page .home-overview { border-color: #303348; }
+:root[data-theme='dark'] .home-page .overview-icon { background: #193c35; color: #66d5b0; }
+:root[data-theme='dark'] .home-page .home-overview > div:nth-child(2) .overview-icon { background: #32234c; color: #b38bff; }
+:root[data-theme='dark'] .home-page .home-overview > div:nth-child(3) .overview-icon { background: #193c35; color: #58c9a7; }
+:root[data-theme='dark'] .home-page .scenery-night { top: 0; height: 800px; background-position: center, center, right top; background-size: 100% 100%, 100% 100%, auto 780px; }
+@media (min-width: 1440px) {
+  .home-page .home-hero { min-height: 570px; padding-top: 65px; }
+  .home-page .scenery-portrait { right: 0; width: 900px; height: 800px; background-size: auto 850px; }
+}
+@media (max-width: 1100px) {
+  .home-page .tutor-header { width: calc(100% - 40px); padding-inline: 25px; gap: 20px; }
+  .home-page .tutor-home { width: calc(100% - 60px); }
+  .home-page .home-overview { padding-inline: 25px; gap: 20px; }
+  .home-page .home-overview > div { gap: 12px; }
+  .home-page .scenery-portrait { right: -100px; }
+}
+@media (max-width: 850px) {
+  .home-page .tutor-header { display: grid; grid-template-columns: 1fr auto; gap: 3px 18px; padding: 12px 24px 7px; border-radius: 0 0 28px 28px; }
+  .home-page .header-actions { grid-row: 1; grid-column: 2; }
+  .home-page .home-hero { min-height: 480px; padding-top: 43px; padding-bottom: 70px; }
+  .home-page .scenery-portrait { right: -230px; }
+  .home-page .scenery-landscape { background-size: auto 1100px; }
+  .home-page .home-overview { width: 100%; padding: 25px; gap: 25px; }
+  .home-page .home-overview > div { flex-direction: column; }
+}
+@media (max-width: 600px) {
+  .home-page .tutor-header { width: calc(100% - 20px); padding-inline: 16px; }
+  .home-page .tutor-brand { font-size: 25px; }
+  .home-page .header-actions { gap: 10px; }
+  .home-page .header-link { padding-inline: 12px; font-size: 10px; }
+  .home-page .tutor-home { width: calc(100% - 32px); }
+  .home-page .home-hero { min-height: 490px; padding: 38px 5px 70px; }
+  .home-page .hero-copy { max-width: 100%; }
+  .home-page .home-eyebrow { font-size: 9px; letter-spacing: 1.9px; }
+  .home-page .tutor-home h1 { font-size: clamp(39px, 8vw, 48px); letter-spacing: -1px; line-height: 1.1; }
+  .home-page .tutor-home h1 em { font-size: .82em; letter-spacing: -1px; }
+  .home-page .home-description { max-width: 290px; font-size: 15px; margin-top: 18px; }
+  .home-page .home-start { min-height: 50px; font-size: 13px; padding-inline: 18px; }
+  .home-page .home-reassurance { max-width: 310px; gap: 10px 14px; font-size: 10px; }
+  .home-page .scenery-portrait { top: 80px; right: -280px; width: 700px; height: 650px; background-size: auto 650px; opacity: .6; }
+  .home-page .scenery-landscape { height: 850px; background-image: linear-gradient(90deg, #063737b3, #173e2c44), url('../../assets/scenery/pao-learner.jpg'); }
+  .home-page .scenery-ribbons { top: 450px; height: 430px; }
+  .home-page .home-overview { grid-template-columns: 1fr; border-radius: 28px; padding: 25px 23px; }
+  .home-page .home-overview > div { flex-direction: row; gap: 17px; }
+  .home-page .home-overview h2 { font-size: 14px; }
+  .home-page .home-overview p { font-size: 12px; }
+  .home-page .tutor-footer { width: calc(100% - 40px); }
+}
+@media (max-width: 380px) {
+  .home-page .tutor-brand { font-size: 23px; }
+  .home-page .brand-icon { width: 33px; }
+  .home-page .header-actions { gap: 6px; }
+  .home-page .header-link { padding-inline: 8px; font-size: 9px; gap: 4px; }
+  .home-page .theme-toggle { width: 62px; }
+}

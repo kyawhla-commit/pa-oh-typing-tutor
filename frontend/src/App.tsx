@@ -2,6 +2,7 @@ import { BrowserRouter, HashRouter, Navigate, Route, Routes } from 'react-router
 import { LessonCatalogProvider } from './features/lessons/LessonCatalogContext';
 import { Home, SimplePractice } from './features/simple/SimpleTutor';
 import './features/simple/simple-tutor.css';
+import './features/simple/home-tutor.css';
 
 
 export default function App() {

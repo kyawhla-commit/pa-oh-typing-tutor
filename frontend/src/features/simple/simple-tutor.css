@@ -93,12 +93,6 @@
 .catalog-empty h1 { font-size: 26px; margin-bottom: 16px; }
 .catalog-empty p { color: var(--muted); margin-bottom: 16px; }
 .catalog-empty .tutor-start { margin-left: 20px; }
-.practice-intro { grid-column: 1; margin-top: 25px; color: #fff9ea; text-shadow: 0 2px 15px #072e2d80; }
-.practice-intro > p { margin: 0 0 9px; color: #e2c46f; font-size: 10px; font-weight: 650; letter-spacing: 1.7px; }
-.practice-intro h2 { margin: 0 0 14px; font: 700 clamp(30px, 3.1vw, 40px)/1.02 Georgia, serif; letter-spacing: -1.2px; }
-.practice-intro em { color: #f0c96e; font-style: normal; white-space: nowrap; }
-.practice-intro > div { max-width: 260px; font-size: 13px; line-height: 1.55; }
-.practice-intro > span { display: block; width: 40px; height: 4px; margin-top: 13px; border-radius: 3px; background: #eac56b; }
 .practice-card { grid-column: 2; min-width: 0; padding: 17px 18px 8px; border: 1px solid #fff8; border-radius: 16px; background: var(--surface); box-shadow: 0 8px 28px #1d312a26; }
 .practice-card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 28px; }
 .lesson-title { display: flex; align-items: center; gap: 14px; min-width: 0; }
@@ -239,8 +233,6 @@
   .practice-nav { gap: 17px; margin-left: 0; flex: 1; }
   .lesson-toolbar { margin-left: 0; }
   .classic-practice { width: calc(100% - 48px); grid-template-columns: 230px minmax(0, 1fr) 100px; gap: 18px; }
-  .practice-intro h2 { font-size: 33px; }
-  .practice-intro > p { font-size: 8px; }
   .lesson-title { gap: 10px; }
   .lesson-title > span { padding-right: 10px; font-size: 8px; }
   .lesson-title h1 { font-size: 19px; }
@@ -262,8 +254,6 @@
   .practice-page .theme-toggle { width: 80px; }
   .lesson-toolbar .lesson-picker-trigger { padding-inline: 10px; }
   .classic-practice { grid-template-columns: 210px minmax(0, 1fr); }
-  .practice-intro h2 { font-size: 30px; }
-  .practice-intro > div { font-size: 12px; }
   .practice-card-top { flex-wrap: wrap; gap: 6px; }
   .lesson-progress-summary { margin-left: auto; }
   .home-overview { gap: 20px; }
@@ -293,10 +283,6 @@
   .practice-nav a, .practice-nav button { font-size: 10px; min-height: 40px; }
   .practice-nav a:first-child { display: none; }
   .classic-practice { width: calc(100% - 32px); grid-template-columns: minmax(0, 1fr); margin-top: 22px; gap: 0; }
-  .practice-intro { grid-column: 1; margin: 0 0 24px; }
-  .practice-intro h2 { font-size: 34px; line-height: 1.08; }
-  .practice-intro > p { font-size: 9px; }
-  .practice-intro > div { max-width: 310px; }
   .practice-card { grid-column: 1; }
   .keyboard-panel { margin-top: 16px; padding: 12px; border-radius: 15px; }
   .practice-page .scenery-portrait { right: -130px; width: 500px; height: 430px; background-size: auto 460px; background-position: right top; }
@@ -323,9 +309,6 @@
   .practice-nav a:first-child { display: inline-flex; }
   .practice-nav a, .practice-nav button { min-height: 36px; }
   .classic-practice { width: calc(100% - 24px); margin-top: 20px; }
-  .practice-intro { margin-bottom: 20px; padding-inline: 4px; }
-  .practice-intro h2 { font-size: 31px; }
-  .practice-intro > div { max-width: 245px; font-size: 11px; }
   .practice-page .scenery-portrait { right: -170px; top: 80px; }
   .practice-card { padding: 14px 13px 10px; border-radius: 13px; }
   .lesson-title { flex-wrap: wrap; gap: 6px 10px; }

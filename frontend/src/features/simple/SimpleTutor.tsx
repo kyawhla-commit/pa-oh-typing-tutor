@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import VirtualKeyboard from '../../components/VirtualKeyboard';
 import { useLessonCatalog } from '../lessons/LessonCatalogContext';
 import type { LessonRecord } from '../lessons/lessonCatalog';
@@ -18,35 +18,22 @@ function Brand() {
 }
 export function Home() {
   return <div className="simple-tutor home-page">
-    <TutorScenery />
-    <header className="tutor-header"><Brand /><div className="header-actions"><TutorThemeToggle /><Link className="header-link" to="/practice">Let’s practice <ArrowRight size={16} /></Link></div></header>
+    <TutorScenery decorative />
+    <header className="tutor-header">
+      <Brand />
+      <div className="header-actions"><TutorThemeToggle /><Link className="header-link" to="/practice">Let’s practice <ArrowRight size={16} /></Link></div>
+    </header>
     <main id="main-content" className="tutor-home">
       <section className="home-hero">
         <div className="hero-copy">
-          <p className="home-eyebrow"><span /> MADE FOR THE PA’O LANGUAGE</p>
-          <h1>Your language.<br />Your keyboard.<br /><em>Your rhythm.</em></h1>
-          <p className="home-description">Make every keystroke feel a little more natural. A quiet place to learn the Pa’O keyboard, one small lesson at a time.</p>
-          <Link to="/practice" className="tutor-start home-start">Start practicing <ArrowRight size={19} /></Link>
-          <p className="home-reassurance"><Check size={14} /> Free to use <span>·</span> No account needed</p>
-        </div>
-        <div className="home-original-preview" aria-label="Example typing lesson preview">
-            <div className="preview-window-dots" aria-hidden="true"><i /><i /><i /></div>
-            <div className="preview-passage" lang="blk">
-              <span className="preview-correct">ဒဒꩻ </span>
-              <span className="preview-current">ဒါ</span>
-              <span>ဒါႏ ဖူးပေႏဆား ဟိဟိꩻ ဟီဟီး ငတသီး</span>
-            </div>
-            <div className="preview-metrics" aria-label="Example results">
-              {[['72', 'WPM'], ['98%', 'Accuracy'], ['0', 'Errors']].map(([v, l]) => (
-                <div key={l}><strong>{v}</strong><span>{l}</span></div>
-              ))}
-            </div>
-            <div className="preview-keyboard">
-              <VirtualKeyboard layout="Pa'O" nextKey={{ code: 'KeyE', label: 'E', shift: false, text: paoKeyLegends.KeyE.unshifted }} />
-            </div>
+          <p className="home-eyebrow">MADE FOR THE PA’O LANGUAGE</p>
+          <h1>Type Pa’O<br /><em>Build Your Future</em></h1>
+          <p className="home-description">Practice Pa’O typing, improve your skills, and help preserve our language for generations to come.</p>
+          <Link to="/practice" className="tutor-start home-start"><Play size={21} />Start practicing <ArrowRight size={19} /></Link>
+          <ul className="home-reassurance" aria-label="Practice benefits"><li><Check size={15} />Free to use</li><li><Check size={15} />No account needed</li><li><Check size={15} />Learn at your own pace</li></ul>
         </div>
       </section>
-      <section className="home-overview" aria-label="How practice works">
+      <section id="about" className="home-overview" aria-label="How practice works">
         <div><span className="overview-icon"><Target size={27} /></span><div><span className="step-number">01</span><h2>Find your starting point.</h2><p>Focused lessons, from first letters to a comfortable typing rhythm.</p></div></div>
         <div><span className="overview-icon"><KeyboardIcon size={27} /></span><div><span className="step-number">02</span><h2>Follow the next key.</h2><p>A clear keyboard guide helps your fingers find their way, at your own pace.</p></div></div>
         <div><span className="overview-icon"><ChartNoAxesColumnIncreasing size={27} /></span><div><span className="step-number">03</span><h2>Let accuracy lead.</h2><p>See your speed and errors as you type. Take your time. Try again.</p></div></div>
@@ -68,8 +55,18 @@ function PracticeSession({ availableLessons }: { availableLessons: LessonRecord[
   const lessons = sessionLessons.map(item => item.content);
   const lessonNames = sessionLessons.map(item => item.title);
   const [lesson, setLesson] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [lessonsOpen, setLessonsOpen] = useState(false);
   const [infoPanel, setInfoPanel] = useState<'progress' | 'about' | null>(null);
+  useEffect(() => {
+    const panel = searchParams.get('panel');
+    if (panel !== 'lessons' && panel !== 'progress') return;
+    setLessonsOpen(panel === 'lessons');
+    setInfoPanel(panel === 'progress' ? 'progress' : null);
+    const next = new URLSearchParams(searchParams);
+    next.delete('panel');
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams]);
   const infoDialog = useRef<HTMLDialogElement>(null);
   const lessonDialog = useRef<HTMLDialogElement>(null);
   const pausedForLessons = useRef(false);
@@ -218,7 +215,6 @@ function PracticeSession({ availableLessons }: { availableLessons: LessonRecord[
         <Link to="/"><House size={15} />Home</Link>
         <button onClick={openLessons} aria-haspopup="dialog">Lessons</button>
         <Link to="/practice" aria-current="page">Practice</Link>
-        <button onClick={() => openInfo('progress')} aria-haspopup="dialog">Progress</button>
         <button onClick={() => openInfo('about')} aria-haspopup="dialog">About</button>
       </nav>
       <div className="lesson-toolbar">
@@ -227,14 +223,14 @@ function PracticeSession({ availableLessons }: { availableLessons: LessonRecord[
         <button onClick={() => changeLesson(lesson + 1)} disabled={lesson === lessons.length - 1} aria-label="Next lesson" aria-keyshortcuts="Control+ArrowRight Meta+ArrowRight"><ChevronRight size={18} /></button>
       </div><div className="header-actions"><TutorThemeToggle /></div></header>
     <dialog ref={infoDialog} className="lesson-modal info-modal" aria-labelledby="info-modal-title"
-      onCancel={event => { event.preventDefault(); closeInfo(); }} onClose={closeInfo}>
+      onCancel={event => { event.preventDefault(); closeInfo(); }} onClose={() => { if (!infoDialog.current?.open) closeInfo(); }}>
       <div className="lesson-modal-header"><div><p className="home-eyebrow">{infoPanel === 'progress' ? 'ONE KEYSTROKE AT A TIME' : 'PRACTICE · IMPROVE · PRESERVE'}</p><h2 id="info-modal-title">{infoPanel === 'progress' ? 'Your current practice' : 'Made for the Pa’O language'}</h2></div><button className="lesson-modal-close" aria-label="Close information" onClick={closeInfo} autoFocus><X size={20} /></button></div>
       {infoPanel === 'progress' ? <div className="session-progress-summary"><p>{lessonNames[lesson]} · Lesson {lesson + 1} of {lessons.length}</p><div className="progress-summary-metrics"><div><strong>{Math.round(snapshot.progress * 100)}%</strong><span>Complete</span></div><div><strong>{Math.round(stats.metrics.correctWpm)}</strong><span>Words per minute</span></div><div><strong>{Math.round(stats.counts.totalInsertionAttempts ? stats.metrics.attemptAccuracy : 100)}%</strong><span>Accuracy</span></div></div><p>Your progress here reflects this practice session. Take your time, follow the highlighted key, and let accuracy lead.</p></div>
         : <div className="about-copy"><p>A quiet place to practice Pa’O, improve your typing skills, and help preserve our language for generations to come.</p><p>Choose a lesson, press Start lesson, and follow the keyboard guide. English keyboards work too — each letter maps to the displayed Pa’O character automatically.</p><p>Free to use. No account needed.</p><a href="https://dakkhinda.pages.dev" target="_blank" rel="noopener noreferrer">Built by Dakkhinda Technologies <ArrowRight size={15} /></a></div>}
     </dialog>
     <dialog ref={lessonDialog} id="lesson-picker" className="lesson-modal" aria-labelledby="lesson-modal-title" aria-describedby="lesson-modal-description"
       onCancel={event => { event.preventDefault(); closeLessons(); }}
-      onClose={closeLessons}
+      onClose={() => { if (!lessonDialog.current?.open) closeLessons(); }}
       onClick={event => {
         if (event.target !== event.currentTarget) return;
         const bounds = event.currentTarget.getBoundingClientRect();
@@ -252,7 +248,6 @@ function PracticeSession({ availableLessons }: { availableLessons: LessonRecord[
       <p className="lesson-modal-note">Choosing a different lesson starts fresh. Closing this window keeps your current practice.</p>
     </dialog>
     <main id="main-content" className="classic-practice" aria-label="Typing practice">
-      <aside className="practice-intro"><p>PRACTICE · IMPROVE · PRESERVE</p><h2>Type Pa’O<br /><em>Build Your Future</em></h2><div>Practice Pa’O typing, improve your skills, and help preserve our language for generations to come.</div><span aria-hidden="true" /></aside>
       <section className="practice-card">
       <div className="practice-card-top"><div className="lesson-title"><span>LESSON {String(lesson + 1).padStart(2, '0')} / {lessons.length}</span><h1>{lessonNames[lesson]}</h1></div>
         <div className="lesson-progress-summary"><div className="lesson-progress" role="progressbar" aria-label="Lesson progress" aria-valuenow={Math.round(snapshot.progress * 100)} aria-valuemin={0} aria-valuemax={100}><span style={{ width: `${snapshot.progress * 100}%` }} /></div><span>{Math.round(snapshot.progress * 100)}% complete</span></div>
