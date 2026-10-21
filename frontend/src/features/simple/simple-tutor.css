@@ -355,3 +355,14 @@
 @media (prefers-reduced-motion: reduce) {
   .simple-tutor *, .simple-tutor *::before, .simple-tutor *::after { transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* Compact numbered pagination, with a wrapping layout for small screens. */
+.lesson-pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+.pagination-count { color: var(--muted); font-size: 11px; margin-right: auto; }
+.pagination-pages, .pagination-page-item { display: flex; align-items: center; gap: 4px; }
+.lesson-pagination button { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--key-surface); color: var(--ink); font-size: 12px; }
+.lesson-pagination button:not(:disabled):hover { border-color: var(--accent); }
+.lesson-pagination button[aria-current='page'] { background: #2563eb; border-color: #2563eb; color: white; }
+.pagination-gap { padding: 0 5px; color: var(--muted); }
+.lesson-pagination select { min-height: 36px; max-width: 100%; padding: 7px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--key-surface); color: var(--ink); font: inherit; font-size: 11px; cursor: pointer; }
+@media (max-width: 600px) { .pagination-count { flex-basis: 100%; } .pagination-pages { max-width: 100%; overflow-x: auto; padding: 4px; } .pagination-pages button { flex-shrink: 0; } }

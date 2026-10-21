@@ -57,6 +57,12 @@ function PracticeSession({ availableLessons }: { availableLessons: LessonRecord[
   const [lesson, setLesson] = useState(0);
   const [searchParams, setSearchParams] = useSearchParams();
   const [lessonsOpen, setLessonsOpen] = useState(false);
+  const [lessonPage, setLessonPage] = useState(0);
+  const [lessonsPerPage, setLessonsPerPage] = useState(10);
+  const lessonPageCount = Math.ceil(sessionLessons.length / lessonsPerPage);
+  const pageStart = lessonPage * lessonsPerPage;
+  const windowStart = Math.max(0, Math.min(lessonPage - 2, lessonPageCount - 5));
+  const pageNumbers = Array.from(new Set([0, ...Array.from({ length: Math.min(5, lessonPageCount) }, (_, i) => windowStart + i), lessonPageCount - 1])).sort((a, b) => a - b);
   const [infoPanel, setInfoPanel] = useState<'progress' | 'about' | null>(null);
   useEffect(() => {
     const panel = searchParams.get('panel');
@@ -119,6 +125,7 @@ function PracticeSession({ availableLessons }: { availableLessons: LessonRecord[
     };
   }, [lessonsOpen]);
   const openLessons = () => {
+    setLessonPage(Math.floor(lesson / lessonsPerPage));
     pausedForLessons.current = session.feedback.getSnapshot().snapshot.status === 'running';
     if (pausedForLessons.current) session.pause();
     setLessonsOpen(true);
@@ -238,12 +245,31 @@ function PracticeSession({ availableLessons }: { availableLessons: LessonRecord[
       }}>
       <div className="lesson-modal-header"><div><p className="home-eyebrow">YOUR PRACTICE LIBRARY</p><h2 id="lesson-modal-title">Choose a lesson</h2></div><button className="lesson-modal-close" aria-label="Close lessons" onClick={closeLessons} autoFocus><X size={20} /></button></div>
       <p id="lesson-modal-description">Build your confidence one lesson at a time. Choose a lesson to load it, then press Start lesson.</p>
+      <nav className="lesson-pagination" aria-label="Lesson pages">
+        <span className="pagination-count" role="status" aria-live="polite">Showing {pageStart + 1}–{Math.min(pageStart + lessonsPerPage, sessionLessons.length)} of {sessionLessons.length} lessons</span>
+        <div className="pagination-pages">
+          <button type="button" aria-label="Previous lesson page" disabled={lessonPage === 0} onClick={() => setLessonPage(page => page - 1)}><ChevronLeft size={16} /></button>
+          {pageNumbers.map((page, index) => <span className="pagination-page-item" key={page}>
+            {index > 0 && page > pageNumbers[index - 1] + 1 && <span className="pagination-gap" aria-hidden="true">…</span>}
+            <button type="button" aria-label={`Lesson page ${page + 1}`} aria-current={page === lessonPage ? 'page' : undefined} onClick={() => setLessonPage(page)}>{page + 1}</button>
+          </span>)}
+          <button type="button" aria-label="Next lesson page" disabled={lessonPage === lessonPageCount - 1} onClick={() => setLessonPage(page => page + 1)}><ChevronRight size={16} /></button>
+        </div>
+        <select aria-label="Lessons per page" value={lessonsPerPage} onChange={event => {
+          const size = Number(event.target.value);
+          setLessonsPerPage(size);
+          setLessonPage(Math.floor(pageStart / size));
+        }}>{[10, 20, 50].map(size => <option key={size} value={size}>{size} / page</option>)}</select>
+      </nav>
       <div className="lesson-modal-grid">
-        {lessonNames.map((name, index) => <button key={name} className={`lesson-choice${index === lesson ? ' is-selected' : ''}`} aria-current={index === lesson ? 'true' : undefined}
+        {sessionLessons.slice(pageStart, pageStart + lessonsPerPage).map((item, offset) => {
+          const index = pageStart + offset;
+          const name = item.title;
+          return <button key={item.id} className={`lesson-choice${index === lesson ? ' is-selected' : ''}`} aria-current={index === lesson ? 'true' : undefined}
           onClick={() => { if (index !== lesson) changeLesson(index); closeLessons(); }}>
           <span className="lesson-choice-top"><span>LESSON {String(index + 1).padStart(2, '0')}</span>{index === lesson ? <span className="lesson-current"><Check size={13} /> Current</span> : <ArrowRight size={16} />}</span>
           <strong>{name}</strong><span className="lesson-preview" lang={layout === "Pa'O" ? "blk" : "en"}>{lessons[index]}</span>
-        </button>)}
+        </button>; })}
       </div>
       <p className="lesson-modal-note">Choosing a different lesson starts fresh. Closing this window keeps your current practice.</p>
     </dialog>

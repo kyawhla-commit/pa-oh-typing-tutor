@@ -103,3 +103,17 @@
   .home-page .header-link { padding-inline: 8px; font-size: 9px; gap: 4px; }
   .home-page .theme-toggle { width: 62px; }
 }
+
+/* Opaque footer surfaces keep text and branding legible over every ribbon. */
+:root:not([data-theme='dark']) .simple-tutor:is(.home-page, .practice-page) .tutor-footer {
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  border: 1px solid #e5dfcd;
+  border-radius: 12px;
+  background: #fffaf0;
+  color: #244f45;
+  font-size: 11px;
+}
+:root:not([data-theme='dark']) .simple-tutor:is(.home-page, .practice-page) .tutor-credit img {
+  filter: none;
+}
