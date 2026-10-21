@@ -290,7 +290,7 @@ function PracticeSession({ availableLessons }: { availableLessons: LessonRecord[
         <div className="classic-typed-line" ref={typedLine} aria-hidden="true" lang={layout === "Pa'O" ? "blk" : "en"}>
           {visibleTypedUnits.map((unit, i) => <span className={unit.correct ? '' : 'typed-error'} key={lastLineStart + i}>{unit.text}</span>)}
           {!snapshot.typedUnits.length && !focused && !compositionDraft && <span className="input-placeholder">{started ? "Type here. Follow the highlighted key…" : "Press Start lesson below to begin."}</span>}
-          {compositionDraft}<span className={started && !complete ? 'typing-caret' : ''} />
+          {compositionDraft}{started && focused && !complete && <span className="typing-caret" />}
         </div>
         <textarea ref={input} aria-label="Type the lesson here" disabled={!started || complete}
           onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}

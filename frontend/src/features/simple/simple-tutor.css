@@ -113,7 +113,8 @@
 .classic-typed-line::-webkit-scrollbar { display: none; }
 .input-placeholder { display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; vertical-align: top; color: var(--muted); font: 11px/30px Inter, sans-serif; }
 .typed-error { color: #c02b42; background: #ffe3e7; text-decoration: underline; }
-.typing-caret { border-right: 2px solid var(--accent); margin-left: 1px; }
+.typing-caret { display: inline-block; width: 2px; height: 1em; margin-left: 2px; vertical-align: -.12em; border-radius: 1px; background: var(--accent); animation: tutor-caret-blink 1s steps(1, end) infinite; pointer-events: none; }
+@keyframes tutor-caret-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
 .classic-bottom { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 9px; }
 .classic-metrics { display: flex; align-items: center; gap: 16px; }
 .classic-metrics > div { display: flex; align-items: center; gap: 10px; padding-left: 15px; border-left: 1px solid var(--line); }
@@ -354,6 +355,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .simple-tutor *, .simple-tutor *::before, .simple-tutor *::after { transition: none !important; scroll-behavior: auto !important; }
+  .typing-caret { animation: none; }
 }
 
 /* Compact numbered pagination, with a wrapping layout for small screens. */
