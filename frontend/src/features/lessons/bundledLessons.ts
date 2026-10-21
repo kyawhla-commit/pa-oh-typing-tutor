@@ -1,27 +1,470 @@
 import type { LessonRecord } from './lessonCatalog';
 
+// Transcribed from lesson/pa-o.html; preserve its Pa’O spelling and punctuation.
+// Array order: word practice, volume/lesson/reading order, then standalone passages.
+// IDs 9 and 10 retain the original passage and word-practice lesson identities.
 // Edit and redeploy to update lessons for everyone.
 export const bundledLessons: LessonRecord[] = [
-  {
-    "id": 9,
-    "title": "Pa’O Passage Practice",
-    "description": "Practice Pa’O sentences at a steady pace.",
-    "difficulty": "Beginner",
-    "category": "Beginner",
-    "content": "နီယိုလိုꩻကျ အုံထာꩻပျောႏငါႏ၊\nတသားသိကျာꩻ ကျိုꩻစာꩻပညာႏနော၊\nကျူႏလုဲင်ꩻထာꩻဒါႏ နီပအိုဝ်ႏလိုꩻမျိုꩻ၊\nဟျူႏထာꩻ တလေ့ငါႏ ကျံႏစံႏတဲးတဲးလုဲင်း၊\nဖျောႏဖေႏတသီႏ ပျုံဖါလူႏကုဲင်းငါႏထာꩻ",
-    "status": "Published",
-    "durationMinutes": 10,
-    "updatedAt": "2026-10-06T12:42:04.018042+00:00"
-  },
   {
     "id": 10,
     "title": "Pa’O Word Practice",
     "description": "Practice Pa’O words and syllable patterns at a steady pace.",
     "difficulty": "Beginner",
     "category": "Beginner",
-    "content": "ဒဒꩻ ဒါဒါႏ ဖူးပေႏဆား ဟိဟိꩻ ဟီဟီး ငတသီး ကုကုꩻ ကူကူး ဗုဲင်ႏတဗူး\nဟေꩻဟေ့ꩻ ဟေဟေး တဖူးဝေး ငဲ့ငဲ့ꩻ ငဲငဲး ဖူးပေႏဗဲး လုဲင့်လုဲင့်ꩻ လုဲင်လုဲင်း ဖူးပေႏရုဲင်း ဖေါ့ဖေါ့ꩻ ဖေါဖေါး ဖူးပေႏနေား ယို့ယို့ꩻ ယိုယိုႏ အံႏတခိုး မံꩻမံꩻ မံးမံး ဖူးပေႏနံး ပုံꩻပုံꩻ ပုံးပုံး နီလုဲင်းတုံး\nတခေါ့ꩻရာႏဆျာႏ နီအံႏကျာႏ ကျူႏလုဲင်ꩻကျသေႏ ပအိုဝ်ႏပေႏ တရေꩻကျောႏကျာႏ မူႏနံꩻဒျာႏ ပညာႏကျိုꩻစာꩻ ကျငါႏထာꩻ ကျံႏမာꩻကျံႏဒေါ့ꩻ ဖေႏကရော့ꩻ မော့ꩻခွဲပျုံဖါ လူႏထာꩻအာ",
+    "content": "ဒဒꩻ ဒါဒါႏ ဖူးပေႏဆား\nဟိဟိꩻ ဟီဟီး ငတသီး\nကုကုꩻ ကူကူး ဗုဲင်ႏတဗူး\nဟေ့ဟေ့ꩻ ဟေဟေး တဖူးဝေး\nငဲ့ငဲ့ꩻ ငဲငဲး ဖူးပေးဗဲး\nလုဲင့်လုဲင့်ꩻ လုဲင်လုဲင်း ဖူးပေႏရုဲင်း\nဖေါ့ဖေါ့ꩻ ဖေါဖေါး ဖူးပေႏနေား\nယို့ယို့ꩻ ယိုယိုႏ အံႏတခိုး\nမံꩻမံꩻ မံးမံး ဖူးပေႏနံး\nပုံꩻပုံꩻ ပုံးပုံး နီလုဲင်းတုံး",
     "status": "Published",
     "durationMinutes": 10,
-    "updatedAt": "2026-10-19T00:00:00.000Z"
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 11,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၁) သွဉ်ခန်ꩻ (၁) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၁)",
+    "description": "Practice Pa’O text from Volume 1, Lesson 1, Reading 1.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "မာꩻတထာတသာ နီတထာ ပသီႏ မာꩻအလူႏဒါႏန သူႏသေထာꩻမꩻ ဟဲ့ꩻလိုꩻတဲးဝါး။ မာꩻကုဲင်းကုဲင်းထာꩻမာꩻနေား လေားကာႏ တထာယိုကို ပအိုဝ်ႏပို ကံႏဆငါႏ ခူးပါကုံႏ ဒုံႏပါထုံ ယုံယုံသာႏသာႏ ကယံငါႏ။\n\nနီ လစ်ꩻ သူခါ၊ အမုဲင်ပါ၊ ငေါဝ်းငွါ ထန်ႏပအိုဝ်ႏ။\n\nဥပမာႏ - က ကꩻ ကာ ကာꩻ ကား ကာႏ",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 9,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၁) သွဉ်ခန်ꩻ (၂) ဖတ်လွူꩻခန် အမုဲင်(၁)",
+    "description": "Practice Pa’O text from Volume 1, Lesson 2, Reading 1.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "နီယိုလိုꩻကျ အုံထာꩻပျောႏငါး၊\nတသာႏသိကျာꩻ ကျိုꩻစာꩻပညာႏနော၊\nကျူႏလုဲင်ꩻထာဒါႏ နီပအိုဝ်ႏလိုꩻမျိုꩻ၊\nဟျူႏထာꩻ တလေ့ငါႏ ကျံႏစံႏတဲးတဲးလုဲင်း၊\nဖျောႏဖေႏတသီႏ ပျုံးဖါလူႏကုဲင်းငါႏထာꩻ",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 12,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၁) သွဉ်ခန်ꩻ (၂) ဖတ်လွူꩻခန် အမုဲင်(၂)",
+    "description": "Practice Pa’O text from Volume 1, Lesson 2, Reading 2.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "တခေါ့ꩻရာႏဆျာႏ နီအံႏကျာႏ\nကျူႏလုဲင်ꩻကျသေႏ ပအိုဝ်ႏပေႏ\nတရေꩻကျောႏကျာႏ မူႏနံꩻဒျာႏ\nပညာႏကျိုꩻစာꩻ ကျငါႏထာꩻ\nကျံႏမာကျံႏဒေါ့ꩻ ဖေႏကရော့ꩻ\nမော့ꩻခွဲပျုံးဖါ လူႏထာꩻအာ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 13,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၁) သွဉ်ခန်ꩻ (၃) ဖတ်လွူꩻခန် အမုဲင် (၁)",
+    "description": "Practice Pa’O text from Volume 1, Lesson 3, Reading 1.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "လိုꩻဖြားစခါ ပြီꩻနအာ ပါꩻပြီꩻန ခꩻခြီႏဒါႏ ပါꩻပေႏ ခြူႏခြီႏအာ တသီႏဖြေႏ အဆာႏကြေႏ ဟူတပြဲႏကားမုဲင်ꩻ။ ဖြုဲင်ꩻဖြီတဲ့ ဒါႏခါꩻဗာႏ ဖြော်ချာဗာႏ ကေꩻဇူꩻ တခြိုꩻကားငါႏ ဆေ့ရေးဗာႏ ဒေါ့ꩻကြံꩻပုဲင်ႏထာꩻ ဗာႏဒါႏပါꩻ ပါꩻမုဲင်ꩻ တဲ့ႏဖြုံႏဒီႏ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 14,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၁) သွဉ်ခန်ꩻ (၃) ဖတ်လွူꩻခန်ꩻ အမုဲင်(၂)",
+    "description": "Practice Pa’O text from Volume 1, Lesson 3, Reading 2.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "လိုꩻဖြားစခါ ဒါႏလုဲင်ꩻအာ ဆရာႏပြီꩻန ပညာႏဆꩻ ပြူးထီတနျာႏ တဗော့ꩻငါႏ ကြေ့ꩻဒီႏကြေ့ꩻပေႏထီႏဖိုနေႏ ဖြေꩻဟူပြဲႏဖါႏ ထဲ့ဆုဲင်ꩻငါႏ။ နာႏဗာႏတရာꩻ ခြုဲင်းဖေႏပါꩻ ကြော့ꩻကတူႏသားအာငါႏမား ဆျာထီးကြိုႏကြိုႏ တမိုႏမိုႏ တခြာခြံတုံး တေားပြုံႏလုံး တေားပြုံႏဖိုးအေႏ လိုႏသေႏသေႏ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 15,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၂) သွဉ်ခန်ꩻ(၁) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၁)",
+    "description": "Practice Pa’O text from Volume 2, Lesson 1, Reading 1.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "ကျိုꩻစာꩻထွာထွာနေား လွူးလွ သွီႏပအိုဝ်ႏလုဲင်း ရုဲင်ဗွူဆို့ꩻလုဲင်း မာꩻကုဲင်းကုဲင်း နီးမွိုးသီး လွေꩻဗွူ နီလိုꩻပေႏယွဲးအစွိုꩻ။\nဒေ့ါꩻဆွော့ꩻထာꩻ ပါꩻလွꩻထီႏ နီဖါထွို့ꩻခါယာဒါႏ မွိုးဖါ ကေꩻဇူꩻအာ စူဝုဲင်ႏပီနုဲင်းဗိုမွံꩻ ထီကွုံꩻ သွုံꩻလꩻအာ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 16,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၂) သွဉ်ခန်ꩻ (၁) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၂)",
+    "description": "Practice Pa’O text from Volume 2, Lesson 1, Reading 2.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "ပအိုဝ်ႏမူႏဗွာ အူဒါႏကွာ ပေါႏထွာပအိုဝ်ႏ သွီႏရုဲင်းလိုႏ စဲ့ꩻပိုႏဝွေꩻသွူ ပါလွေꩻထွူ အုံစွူမဒါႏ စွဲးကိုဗာႏ လိုꩻဒါႏသဆွော့ꩻ ဖျော်ယိုတွော့ꩻ နီစွော့ꩻအာႏကွိုꩻ သကသွိုꩻ သွံစွိုꩻဖေႏအား သာႏသနာႏ မနုဟာႏထွုံꩻ နီထူꩻသွုံꩻ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 17,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၂) သွဉ်ခန်ꩻ (၂) ဖတ်လွူꩻခန်ꩻ အမုဲင်(၁)",
+    "description": "Practice Pa’O text from Volume 2, Lesson 2, Reading 1.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "ကျွꩻလွေꩻမုဲင်ꩻဗွေႏ ရီရိုႏသေႏ ဆေ့ရေးချွေတာ ချမ်ꩻသာႏအာ သူႏကျွဲႏသဌေꩻ ယံထွာလွေꩻ စွိုးခွိုꩻသထွုံႏ နီခွဲးကျွုံႏ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 18,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၂) သွဉ်ခန်ꩻ (၂) ဖတ်လွူꩻခန်ꩻ အမုဲင်(၂)",
+    "description": "Practice Pa’O text from Volume 2, Lesson 2, Reading 2.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "တွိုႏမုဲင်ꩻခါꩻမ နီဗွေႏကျွꩻ သွုံꩻချွေတာမꩻ ချံꩻသာႏလꩻ သူႏကျွဲႏမွိုႏဖါ ကျူႏဗောႏအာ ခွဲကျွုံႏခွိုꩻခွိုꩻ ဖူးဝေးစွိုꩻ",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 19,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၂) သွဉ်ခန်ꩻ (၃) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၁)",
+    "description": "Practice Pa’O text from Volume 2, Lesson 3, Reading 1.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "ခြွꩻဗူႏဖိုးအေး နီဝေ့တဖြွီꩻဒါႏ ပါꩻဗား ကလူꩻတဖြွူ ပါꩻခြွေတဖြာꩻ လူႏမွေးထာꩻ စာပြွဲနေးလဲ့လꩻဒျာႏ စာပြွဲစာရွံꩻ အွိုးဆေꩻတွံꩻ ဒေါ့ꩻထာꩻ တပြွော်ပြွော် ဒေါ့ꩻကြွို့ꩻမွော့ထာꩻ ဗာႏဒါႏပါꩻ ငိုးခြွံႏခြွံႏနေား တဖူꩻလွေꩻခြွုံးခြွုံး။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 20,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၂) သွဉ်ခန်ꩻ (၃) ဖတ်လွူꩻခန်ꩻ အမုဲင်(၂)",
+    "description": "Practice Pa’O text from Volume 2, Lesson 3, Reading 2.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "ခြွꩻထာꩻအီႏထွူ ရုဲင်သော့ꩻဗွူ တကြွီႏလုံးသူꩻ ခူႏတဖူꩻ ကလူꩻတဖြွူ လွꩻထွားသွူ စိုးရီးလူႏအာ ခြွေယိုခါ ပါꩻစာထော့ꩻစွဲႏ ဖျော်ဖြွဲႏဖြွဲႏ မာꩻထာꩻခြွော့သꩻ အာႏကွိုꩻလꩻ နာꩻတဖြွို့ယို အရာႏဖြို ဖူးမူႏနျꩻခြွံ ပါꩻထွားဟွံ တဖြွုံသော့ꩻထီ ယားဒါႏအီ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 21,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၃) သွဉ်ခန်ꩻ (၁) ဖတ်လွူꩻခန် အမုဲင် (၁)",
+    "description": "Practice Pa’O text from Volume 3, Lesson 1, Reading 1.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "စေႏတနာႏ စင်ဗွာ သထွုံႏပေႏ သီႏသဲင်ႏ မဥ်နာႏငါႏတရာꩻ အမဲဥ်ႏတရာꩻ ယံငါႏထာꩻ ရဟန်ꩻသင်္ဃာႏ။ မေႏတေန်ꩻ မေႏဗို နီခမ်းနီထီ အောဝ်ႏမုဲင်ꩻအီ ကဗျာလင်္ကာႏ တဲမ်းဒါႏဗာႏ တယ်ႏဘုရာꩻစေႏတီႏ ထီꩻသင်ꩻခေါဝ်ႏလို့ဝင်ꩻ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 22,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၃) သွဉ်ခန်ꩻ (၁)၊ ဖတ်လွူꩻခန်ꩻ အမုဲင် (၂)",
+    "description": "Practice Pa’O text from Volume 3, Lesson 1, Reading 2.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "ဒင်ႏဖိုးစခါ လွေꩻသဲင်ꩻအာ ခဉ်ႏပါခံꩻယာႏ မဲစ်အာငါႏ လူႏဗာႏတန်ꩻမွေး ကေန်ꩻတောဝ်းကွေး ကပ်နေးပဉ်ပါꩻ လဲပ်ငါႏထာꩻ ကလာꩻခယ်ႏဖြား လဲင်ꩻအုံထွား တဲးဝါးမာꩻလွေꩻ လွိုတောဝ်းဝွေꩻ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 23,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၃) သွဉ်ခန်ꩻ (၂) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၁)",
+    "description": "Practice Pa’O text from Volume 3, Lesson 2, Reading 1.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "နမ်းကျင်ꩻတရာꩻ ဟောဝ်ဗာႏ နီပအိုဝ်ႏချင်ꩻချင်ꩻ ရက်ဗာႏလို့ဝင်ꩻ ဘာႏသာႏထွုံꩻမျတ် နီဆွုံꩻဖျတ် မာꩻကျပ်ကုသိုလ်ႏ ချမ်ꩻသာႏပိုႏ အောဝ်ႏလိုႏတဲမ်းယို ကျမ်ꩻဂန်ႏကို။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 24,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၃) သွဉ်ခန်ꩻ (၂) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၂)",
+    "description": "Practice Pa’O text from Volume 3, Lesson 2, Reading 2.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "ကံကျင်ꩻမီႏဒါႏ ကျိုꩻအာငါႏ ခမ်းသားချင်ꩻချင်ꩻ ရက်သွော့ဝင်ꩻ အကျင်ꩻဟောဝ်မျတ် မာꩻထာꩻပျတ် ထွားကျပ်ကျမ်ꩻဂန်ႏ တဲမ်းဟော်ꩻထန်ႏ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 25,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၃) သွဉ်ခန်ꩻ (၃) ဖတ်လွူꩻခန် အမုဲင် (၁)",
+    "description": "Practice Pa’O text from Volume 3, Lesson 3, Reading 1.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "ဖိုးပနားတကြက်ꩻ ခံႏယာႏ တခြဲက်ꩻကားမုဲင်ꩻ ဖြစ်ꩻနံႏသာႏထီ လိုꩻကြဲစ်ထာꩻကျင်ႏ ထွာလိုꩻပျင်ႏ လိုꩻထာꩻလွတန် ကေန်ꩻခြေားဖြန်။ ခြပ်ဟတ်ပဉ်စား ထီႏဖုဲင်ႏထွား လိုꩻလွထာꩻမာꩻ ပြဲမ်ႏရဝ်းပါꩻ ဖြေꩻဟူပြယ်ႏဖါႏ ယံတဝ်းငါႏ ဒေ့ါꩻသင်ႏခြဝ်သန် ဟဝ်တဝ်းတန်။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 26,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၃) သွဉ်ခန်ꩻ (၃) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၂)",
+    "description": "Practice Pa’O text from Volume 3, Lesson 3, Reading 2.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "လမ်းနီပြက်ꩻထွာ ပသီးဗွာ တဲမ်းပြဲင်ႏကဗျာ လꩻဆုꩻအာ ထုဲင်ပြဉ်းထွူမꩻ ဆို့ꩻသော့ꩻလꩻ ဖါဖြားတိဟန် ခြဲစ်ꩻထွားဗန် ဖြားဆာဗွိုႏစန်း ကဟောဝ်ပြန်း ခြပ်ဟောဝ်ကွံꩻဗီႏ ထွာႏကညီႏ ယꩻဝါႏတခြဲမ် လေန်းလုဲင်ꩻဝဲဉ် အုံတရာꩻလꩻ ခြယ်ꩻလောဘ ခြေဝ်းကောႏယိုခါ ဝင်ꩻသွုံꩻအာ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 27,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၄) သွဉ်ခန်ꩻ (၁) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၁)",
+    "description": "Practice Pa’O text from Volume 4, Lesson 1, Reading 1.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "စူသွို့ꩻခံꩻ တကွင်ꩻကားမုဲင်ꩻ ကျိုꩻစာꩻသွဉ်မွေးမွေးပညာႏနေား ဗွေးဗွန်ကွတ်ꩻပါꩻ ကျွꩻလွဉ်သွူ သဲ့ꩻသွမ်ꩻဝင်ꩻနဝ်ꩻ ဟောဝ်တဝ်း နီကိုꩻကွယ်ႏဒျာႏ ရတနာႏသွံပါꩻ",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 28,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၄) သွဉ်ခန်ꩻ (၁) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၂)",
+    "description": "Practice Pa’O text from Volume 4, Lesson 1, Reading 2.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "တွက်ဂဏန်ꩻဒါႏ ယံဟောဝ်ငါႏ ဗဟိုႏသွဉ်တန်ꩻ အွဉ်ႏစီꩻကန်ꩻ ခွန်မနုဟာႏ ပအိုဝ်ႏဒျာႏ ကွပ်မာꩻသီဆျာ ဝွဋ်တွပ်ꩻအာ သꩻစါယ်ꩻမဲဉ်ဒါႏ သွဉ်မွေးငါႏ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 29,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၄) သွဉ်ခန်ꩻ (၂) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၁)",
+    "description": "Practice Pa’O text from Volume 4, Lesson 2, Reading 1.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "နာꩻသက္ကရာဇ် ကျွင်ꩻတဗာႏနဲ့ ဗွေႏဘုရာꩻ လယ်ႏချွစ်သတ္တဝါႏ ဘုရာꩻပွင်ꩻဒျာႏ ကျွန်ꩻနောဝ်ကိုယို ဗုံကျွမ်ꩻတဖြို့ꩻ မာꩻအီထမုဲင်ꩻ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 30,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၄) သွဉ်ခန်ꩻ (၂) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၂)",
+    "description": "Practice Pa’O text from Volume 4, Lesson 2, Reading 2.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "နာꩻသက္ကရာဇ် ကျွင်ꩻတဗာႏ တင်ꩻကျွစ်လာတာႏ မာꩻမေႏဗို နီကျွန်ꩻနောဝ်ယို အထွုံꩻစံႏ ဖို့ꩻကျွမ်ꩻကျွမ်ꩻအံႏ ကသံးယံ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 31,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၄) သွဉ်ခန်ꩻ (၃) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၁)",
+    "description": "Practice Pa’O text from Volume 4, Lesson 3, Reading 1.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "လိုꩻပေႏစွဲက်ထီ ပြွက်ꩻဟံႏဗော့ꩻ ထီႏသေဖြွဉ်တရာꩻ လွေꩻမာꩻထာꩻမာꩻ ပြွတ်ခွမ်ꩻလာꩻ ပအိုဝ်ႏမူႏစခါ ခင်ႏပြွမ် ဟွဲး ငွဉ်ꩻဟွဲႏပြွယ်ꩻ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 32,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၄) သွဉ်ခန်ꩻ (၃) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၂)",
+    "description": "Practice Pa’O text from Volume 4, Lesson 3, Reading 2.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "ပါꩻပြွက်ꩻဟံႏဗော့ꩻ ထွားမရော့ꩻ ဆို့ꩻအာစွစ်ꩻစွစ်ꩻ ဝါႏမွူးပြွစ်ꩻ ကဝ်ႏတုဲင်မော်နမ်း ပြွတ်လုဲင်ႏသမ်း နီပအိုဝ်ႏချင်ꩻ ဖြွမ်းလို့ဝင်ꩻ လိုꩻမူႏဟွဲးပြွဲꩻ ပါꩻထွားစွယ်ꩻ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 33,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၅) သွဉ်ခန်ꩻ (၁) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၁)",
+    "description": "Practice Pa’O text from Volume 5, Lesson 1, Reading 1.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "အုံလိန်ႏလိန်ႏမာႏမာႏထာꩻနောꩻ ဗွေႏဗွန်ထီသိမ်ႏ လွေꩻယုန်ꩻဗွူ ယုန်ꩻဗေဟံႏ လုပ်ꩻမွေးထာꩻသား ခြွေကဲဉ်းအာ ဆို့ꩻအာအာ သေင်ႏမုဲင်သက်ꩻလုဲင်း ထမ်ႏထာꩻလူႏ ကျုႏလေပ်ဘုရာꩻ သꩻဗိုန်ပီဝင်ꩻ ပအိုဝ်ႏချင်ꩻ ပအိုဝ်ႏလိတ်စောင်ႏ ထွားမူႏမောင်ႏ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 34,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၅) သွဉ်ခန်ꩻ (၁) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၂)",
+    "description": "Practice Pa’O text from Volume 5, Lesson 1, Reading 2.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "စိတ်သွော့ပတီꩻ ပနီꩻနီꩻ ဆွဉ်းစိမ်ꩻယာဗွာ သီတငါ ဟိုႏပꩻလုံးသူꩻ မာꩻတဖူꩻ သျင်ႏလောင်ꩻထုမ်းသေ သွံရျာꩻဗွေ ပအိုဝ်ႏပိုမူႏ လေင်းဒါႏလူႏ ကေပ်ꩻရွဉ်လူႏထာꩻ နာႏတရာꩻ ခမ်းသားချင်ꩻချင်ꩻ မိုတ်လို့ဝင်ꩻ ပွယ်ꩻသွဉ်တန်ꩻအောင်ႏ ပျောႏမူႏမောင်ႏ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 35,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၅) သွဉ်ခန်ꩻ (၂) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၁)",
+    "description": "Practice Pa’O text from Volume 5, Lesson 2, Reading 1.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "အုံပျင်ႏလွꩻဗုဲင် ယားကုဲင်အချိန်ႏ နေးတွမ်ႏမေတ္တာႏ အုပ်ချုပ် ချောက်ကုဲင်ဒါႏဝင်ꩻ ဟောဝ်တဝ်းရင်ꩻ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 36,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၅) သွဉ်ခန်ꩻ (၂) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၂)",
+    "description": "Practice Pa’O text from Volume 5, Lesson 2, Reading 2.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "အချိန်ႏနားရီႏ ရိုႏသေႏညီႏ ဝင်ꩻထီႏနာနီ လွစ်သွင်ꩻဖွီ အုပ်ချုပ်ရေꩻတာႏ လိုႏလိုꩻဒါႏ အမာႏလွစ်ကင်ꩻရက်သညင်ꩻ ခွန်နင်ꩻသီးယို ထင်ႏကျောင်ꩻကို မူႏခိုဓိဌာန်း ဆုꩻနိဗ္ဗာန်ႏ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 37,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၅) သွဉ်ခန်ꩻ (၃) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၁)",
+    "description": "Practice Pa’O text from Volume 5, Lesson 3, Reading 1.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "လိုꩻပြိန်ꩻသားခြာ ဒေါ့ꩻဗာႏအာ ပြာꩻတဒွီခါ အိန်ခြိမ်ꩻပါ ဖီးအွာဖုံႏညီႏ ထွာဖြုန်ႏဒီႏ ထျခြုမ်ႏဗေသေင် အံႏခြေင်ခြေင် လမ်းသောင်လမ်းထျꩻ သဲ့ꩻကြေင်းမꩻ နမ်းယင်လမ်းယင် သျင်ꩻကြေင်းစင်။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 38,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၅) သွဉ်ခန်ꩻ (၃) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၂)",
+    "description": "Practice Pa’O text from Volume 5, Lesson 3, Reading 2.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "လိုꩻပြိန်ဝင်ꩻလဲဉ် လွူးထဲင်းဒဲဉ် ဖက်ꩻခေါ်ကြိပ်ꩻတန် ထိုအခန် လွေꩻပြုတ်ꩻနွေႏဒီႏ လိုꩻစွိုꩻညီႏ သေင်ႏပင်ခြုမ်ႏငါႏ လင်ꩻထဲ့ဒါႏ။ ဇတ်ခြေင်ႏလောင်းငါ လိုꩻစွိုꩻအာ ခွမ်ꩻလာꩻဖြေင်းယို နီရက်လွို ခူႏသဲင်ꩻထီခြောင် နီဒုံသောင် မွူးခေ့ꩻမꩻကျောင်ႏ ဝါးအွတ်ခြောင်ႏ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 39,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၆) သွဉ်ခန်ꩻ (၁) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၁)",
+    "description": "Practice Pa’O text from Volume 6, Lesson 1, Reading 1.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "လယ်ႏလွုက်ꩻထာꩻ ဝင်ꩻယွူးဒါႏလိုꩻ ယွုတ်ပင်ႏထို ပညာႏရေꩻ ကွိုက်ꩻလိုꩻမွိုက် ထွာလိုꩻယွုတ် ကျိုႏဆွုမ်ႏဒျာႏ ခွန်တွမ်ႏနင်ꩻ မော့ꩻခွဲးခွိုန်ꩻချာ ပအိုဝ်ႏအာ လောင်းလွိုးပယွုမ်း ဝင်ꩻရက်အာ မေတ္တာႏတဖွောင်ꩻ အဟဝ်သွတ်ꩻ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 40,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၆) သွဉ်ခန်ꩻ (၁) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၂)",
+    "description": "Practice Pa’O text from Volume 6, Lesson 1, Reading 2.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "ခွုင်းကားလိုꩻကျောင်ꩻ သံႏဃာႏပေါင်ꩻ ဖြေꩻစာကျင်ႏလယ်ႏ ထွာကွုန်ႏသယ်ႏ ထေင်းဒဲဉ်အွုပ်ꩻခံꩻ ဖူးမူႏနံꩻ ဗွူဟူဗေဟံႏ အောဝ်ႏပွုမ်ႏပံႏ အွꩻအံႏလွိုင်ႏအာ နန်းတောဝ်းခြာ နေင်ႏဟာပွယ်ꩻကွိုန်ꩻ ယူႏလခွိုန်ꩻ နင်ႏဝွိုန်ꩻစေႏတနာႏ စွိုမ်းဟောဝ်ငါႏ သꩻရာႏတဉ်ႏခွေါင် တရာꩻဗွောင်။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 41,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၆) သွဉ်ခန်ꩻ (၂) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၁)",
+    "description": "Practice Pa’O text from Volume 6, Lesson 2, Reading 1.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "မာꩻသွူတ်မွိုန်းထာꩻလုဲင်း စုဲင်ႏဖျုန်ꩻတမွိုꩻမွိုန်း ရွဉ်ဟုဲင်း ခွေကျိုက်သꩻဟောဝ်ငါႏ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 42,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၆) သွဉ်ခန်ꩻ (၂) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၂)",
+    "description": "Practice Pa’O text from Volume 6, Lesson 2, Reading 2.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "လိုꩻသွူတ်တဖြာꩻ ပါꩻဆွမ်ꩻခါꩻ တချွုန်ဖျွုန်ꩻရွဉ် ကေန်ꩻခြေားလွဉ် ကျွိုက်သꩻလွိုက်လꩻ ဖက်ꩻခေါ်ဆꩻ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 43,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၆) သွဉ်ခန်ꩻ (၃) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၁)",
+    "description": "Practice Pa’O text from Volume 6, Lesson 3, Reading 1.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "ပါꩻဒုံႏဂီတာ သင်ႏခြွုင်ꩻခြွုင်ꩻ ပါꩻပေႏတဖြွုန်းထာꩻ ယားမွိုန်းဖြွုမ် တဲစ်ꩻဒါႏလိုꩻ ခမ်းပြွိုင်းဟောဝ်ငါႏ စက်ခြွုတ်ဗွူနောဝ်ꩻ လို့ကားမုဲင်ꩻ ဖြွုမ်ဖူႏ ဖြွိုမ်ဖူႏ ဟဲ့ꩻနီမျိုꩻ အုံဖြွောင်ႏဖြွောင်ႏထာꩻ ထုမ်ႏတရာꩻ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 44,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၆) သွဉ်ခန်ꩻ (၃) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၂)",
+    "description": "Practice Pa’O text from Volume 6, Lesson 3, Reading 2.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "တိန်ႏတန်တဗွုင်ꩻ သင်းခြွုင်ꩻခြွုင်ꩻ ထာꩻခြွုတ်ခြက်ခါႏ လွေꩻယပ်ꩻငါႏ ကြွုမ်ဒီႏကြွုမ်ဆုံꩻ စာဟိုပုံꩻ ခြွိုင်သုဲင်ꩻထွားလွိုက် မာꩻလမ်းတွိုက်။ ခြွူႏခြွိန်တွောင်းမꩻ ယဲက်ထွားလꩻ ပါꩻဖဲ့ဖြွိုမ်းဆုံꩻ နွို့ဗာႏပုံꩻ လာလျားချိန်ႏခါႏ ခြွေင်ꩻသေင်ႏလာႏ လွောင်ႏဗူႏထွာအာႏ စွိုးခွိုꩻတာႏ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 45,
+    "title": "ရန်ႏသူႏစဲစ်ထွာ ဖိန်ꩻယာဗွာ",
+    "description": "Practice a Pa’O reading passage at a steady pace.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "ယာဗွာတခြဲက်ꩻ နီရန်ႏသူႏ ကကျင်ꩻခိုမူႏ ခြင်ꩻဒုက္ခ နုဲင်းခြောင်းကဝ်ႏယ ဖိုꩻမတန်ႏ လိုꩻမွိုက်ထာꩻအံႏ ခြွိုင်ႏသန်ꩻကုဲင် သွီႏယာႏဟုဲင်လုဲင် သဲင်တခြစ်ꩻ ထာꩻယူႏတဲ့ပစ်ꩻ မပေါက်ဖြဲဉ် အံႏမတေားဒဲဉ် ကေန်ꩻဖြန်ဗာႏ စေꩻစိန်ႏဥစ္စာႏ လို့ခြေင်အာ သꩻဖြုံႏနောဝ်ꩻခါ အအာႏဆေ့ꩻ အောဝ်ႏခြံစာတေ့ꩻ ဝင်ꩻထူႏသိမ်ꩻ စာဗာႏအေင်ခြိမ်ꩻ စာပါဆုမ်ႏ သေင်ႏပင်ခြုမ်ႏခြုမ်ႏ ထုမ်ႏဗျာႏစာ ခင်ႏဖါႏခြဲပ်ငါ မထုမ်းဗာႏ ခြောဝ်ငေါဝ်းသီပြာႏ \"ယာဗွာသာႏ\"။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 46,
+    "title": "ခꩻမွိုန်းဝါး",
+    "description": "Practice a Pa’O reading passage at a steady pace.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "သေင်ႏမွူးသဉ်နာ အွိုးသူꩻဟာ ပီဆျာကြိုႏကြိုႏ တမိုႏမိုႏ။ အောဝ်ႏလိုႏစွဉ်ႏလဲ့ ခꩻမွိုန်းတဲ့ လင်ꩻထဲ့ငါးရုဲင်ꩻတွိုႏဆုဲင်ꩻဆုဲင်ꩻ။ ဝါးတမုဲင်ꩻဟောင်း သေနေကောင်း အင်ဖြောင်းလိုႏတောဝ်း နာႏအငေါဝ်း တွုတ် တူး တူး - တူ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 47,
+    "title": "ဟောဝ်နမ်းတာႏ ငွိုးဗာႏထာꩻ",
+    "description": "Practice a Pa’O reading passage at a steady pace.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "ကွတ် ကွတ် ကွတ် ကွတ် အမွူးဟောင် ဆျာပေႏဖင်းလွဉ်ရောင်။ အမွိုးသောင် လွဉ်အောဝ်ႏဗူႏ မွိုးငေါဝ်းနေးနာႏထူႏ။ အမွိုးမူႏ ခြဲစ်ꩻအဆာႏ သေအံႏတွမ်လွဒျာႏ။ ခꩻတဗာႏ လꩻယဲ့သဲင် အီလွင်းညာထွူတဲင်။ ယွယွယဲင် အံႏခြယ်ꩻတေ့ꩻ အမွိုးထိုꩻနꩻပြေ့ꩻ။ အံႏတေ့ꩻထွူ ထွားအမွိုး ထီႏတောဝ်းတဲင် ဝွေꩻငွိုး စိပ် စိပ် စိပ်။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 48,
+    "title": "မာႏဒါႏနေနေ",
+    "description": "Practice a Pa’O reading passage at a steady pace.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "ညောႏဖြားတဗာႏ ထေအဟန် နေးအာႏခြဲစ်ꩻအဗန်။ ယူႏဖြားတန် အောဝ်ႏထင်ႏထီႏ ယူးဖြားမဲ့ထီရီႏ။ ညောႏဖြားတန် ခြဲစ်ꩻဗန်မာႏ နက်နောဝ်လွေꩻတောဒျာႏ။ ညောႏဖြားနက်နောဝ် ယူးဖြားထီႏ ယူးဖြားကငအွီႏ စွိꩻ စွိꩻ စွိꩻ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 49,
+    "title": "နားရီႏမွန်",
+    "description": "Practice a Pa’O reading passage at a steady pace.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "တရောဝ်ꩻသွံ အငေါဝ်းလဲ့အွီႏ တမာလိုꩻ ထွိုင်ႏခန်း ထွိုင်ႏခန်းတဲ့ ဝွေꩻရိုꩻ ယူးဝါးမျိုꩻ သေချိန်ႏခါႏ ငွဉ်ꩻဟွဲတနျာႏနျာႏ၊ တွိုႏအဆာႏ မက်ဟူဖေါင်း အနုံꩻအောဝ်ႏခင်ႏလောင်း၊ တွိုႏအဖြောင်း ဗွိုန်နုဲင်းဝါး အမေးပေါင်း ဖါး ဖါး၊ အဒေ့ꩻတရား နားဆွဉ်ႏဗွာ ကနောက်ꩻအောဝ်ႏဒင်ႏတဝီးနာ၊ အွိုးလမ်းငါ တသီးသီး သီထင်းတမုဲင်ꩻအီး တော်ဒျာႏနီဆျာထီး အောက်အီးအီး အျောက်။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 50,
+    "title": "မွိုးဖါဗွေႏ",
+    "description": "Practice a Pa’O reading passage at a steady pace.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "နီအံႏအွꩻတာႏ ကွဉ်ကꩻတာႏ ကျံႏဗာႏထုမ်ႏဖေႏ မွိုးဖါဗွေႏ။ အွဉ်ႏသꩻကုဲင်းကုဲင်း သွို့ꩻခြံလုဲင်း ပွိုဆုဲင်းဗာႏသေႏ မွိုးဖါဗွေႏ။ ယာခိုးချိန်ႏခါႏ မအုံဗာႏ ယပ်ꩻငါႏသေႏသေႏ မွိုးဖါဗွေႏ။ ကေꩻဇူꩻတန်အာ မွိုးတွမ်ႏဖါ ယိုခါတန်ပေႏ နီရိုႏသေႏ နီရိုႏသေႏ။",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-21T00:00:00.000Z"
   }
 ];

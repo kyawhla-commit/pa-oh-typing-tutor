@@ -135,9 +135,16 @@ Read [the pilot architecture](src/features/pilot/README.md), [consent and ten-ta
 
 ### Frontend lesson catalog
 
-Home and Practice use the 2 published Pa’O lessons in
+Home and Practice use the 42 published Pa’O lessons in
 `src/features/lessons/bundledLessons.ts`. The running app does not fetch lessons
 from Supabase or browser storage. The admin route is removed.
+
+The catalog follows `lesson/pa-o.html`: one word-practice exercise, 35 readings
+from volumes 1–6, and six standalone passages. It preserves the source headings,
+Pa’O spelling, punctuation, and paragraph breaks, with HTML indentation removed.
+The array starts with word practice, followed by readings in volume, lesson, and
+reading order, then the standalone passages. IDs 9 and 10 keep their original
+passage and word-practice identities; new lessons use IDs 11–50.
 
 To change lessons, edit that file and redeploy. Keep IDs unique and set
 `status: "Published"` for visible lessons. Do not include private draft content
