@@ -91,3 +91,15 @@ it('pairs the Reading 2 illustrations with the complete selectable passage', () 
   expect(host.querySelector('.reading-landscape')).not.toBeNull();
   expect(host.querySelector('.reading-passage')?.textContent).toBe(bundledLessons.find(item => item.id === 10)!.content);
 });
+
+it('shows Lesson 2 book rows and both readings without losing catalog text', () => {
+  const host = render('/lessons/52');
+  expect(host.querySelectorAll('.reading-pattern-table tbody tr')).toHaveLength(10);
+  expect([...host.querySelectorAll('.reading-pattern-example')].filter(cell => cell.textContent === '– (×)')).toHaveLength(3);
+  expect(host.querySelector('.reading-paired-verse')?.textContent).toBe(bundledLessons.find(item => item.id === 9)!.content.replace(/\s+(?=တသာႏ|ကျူႏလုဲင်ꩻ|ဟျူႏ|ဖျောႏ)/g, ''));
+  act(() => host.querySelector<HTMLAnchorElement>('[aria-label="Next lesson"]')!.click());
+  act(() => host.querySelector<HTMLAnchorElement>('[aria-label="Next lesson"]')!.click());
+  expect(host.querySelector('.reading-dance-illustration')).not.toBeNull();
+  expect(host.querySelectorAll('.reading-paired-verse > div')).toHaveLength(6);
+  expect(host.querySelector('.reading-paired-verse')?.textContent).toBe(bundledLessons.find(item => item.id === 12)!.content.replace(/\n/g, ''));
+});

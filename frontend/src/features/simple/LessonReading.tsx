@@ -6,6 +6,7 @@ import type { LessonRecord } from '../lessons/lessonCatalog';
 import TutorBrand from './TutorBrand';
 import TutorThemeToggle from './TutorThemeToggle';
 import './lesson-reading.css';
+import danceIllustration from '../../assets/lessons/volume-1/dance.webp';
 import boyIllustration from '../../assets/lessons/volume-1/boy.webp';
 import childrenIllustration from '../../assets/lessons/volume-1/children.webp';
 import girlIllustration from '../../assets/lessons/volume-1/girl.webp';
@@ -76,7 +77,8 @@ export default function LessonReading() {
   const previous = lessons[index - 1];
   const next = lessons[index + 1];
   const ref = lesson ? reference(lesson) : null;
-  const bookReading = lesson?.id === 51 ? lessons.find(item => item.id === 11) : undefined;
+  const isBookPattern = lesson?.id === 51 || lesson?.id === 52;
+  const bookReading = isBookPattern ? lessons.find(item => item.id === (lesson.id === 51 ? 11 : 9)) : undefined;
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => { heading.current?.focus(); }, [lessonId]);
 
@@ -92,12 +94,12 @@ export default function LessonReading() {
         {lessons.length ? <LessonLibrary lessons={lessons} /> : <p className="reading-empty">No published lessons yet. Please check back soon.</p>}
       </> : lesson ? <>
         <Link className="reading-back" to="/lessons"><ArrowLeft size={17} />All lessons</Link>
-        <article className={`reading-paper${lesson.id === 51 ? ' reading-book-page' : lesson.id === 10 ? ' reading-illustrated-page' : ''}`} aria-labelledby="reading-title">
-          {lesson.id === 51 && <div className="reading-book-number" lang="blk">(၁၀)</div>}
+        <article className={`reading-paper${isBookPattern ? ' reading-book-page' : lesson.id === 10 ? ' reading-illustrated-page' : lesson.id === 12 ? ' reading-dance-page' : ''}`} aria-labelledby="reading-title">
+          {isBookPattern && <div className="reading-book-number" lang="blk">{lesson.id === 51 ? '(၁၀)' : '(၁၂)'}</div>}
           <header className="reading-paper-heading">
             <p className="reading-eyebrow">{ref ? `Volume ${ref.volume} · Lesson ${ref.lesson} · ${ref.reading ? `Reading ${ref.reading}` : 'Letter patterns'}` : 'Reading passage'}</p>
             <h1 id="reading-title" ref={heading} tabIndex={-1} lang="blk">{lesson.title}</h1>
-            {topic(lesson) && <p className="reading-topic" lang="blk">{topic(lesson)}</p>}
+            {!isBookPattern && topic(lesson) && <p className="reading-topic" lang="blk">{topic(lesson)}</p>}
           </header>
           {lesson.id === 10 && <div className="reading-illustration-strip">
             <img src={boyIllustration} alt="A smiling boy in a collared shirt" width={1254} height={1254} />
@@ -106,12 +108,25 @@ export default function LessonReading() {
           </div>}
           <div className="reading-passage" lang="blk">{lesson.content.split(/\n\s*\n/).map((paragraph, i) => {
             // This source paragraph contains ten vowel families without row breaks.
-            const patternRows = lesson.id === 51 && i === 0;
-            if (!patternRows) return lesson.id === 51 ? null : <p key={i}>{paragraph}</p>;
-            const rows = paragraph.split(/\s+(?=ကိ |ကု |ကေ့ |ကဲ့ |ကုဲင့် |ကော့ |ကို့ |ကံ့ |ကုံ့ )/).map(row => row.trim().split(/\s+/));
+            const patternRows = isBookPattern && i === 0;
+            if (!patternRows) {
+              if (isBookPattern) return null;
+              if (lesson.id === 12) return <div key={i} className="reading-paired-verse">{paragraph.split('\n').map((line, row) => {
+                const split = line.indexOf(' ');
+                return <div key={row}><span>{line.slice(0, split)}</span>{' '}<span>{line.slice(split + 1)}</span></div>;
+              })}</div>;
+              return <p key={i}>{paragraph}</p>;
+            }
+            const rowBoundary = lesson.id === 51 ? /\s+(?=ကိ |ကု |ကေ့ |ကဲ့ |ကုဲင့် |ကော့ |ကို့ |ကံ့ |ကုံ့ )/ : /\s+(?=ကျု |ကျေ့ |ကျော့ |ကျို့ |ကျံ့ |ကျုံ့ )/;
+            const rows = paragraph.split(rowBoundary).map(row => row.trim().split(/\s+/));
+            if (lesson.id === 52) {
+              // Reading-only rows marked with × in the supplied book photograph.
+              rows.splice(1, 0, ['ကျိ', 'ကျိꩻ', 'ကျီ', 'ကျီꩻ', 'ကျီး', 'ကျီႏ', '– (×)']);
+              rows.splice(4, 0, ['ကျဲ့', 'ကျဲ့ꩻ', 'ကျဲ', 'ကျဲꩻ', 'ကျဲး', 'ကျဲႏ', '– (×)'], ['ကျုဲင့်', 'ကျုဲင့်ꩻ', 'ကျုဲင်', 'ကျုဲင်ꩻ', 'ကျုဲင်း', 'ကျုဲင်ႏ', '– (×)']);
+            }
             return <div key={i} className="reading-pattern-scroll" tabIndex={0} role="region" aria-label="Letter pattern table; scroll horizontally to see all columns">
               <table className="reading-pattern-table">
-                <thead><tr><th scope="col">တွယ်ꩻ</th><th scope="col">ဗီးတွမ်း မူလသရစဲဉ်း ရော်ꩻခဏ်ꩻ</th><th scope="col">ပွုံႏစံႏ</th></tr></thead>
+                <thead><tr><th scope="col">တွယ်ꩻ</th><th scope="col">{lesson.id === 52 ? topic(lesson) : 'ဗီးတွမ်း မူလသရစဲဉ်း ရော်ꩻခဏ်ꩻ'}</th><th scope="col">ပွုံႏစံႏ</th></tr></thead>
                 <tbody>{rows.map((words, rowIndex) => <tr key={rowIndex}>
                   <th scope="row">{String(rowIndex + 1).replace(/\d/g, digit => '၀၁၂၃၄၅၆၇၈၉'[Number(digit)])}</th>
                   <td><div className="reading-pattern-letters">{words.slice(0, -1).map((word, wordIndex) => <span key={wordIndex}>{word}</span>)}</div></td>
@@ -120,19 +135,24 @@ export default function LessonReading() {
               </table>
             </div>;
           })}</div>
-          {lesson.id === 51 && <div className="reading-book-bottom" lang="blk">
-            <p className="reading-book-alphabet">သွုံꩻအာ - က ခ င စ ဆ ည တ ထ ဒ န ပ ဖ ဗ မ ယ ရ လ ၀ ဟ (အဖြုံႏ ၂၀ ယိုသွူ</p>
+          {isBookPattern && <div className="reading-book-bottom" lang="blk">
+            {lesson.id === 51 && <p className="reading-book-alphabet">သွုံꩻအာ - က ခ င စ ဆ ည တ ထ ဒ န ပ ဖ ဗ မ ယ ရ လ ၀ ဟ (အဖြုံႏ ၂၀ ယိုသွူ</p>}
             {bookReading && <section aria-labelledby="book-reading-title">
               <h2>{lesson.title}</h2>
               <h3 id="book-reading-title">ဖတ်လွူꩻခန်ꩻ (၁)</h3>
-              <div className="reading-book-verse">{bookReading.content.split(/\s+(?=မာꩻကုဲင်းကုဲင်း)/).map((column, columnIndex) =>
+              {lesson.id === 51 ? <div className="reading-book-verse">{bookReading.content.split(/\s+(?=မာꩻကုဲင်းကုဲင်း)/).map((column, columnIndex) =>
                 <p key={columnIndex}>{column.replace(/\s+(?=နီတထာ|မာꩻအလူႏ|သူႏသေ|ဟဲ့ꩻလိုꩻ|လေားကာႏ|ပအိုဝ်ႏပို|ခူးပါကုံႏ|ယုံယုံသာႏ)/g, '\n')}</p>
-              )}</div>
+              )}</div> : <div className="reading-paired-verse">{bookReading.content.split(/\s+(?=တသာႏ|ကျူႏလုဲင်ꩻ|ဟျူႏ|ဖျောႏ)/).map((line, row) => {
+                const split = line.search(/\s+(?=အုံထာꩻ|ကျိုꩻစာꩻ|နီပအိုဝ်ႏ|ကျံႏစံႏ|ပျုံးဖါ)/);
+                return <div key={row}><span>{line.slice(0, split)}</span>{' '}<span>{line.slice(split).trim()}</span></div>;
+              })}</div>}
+
             </section>}
             {lesson.content.split(/\n\s*\n/).slice(1).map((paragraph, i) => <p className="reading-book-note" key={i}>{paragraph}</p>)}
           </div>}
 
           {lesson.id === 10 && <img className="reading-landscape" src={landscapeIllustration} alt="Rice fields, distant hills, trees, and a hut beside a stream" width={2172} height={724} loading="lazy" />}
+          {lesson.id === 12 && <img className="reading-dance-illustration" src={danceIllustration} alt="Two Pa’O dancers in traditional clothing accompanied by a drummer and a cymbal player" width={1448} height={1086} loading="lazy" />}
         </article>
         <nav className="reading-pagination" aria-label="Read another lesson">
           {previous ? <Link to={`/lessons/${previous.id}`} rel="prev" aria-label="Previous lesson"><ArrowLeft size={18} /><span>Previous lesson<strong lang="blk">{previous.title}</strong></span></Link> : <span />}

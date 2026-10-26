@@ -109,3 +109,18 @@
   .reading-illustrated-page .reading-paper-heading { padding: 16px 12px; }
   .reading-illustrated-page .reading-passage { padding: 16px 10px; }
 }
+
+.reading-paired-verse { font: 20px/2.1 'Noto Sans Myanmar', sans-serif; margin: 12px auto 20px; width: fit-content; max-width: 100%; }
+.reading-paired-verse > div { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.reading-dance-page { background: #f7f3e7; color: #292923; border-radius: 2px; padding: 26px; }
+.reading-dance-page .reading-paper-heading { border: 1px solid #777267; border-radius: 18px; padding: 12px; margin-bottom: 20px; text-align: center; }
+.reading-dance-page .reading-eyebrow { display: none; }
+.reading-dance-page h1 { font-size: 22px; font-weight: 500; }
+.reading-dance-illustration { display: block; width: 100%; height: auto; mix-blend-mode: multiply; }
+:root[data-theme='dark'] .reading-dance-page { background: #e3ddcd; color: #292923; }
+@media (max-width: 480px) {
+  .reading-dance-page { padding: 14px; }
+  .reading-dance-page h1 { font-size: 18px; }
+  .reading-dance-page .reading-paired-verse { font-size: 17px; }
+  .reading-dance-page .reading-paired-verse > div { gap: 12px; }
+}
