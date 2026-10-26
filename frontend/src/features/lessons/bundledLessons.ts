@@ -1,20 +1,21 @@
 import type { LessonRecord } from './lessonCatalog';
 
-// Transcribed from lesson/pa-o.html; preserve its Pa’O spelling and punctuation.
-// Array order: word practice, volume/lesson/reading order, then standalone passages.
-// IDs 9 and 10 retain the original passage and word-practice lesson identities.
+// Transcribed from active sections in lesson/pa-o.html; preserve Pa’O spelling and punctuation.
+// Array order: each volume/lesson practice followed by its readings, then standalone passages.
+// Subheadings belong in descriptions; commented-out source passages are excluded.
+// Existing IDs 9–50 are preserved; the added practice sections use IDs 51–68.
 // Edit and redeploy to update lessons for everyone.
 export const bundledLessons: LessonRecord[] = [
   {
-    "id": 10,
-    "title": "Pa’O Word Practice",
-    "description": "Practice Pa’O words and syllable patterns at a steady pace.",
+    "id": 51,
     "difficulty": "Beginner",
     "category": "Beginner",
-    "content": "ဒဒꩻ ဒါဒါႏ ဖူးပေႏဆား\nဟိဟိꩻ ဟီဟီး ငတသီး\nကုကုꩻ ကူကူး ဗုဲင်ႏတဗူး\nဟေ့ဟေ့ꩻ ဟေဟေး တဖူးဝေး\nငဲ့ငဲ့ꩻ ငဲငဲး ဖူးပေးဗဲး\nလုဲင့်လုဲင့်ꩻ လုဲင်လုဲင်း ဖူးပေႏရုဲင်း\nဖေါ့ဖေါ့ꩻ ဖေါဖေါး ဖူးပေႏနေား\nယို့ယို့ꩻ ယိုယိုႏ အံႏတခိုး\nမံꩻမံꩻ မံးမံး ဖူးပေႏနံး\nပုံꩻပုံꩻ ပုံးပုံး နီလုဲင်းတုံး",
     "status": "Published",
     "durationMinutes": 10,
-    "updatedAt": "2026-10-21T00:00:00.000Z"
+    "title": "လိတ်မွူးအတွယ်ꩻ (၁) သွဉ်ခန်ꩻ (၁)",
+    "description": "Practice Pa’O patterns from Volume 1, Lesson 1.",
+    "content": "က ကꩻ ကာ ကာꩻ ကား ကာႏ ကာꩻကားငါႏ ကိ ကိꩻ ကီ ကီꩻ ကီး ကီႏ နီဝါးကီႏ ကု ကုꩻ ကူ ကူꩻ ကူး ကူႏ ကူႏတဗာႏ ကေ့ ကေ့ꩻ ကေ ကေꩻ ကေး ကေႏ ကေပေႏ ကဲ့ ကဲ့ꩻ ကဲ ကဲꩻ ကဲး ကဲႏ ကဲ့ꩻထဲ့ ကုဲင့် ကုဲင့်ꩻ ကုဲင် ကုဲင်ꩻ ကုဲင်ႏ ကုဲင်ႏ ရူးတကုဲင်ႏ ကော့ ကော့ꩻ ကော် ကော် ကော်ꩻ ကေား ကောႏ နꩻကော့ꩻ ကို့ ကို့ꩻ ကို ကိုꩻ ကိုး ကိုး လꩻယိုကို ကံ့ ကံ့ꩻ ကံ ကံꩻ ကံး ကံႏ စံꩻကံႏ ကုံ့ ကုံ့ꩻ ကုံ ကုံꩻ ကုံး ကုံႏ ခူးကုံႏ\n\nနီ လစ်ꩻ သူခါ၊ အမုဲင်ပါ၊ ငေါဝ်းငွါထန်ႏ ပအိုဝ်ႏ။\n\nဥပမာႏ - က ကꩻ ကာ ကာꩻ ကား ကာႏ",
+    "updatedAt": "2026-10-26T00:00:00.000Z"
   },
   {
     "id": 11,
@@ -22,21 +23,43 @@ export const bundledLessons: LessonRecord[] = [
     "description": "Practice Pa’O text from Volume 1, Lesson 1, Reading 1.",
     "difficulty": "Beginner",
     "category": "Beginner",
-    "content": "မာꩻတထာတသာ နီတထာ ပသီႏ မာꩻအလူႏဒါႏန သူႏသေထာꩻမꩻ ဟဲ့ꩻလိုꩻတဲးဝါး။ မာꩻကုဲင်းကုဲင်းထာꩻမာꩻနေား လေားကာႏ တထာယိုကို ပအိုဝ်ႏပို ကံႏဆငါႏ ခူးပါကုံႏ ဒုံႏပါထုံ ယုံယုံသာႏသာႏ ကယံငါႏ။\n\nနီ လစ်ꩻ သူခါ၊ အမုဲင်ပါ၊ ငေါဝ်းငွါ ထန်ႏပအိုဝ်ႏ။\n\nဥပမာႏ - က ကꩻ ကာ ကာꩻ ကား ကာႏ",
+    "content": "မာꩻတထာတသာ နီတထာ ပသီႏ မာꩻအလူႏဒါႏန သူႏသေထာꩻမꩻ ဟဲ့ꩻလိုꩻတဲးဝါး မာꩻကုဲင်းကုဲင်းထာꩻမာꩻနော၊ လေားကာႏ တထာယိုကို၊ ပအိုဝ်ႏပိုကံႏဆငါႏ၊ ခူးပါကုံႏ ဒုံႏပါထုံ၊ ယုံယုံသာႏသာႏ ကယံငါႏ။",
     "status": "Published",
     "durationMinutes": 10,
-    "updatedAt": "2026-10-21T00:00:00.000Z"
+    "updatedAt": "2026-10-26T00:00:00.000Z"
+  },
+  {
+    "id": 10,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၁) သွဉ်ခန်ꩻ (၁) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၂)",
+    "description": "Practice Pa’O text from Volume 1, Lesson 1, Reading 2.",
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "content": "ဒဒꩻ ဒါဒါႏ ဖူးပေႏဆား\nဟိဟိꩻ ဟီဟီး ငတသီး\nကုကုꩻ ကူကူး ဗုဲင်ႏတဗူး\nဟေ့ဟေ့ꩻ ဟေဟေး တဖူးဝေး\nငဲ့ငဲ့ꩻ ငဲငဲး ဖူးပေးဗဲး\nလုဲင့်လုဲင့်ꩻ လုဲင်လုဲင်း ဖူးပေႏရုဲင်း\nဖေါ့ဖေါ့ꩻ ဖေါဖေါး ဖူးပေႏနေား\nယို့ယို့ꩻ ယိုယိုႏ အံႏတခိုး\nမံꩻမံꩻ မံးမံး ဖူးပေႏနံး\nပုံꩻပုံꩻ ပုံးပုံး နီလုဲင်းတုံး",
+    "status": "Published",
+    "durationMinutes": 10,
+    "updatedAt": "2026-10-26T00:00:00.000Z"
+  },
+  {
+    "id": 52,
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "status": "Published",
+    "durationMinutes": 10,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၁) သွဉ်ခန်ꩻ (၂)",
+    "description": "Practice Pa’O patterns from Volume 1, Lesson 2. ယပယ်ခဏ်ꩻ",
+    "content": "ကျ ကျꩻ ကျာ ကျာꩻ ကျား ကျာႏ ကျာႏတခေါ့ꩻ ကျု ကျုꩻ ကျူ ကျူꩻ ကျူး ကျူႏ ကျူႏလုဲင်ꩻထာꩻ ကျေ့ ကျေ့ꩻ ကျေ ကျေꩻ ကျေး ကျေႏ ကျေꩻဇူꩻတရာꩻ ကျော့ ကျော့ꩻ ကျော် ကျော်ꩻ ကျေား ကျောႏ မဉ်ꩻကျောႏ ကျို့ ကျို့ꩻ ကျို ကျိုꩻ ကျိုး ကျိုႏ နာႏအကျိုꩻ ကျံ့ ကျံ့ꩻ ကျံ ကျံꩻ ကျံး ကျံႏ ကျံႏစဲႏမာꩻ ကျုံ့ ကျုံ့ꩻ ကျုံ ကျုံꩻ ကျုံး ကျုံႏ ဒုံကျုံး",
+    "updatedAt": "2026-10-26T00:00:00.000Z"
   },
   {
     "id": 9,
-    "title": "လိတ်မွူးအတွယ်ꩻ (၁) သွဉ်ခန်ꩻ (၂) ဖတ်လွူꩻခန် အမုဲင်(၁)",
+    "title": "လိတ်မွူးအတွယ်ꩻ (၁) သွဉ်ခန်ꩻ (၂) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၁)",
     "description": "Practice Pa’O text from Volume 1, Lesson 2, Reading 1.",
     "difficulty": "Beginner",
     "category": "Beginner",
-    "content": "နီယိုလိုꩻကျ အုံထာꩻပျောႏငါး၊\nတသာႏသိကျာꩻ ကျိုꩻစာꩻပညာႏနော၊\nကျူႏလုဲင်ꩻထာဒါႏ နီပအိုဝ်ႏလိုꩻမျိုꩻ၊\nဟျူႏထာꩻ တလေ့ငါႏ ကျံႏစံႏတဲးတဲးလုဲင်း၊\nဖျောႏဖေႏတသီႏ ပျုံးဖါလူႏကုဲင်းငါႏထာꩻ",
+    "content": "နီယိုလိုꩻကျ အုံထာꩻပျောႏငါႏ၊ တသာႏသိကျာꩻ ကျိုꩻစာꩻပညာႏနော၊ ကျူႏလုဲင်ꩻထာဒါႏ နီပအိုဝ်ႏလိုꩻမျိုꩻ၊ ဟျူႏထာꩻ တလေ့ငါႏ ကျံႏစံႏတဲးတဲးလုဲင်း၊ ဖျောႏဖေႏတသီႏ ပျုံးဖါလူႏကုဲင်းငါႏထာꩻ။",
     "status": "Published",
     "durationMinutes": 10,
-    "updatedAt": "2026-10-21T00:00:00.000Z"
+    "updatedAt": "2026-10-26T00:00:00.000Z"
   },
   {
     "id": 12,
@@ -50,15 +73,26 @@ export const bundledLessons: LessonRecord[] = [
     "updatedAt": "2026-10-21T00:00:00.000Z"
   },
   {
+    "id": 53,
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "status": "Published",
+    "durationMinutes": 10,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၁) သွဉ်ခန်ꩻ (၃)",
+    "description": "Practice Pa’O patterns from Volume 1, Lesson 3. လဗဲဥ် + ရဗဲဥ်ခဏ်ꩻ",
+    "content": "ကြ ကြꩻ ကြာ ကြာꩻ ကြား ကြာႏ ကြားခြာ ကြိ ကြိꩻ ကြီ ကြီꩻ ကြီး ကြီႏ ပါꩻပြီꩻခꩻခြီႏ ကြု ကြုꩻ ကြူ ကြူꩻ ကြူး ကြူႏ ကြူးအံႏနေး ကြေ့ ကြေ့ꩻ ကြေ ကြေꩻ ကြေး ကြေႏ ကြေ့ဖြေꩻ ကြဲ့ ကြဲ့ꩻ ကြဲ ကြဲꩻ ကြဲး ကြဲႏ ဖြဲႏတကြဲ့ꩻ ကြုဲင့် ကြုဲင့်ꩻ ကြုဲင် ကြုဲင်ꩻ ကြုဲင်း ကြုဲင်ႏ ခြုဲင်းတေားကြုဲင် ကြော့ ကြော့ꩻ ကြော် ကြော်ꩻ ကြေား ကြောႏ ကြော့ꩻကတူႏ ကြို့ ကြို့ꩻ ကြို ကြိုꩻ ကြိုး ကြိုႏ တသီႏထီကြိုႏ ကြံ့ ကြံ့ꩻ ကြံ ကြံꩻ ကြံး ကြံႏ မာꩻကြံꩻခြံ ကြုံ့ ကြုံ့ꩻ ကြုံ ကြုံꩻ ကြုံး ကြုံႏ ဝါႏပြုံႏ-ငခြုံး\n\nတောင်ꩻခါꩻ - က ပ (၂) ဖြုံႏနောဝ်ꩻ လ-ဗဲဥ်၊ ခ ဖ(၂)ဖြုံႏနောဝ်ꩻ ရ-ဗဥ်။ ဗ (၁)ဖြုံႏနောဝ်ꩻ လ-ဗဉ်၊ ရ-ဗဥ်။\n( က-ပ-လ၊ ခ-ဖ-ရ၊ ဗ-ရ-လ၊ တောင်ꩻလွသွော့နုဲင်းနောဝ်ꩻ )",
+    "updatedAt": "2026-10-26T00:00:00.000Z"
+  },
+  {
     "id": 13,
-    "title": "လိတ်မွူးအတွယ်ꩻ (၁) သွဉ်ခန်ꩻ (၃) ဖတ်လွူꩻခန် အမုဲင် (၁)",
+    "title": "လိတ်မွူးအတွယ်ꩻ (၁) သွဉ်ခန်ꩻ (၃) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၁)",
     "description": "Practice Pa’O text from Volume 1, Lesson 3, Reading 1.",
     "difficulty": "Beginner",
     "category": "Beginner",
-    "content": "လိုꩻဖြားစခါ ပြီꩻနအာ ပါꩻပြီꩻန ခꩻခြီႏဒါႏ ပါꩻပေႏ ခြူႏခြီႏအာ တသီႏဖြေႏ အဆာႏကြေႏ ဟူတပြဲႏကားမုဲင်ꩻ။ ဖြုဲင်ꩻဖြီတဲ့ ဒါႏခါꩻဗာႏ ဖြော်ချာဗာႏ ကေꩻဇူꩻ တခြိုꩻကားငါႏ ဆေ့ရေးဗာႏ ဒေါ့ꩻကြံꩻပုဲင်ႏထာꩻ ဗာႏဒါႏပါꩻ ပါꩻမုဲင်ꩻ တဲ့ႏဖြုံႏဒီႏ။",
+    "content": "လိုꩻဖြားစခါ ပြီꩻနꩻအာ၊ ပါꩻပြီꩻနꩻ ခꩻခြီႏဒါႏ ပါꩻပေႏခြူႏခြီႏအာ၊ တသီးဖြေႏ အဆာႏကြေႏ၊ ဟူတပြဲႏကားမုဲင်ꩻ၊ ဖြုဲင်ꩻဖြီတဲ့ ဒါႏခါꩻဗာႏ၊ ဖြော်ချာဗာႏကေꩻဇူꩻ၊ တခြိုꩻကားငါႏ ဆေ့ရေးဗာႏ၊ ဒေါ့ꩻကြံꩻ ပုဲင်ႏထာꩻ ဗာႏဒါႏပါꩻ၊ ပါꩻမုဲင်ꩻတဲႏဖြုံႏဒီႏ။",
     "status": "Published",
     "durationMinutes": 10,
-    "updatedAt": "2026-10-21T00:00:00.000Z"
+    "updatedAt": "2026-10-26T00:00:00.000Z"
   },
   {
     "id": 14,
@@ -70,6 +104,17 @@ export const bundledLessons: LessonRecord[] = [
     "status": "Published",
     "durationMinutes": 10,
     "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 54,
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "status": "Published",
+    "durationMinutes": 10,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၂) သွဉ်ခန်ꩻ (၁)",
+    "description": "Practice Pa’O patterns from Volume 2, Lesson 1. ဝဟွဲးရိုꩻရိုꩻခဏ်ꩻ",
+    "content": "ကွ ကွꩻ ကွာ ကွာꩻ ကွား ကွာႏ အူကွာနဲ့ကွာႏ ကွိ ကွိꩻ ကွီ ကွီꩻ ကွီး ကွီႏ ကွီလတွီးသူꩻ ကွု ကွုꩻ ကွူ ကွူꩻ ကွူး ကွူႏ ဝါးကွူ ကွေ့ ကွေ့ꩻ ကွေ ကွေꩻ ကွူႏ ကွူႏ ဝါးကွူ ကွေ့ ကွေ့ꩻ ကွေ ကွေꩻ ကွေး ကွေႏ ဝွေꩻကွေႏကွေႏ ကွဲ့ ကွဲ့ꩻ ကွဲ ကွဲꩻ ကွဲး ကွဲဲႏ တသီႏကွဲႏ ကွော့ ကွော့ꩻ ကွော် ကွော်ꩻ ကွေား ကွောႏ ကွော့ꩻပေါ် ကွို့ ကွို့ꩻ ကွို ကွိုꩻ ကွိုး ကွိုႏ ဟို့ꩻကွို့ꩻငါႏ ကွံ့ ကွံ့ꩻ ကွံ ကွံꩻ ကွံး ကွံႏ တကွံꩻသွံစွဲး ကွုံꩻ ကွုံ့ꩻ ကွုံ ကွုံꩻ ကွုံး ကွုံႏ ထီကွုံꩻ",
+    "updatedAt": "2026-10-26T00:00:00.000Z"
   },
   {
     "id": 15,
@@ -94,6 +139,17 @@ export const bundledLessons: LessonRecord[] = [
     "updatedAt": "2026-10-21T00:00:00.000Z"
   },
   {
+    "id": 55,
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "status": "Published",
+    "durationMinutes": 10,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၂) သွဉ်ခန်ꩻ (၂)",
+    "description": "Practice Pa’O patterns from Volume 2, Lesson 2. ဝဟွဲးယပယ်ခဏ်ꩻ",
+    "content": "ကျွ ကျွꩻ ကျွာ ကျွာꩻ ကျွား ကျွာႏ လိုꩻကျွား ကျွေ့ ကျွေ့ꩻ ကျွေ ကျွေꩻ ကျွေး ကျွေႏ ချွေတာ ကျွဲ့ ကျွဲ့ꩻ ကျွဲ ကျွဲꩻ ကျွဲး ကျွဲႏ သူႏကျွဲႏ ကျွုံ့ ကျွုံ့ꩻ ကျွုံ ကျွုံး ကျွုံႏ ဘုရာꩻကာႏချွုံ",
+    "updatedAt": "2026-10-26T00:00:00.000Z"
+  },
+  {
     "id": 17,
     "title": "လိတ်မွူးအတွယ်ꩻ (၂) သွဉ်ခန်ꩻ (၂) ဖတ်လွူꩻခန်ꩻ အမုဲင်(၁)",
     "description": "Practice Pa’O text from Volume 2, Lesson 2, Reading 1.",
@@ -114,6 +170,17 @@ export const bundledLessons: LessonRecord[] = [
     "status": "Published",
     "durationMinutes": 10,
     "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 56,
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "status": "Published",
+    "durationMinutes": 10,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၂) သွဉ်ခန်ꩻ (၃)",
+    "description": "Practice Pa’O patterns from Volume 2, Lesson 3. ဝဟွဲး လဗဲဥ် - ရဗဲဥ် ခဏ်ꩻ",
+    "content": "ကြွ ကြွꩻ ကြွာ ကြွာꩻ ကြွား ကြွာႏ တကြွꩻရာႏ ကြွိ ကြွိꩻ ကြွီ ကြွီꩻ ကြွီး ကြွီႏ တကြွီႏညာꩻ ကြွု ကြွုꩻ ကြွူ ကြွူꩻ ကြွူး ကြွူႏ လွိုးအွူႏကြွူး ကြွေ့ ကြွေ့ꩻ ကြွေ ကြွေꩻ ကြွေး ကြွေႏ ဖြွေႏဗေဟံႏ ကြွဲ့ ကြွဲ့ꩻ ကြွဲ ကြွဲꩻ ကြွဲး ကြွဲႏ မူႏနံꩻဟွဲးပြွဲꩻ ကြွော့ ကြွော့ꩻ ကြွော် ကြွော်ꩻ ကြွော်း ကြွော်ႏ အမော့ကြွော့ꩻ ကြွို့ ကြွို့ꩻ ကြွို ကြွိုꩻ ကြွိုး ကြွိုႏ ဒေါ့ꩻကြွို့ꩻမွော့ထာ ကြွံ့ ကြွိ့ꩻ ကြွံ ကြွံꩻ ကြွံး ကြွံႏ နျꩻခြွံ ကြွို့ ကြွုံ့ꩻ ကြွုံ ကြွုံꩻ ကြွုံး ကြွုံႏ ဟံႏလူးကြွုံႏ",
+    "updatedAt": "2026-10-26T00:00:00.000Z"
   },
   {
     "id": 19,
@@ -138,6 +205,17 @@ export const bundledLessons: LessonRecord[] = [
     "updatedAt": "2026-10-21T00:00:00.000Z"
   },
   {
+    "id": 57,
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "status": "Published",
+    "durationMinutes": 10,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၃) သွဉ်ခန်ꩻ (၁)",
+    "description": "Practice Pa’O patterns from Volume 3, Lesson 1. ဗီးသွတ်ꩻရိုꩻရိုꩻခဏ်ꩻ",
+    "content": "ကက် ကက်ꩻ ကင် ကင်ꩻ ကင်း ကင်ႏ ယာကင်ႏ ကဲက် ကဲက်ꩻ ကဲင် ကဲင်ꩻ ကဲင်း ကဲင်ႏ နꩻကဲင်ႏ ကစ် ကစ်ꩻ ကဉ် ကဥ်ꩻ ကဥ်း ကဥ်ႏ ကဥ်ႏအစော့ꩻ ကဲစ် ကဲစ်ꩻ ကဲဥ် ကဲဥ်ꩻ ကဲဥ်း ကဲဥ်ႏ ဟို့ꩻတကဲစ်ꩻ ကတ် ကတ်ꩻ ကန် ကန်ꩻ ကန်း ကန်ႏ ထီကန်ႏ ကေတ် ကေတ်ꩻ ကေန် ကေန်ꩻ ကေန်း ကေန်ႏ လိုꩻကေန်ꩻဆေ့ꩻ ကပ် ကပ်ꩻ ကမ် ကမ်ꩻ ကမ်း ကမ်ႏ ကမ်းသꩻ ကဲပ် ကဲပ်ꩻ ကဲမ် ကဲမ်ꩻ ကဲမ်း ကဲမ်ႏ အံႏကဲမ်ဝင်ꩻ ကယ့် ကယ့်ꩻ ကယ် ကယ်ꩻ ကယ်း ကယ်ႏ ကယ်ႏဆယ်ႏ ကောဝ့် ကောဝ့်ꩻ ကောဝ် ကောဝ်ꩻ ကောဝ်း ကောဝ်ႏ ကောဝ်ႏမွံꩻ",
+    "updatedAt": "2026-10-26T00:00:00.000Z"
+  },
+  {
     "id": 21,
     "title": "လိတ်မွူးအတွယ်ꩻ (၃) သွဉ်ခန်ꩻ (၁) ဖတ်လွူꩻခန် အမုဲင် (၁)",
     "description": "Practice Pa’O text from Volume 3, Lesson 1, Reading 1.",
@@ -158,6 +236,17 @@ export const bundledLessons: LessonRecord[] = [
     "status": "Published",
     "durationMinutes": 10,
     "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 58,
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "status": "Published",
+    "durationMinutes": 10,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၃) သွဉ်ခန်ꩻ (၂)",
+    "description": "Practice Pa’O patterns from Volume 3, Lesson 2. ယပယ် ဗီးသွတ်ꩻခဏ်ꩻ",
+    "content": "ကျက် ကျက်ꩻ ကျင် ကျင်ꩻ ကျင်း ကျင်ႏ တခြေ့တကျင်\nကျတ် ကျတ်ꩻ ကျန် ကျန်ꩻ ကျန်း ကျန်ႏ အုံကုဲင်ကျန်ႏ ကျပ် ကျပ်ꩻ ကျမ် ကျမ်ꩻ ကျမ်း ကျမ်ႏ ထာꩻမာꩻကျပ်",
+    "updatedAt": "2026-10-26T00:00:00.000Z"
   },
   {
     "id": 23,
@@ -182,6 +271,17 @@ export const bundledLessons: LessonRecord[] = [
     "updatedAt": "2026-10-21T00:00:00.000Z"
   },
   {
+    "id": 59,
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "status": "Published",
+    "durationMinutes": 10,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၃) သွဉ်ခန်ꩻ (၃)",
+    "description": "Practice Pa’O patterns from Volume 3, Lesson 3. လ ဗဲဥ် ဗီးသွတ်ꩻခဏ်ꩻ",
+    "content": "ကြက် ကြက်ꩻ ကြင် ကြင်ꩻ ကြင်း ကြင်ႏ တကြက်ꩻလုဲင်း ကြဲက် ကြဲက်ꩻ ကြဲင် ကြဲင်ꩻ ကြဲင်း ကြဲင်ႏ ကြဲင်ႏတာ ကြစ် ကြစ်ꩻ ကြဉ် ကြဉ်ꩻ ကြဥ်း ကြဥ်ႏ တအီခြစ်ꩻ ကြဲစ် ကြဲစ်ꩻ ကြဲဉ် ကြဲဉ်ꩻ ကြဲဉ်း ကြဲဉ်ႏ ကြဲစ်ထာꩻဒါႏ ကြတ် ကြတ်ꩻ ကြန် ကြန်ꩻ ကြန်း ကြန်ႏ တကြတ်ꩻထာꩻ ကြေတ် ကြေတ်ꩻ ကြေန် ကြေန်ꩻ ကြေန်း ကြေန်ႏ သျင်ႏကြေတ် ကြပ် ကြပ်ꩻ ကြမ် ကြမ်ꩻ ကြမ်း ကြမ်ႏ ပဉ်ကြပ်ꩻကြပ်ꩻ ကြဲပ် ကြဲပ်ꩻ ကြဲမ် ကြဲမ်ꩻ ကြဲမ်း ကြမ်ႏ ဝါႏတကြဲမ် ကြယ့် ကြယ့်ꩻ ကြယ် ကြယ်ꩻ ကြယ်း ကြယ်ႏ စင်ႏကြယ်ႏ ကြောဝ့် ကြောဝ့်ꩻ ကြောဝ် ကြောဝ်ꩻ ကြောဝ်း ကြောဝ်ႏ မဲ့ကြောဝ်ႏတ",
+    "updatedAt": "2026-10-26T00:00:00.000Z"
+  },
+  {
     "id": 25,
     "title": "လိတ်မွူးအတွယ်ꩻ (၃) သွဉ်ခန်ꩻ (၃) ဖတ်လွူꩻခန် အမုဲင် (၁)",
     "description": "Practice Pa’O text from Volume 3, Lesson 3, Reading 1.",
@@ -202,6 +302,17 @@ export const bundledLessons: LessonRecord[] = [
     "status": "Published",
     "durationMinutes": 10,
     "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 60,
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "status": "Published",
+    "durationMinutes": 10,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၄) သွဉ်ခန်ꩻ (၁)",
+    "description": "Practice Pa’O patterns from Volume 4, Lesson 1. ဝဟွဲးဗီးသွတ်ꩻခဏ်ꩻ",
+    "content": "ကွက် ကွက်ꩻ ကွင် ကွင်ꩻ ကွင်း ကွင်ႏ လုဲင်ꩻကွက် ကွဲက် ကွဲက်ꩻ ကွဲင် ကွဲင်ꩻ ကွဲင်း ကွဲင်ႏ ရေဒီယိုကွဲင် ကွစ် ကွစ်ꩻ ကဉ် ကွဥ်ꩻ် ကွဥ်း ကွဥ်ႏ တွို့ꩻကွဥ်ႏ ကွတ် ကွတ်ꩻ ကွန် ကွန်ꩻ ကွန်း ကွန်ႏ ကွန်ႏကွတ်ꩻရျာꩻ ကွပ် ကွပ်ꩻ ကွမ် ကွမ်ꩻ ကွမ်း ကွမ်ႏ သေကွပ်ꩻ ကွယ့် ကွယ့်ꩻ ကွယ် ကွယ်ꩻ ကွယ်း ကွယ်ႏ ထာꩻကိုႏကွယ်ႏ",
+    "updatedAt": "2026-10-26T00:00:00.000Z"
   },
   {
     "id": 27,
@@ -226,6 +337,17 @@ export const bundledLessons: LessonRecord[] = [
     "updatedAt": "2026-10-21T00:00:00.000Z"
   },
   {
+    "id": 61,
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "status": "Published",
+    "durationMinutes": 10,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၄) သွဉ်ခန်ꩻ (၂)",
+    "description": "Practice Pa’O patterns from Volume 4, Lesson 2. ဝ ဟွဲးယပယ်ဗီးသွတ်ꩻခဏ်ꩻ",
+    "content": "ကျွက် ကျွက်ꩻ ကျွင် ကျွင်ꩻ ကျွင်း ကျွင်ႏ ကျွင်ꩻသွံဗာႏ ကျွစ် ကျွစ်ꩻ ကျွဉ် ကျွဉ်ꩻ ကျွဉ်း ကျွဉ်ႏ တင်ꩻကျွစ်လာ ကျွတ် ကျွတ်ꩻ ကျွန် ကျွန်ꩻ ကျွန်း ကျွန်ႏ ကျွန်ꩻနောဝ် ကျွပ် ကျွပ်ꩻ ကျွမ် ကျွမ်ꩻ ကျွမ်း ကျွမ်ႏ ဗုံကျွမ်ꩻ",
+    "updatedAt": "2026-10-26T00:00:00.000Z"
+  },
+  {
     "id": 29,
     "title": "လိတ်မွူးအတွယ်ꩻ (၄) သွဉ်ခန်ꩻ (၂) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၁)",
     "description": "Practice Pa’O text from Volume 4, Lesson 2, Reading 1.",
@@ -246,6 +368,17 @@ export const bundledLessons: LessonRecord[] = [
     "status": "Published",
     "durationMinutes": 10,
     "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 62,
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "status": "Published",
+    "durationMinutes": 10,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၄) သွဉ်ခန်ꩻ (၃)",
+    "description": "Practice Pa’O patterns from Volume 4, Lesson 3. ဝဟွဲး လ-ရဗဲဥ်ဗီးသွတ်ꩻခဏ်ꩻ",
+    "content": "ကြွက် ကြွက်ꩻ ကြွင် ကြွင်ꩻ ကြွင်း ကြွင်ႏ ပြွက်ꩻဟံႏဗော့ꩻ ကြွစ် ကြွစ်ꩻ ကြွဉ် ကြွဥ်ꩻ ကြွဥ်း ကြွဉ်ႏ မီꩻယာကြွဉ်ႏ ကြွတ် ကြွတ်ꩻ ကြွန် ကြွန်ꩻ ကြွန်း ကြွန်ႏ ခွမ်ꩻလာꩻပြွတ် ကြွပ် ကြွပ်ꩻ ကြွမ် ကြွမ်ꩻ ကြမ်း ကြမ်ႏ တကြွမ်စက်ꩻ ကြွယ့် ကြွယ့်ꩻ ကြွယ် ကြွယ်ꩻ ကြွယ်း ကြွယ်ႏ ကြွယ်ဒီႏ",
+    "updatedAt": "2026-10-26T00:00:00.000Z"
   },
   {
     "id": 31,
@@ -270,6 +403,17 @@ export const bundledLessons: LessonRecord[] = [
     "updatedAt": "2026-10-21T00:00:00.000Z"
   },
   {
+    "id": 63,
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "status": "Published",
+    "durationMinutes": 10,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၅) သွဉ်ခန်ꩻ (၁)",
+    "description": "Practice Pa’O patterns from Volume 5, Lesson 1. သွဉ်ခဏ်ꩻ (၁) ဗီးသရဆင်းဗီးသွတ်ꩻခဏ်ꩻ",
+    "content": "ကိတ် ကိတ်ꩻ ကိန် ကိန်ꩻ ကိန်း ကိန်ႏ ကိန်ꩻမုဲင်ႏ ကိပ် ကိပ်ꩻ ကိမ် ကိမ်ꩻ ကိမ်း ကိမ်ႏ ခင်ႏဖာႏကိပ်ꩻ ကုတ် ကုတ်ꩻ ကုန် ကုန်ꩻ ကုန်း ကုန်ႏ လောႏကုတ် ကုပ် ကုပ်ꩻ ကုမ် ကုမ်ꩻ ကုမ်း ကုမ်ႏ ရွဉ်ကုမ်ꩻဗီႏ ကေက် ကေက်ꩻ ကေင် ကေင်ꩻ ကေင်း ကေင်ႏ ကေင်တငါ ကေပ် ကေပ်ꩻ ကေမ် ကေမ်ꩻ ကေမ်း ကေမ်ႏ ကေပ်ရွဉ် ကိုတ် ကိုတ်ꩻ ကိုန် ကိုန်ꩻ ကိုန်း ကိုန်ႏ မိုတ်လို့ဝင်ꩻ ကောက် ကောက်ꩻ ကောင် ကောင်ꩻ ကောင်း ကောင်ႏ ထီကောင်ႏ",
+    "updatedAt": "2026-10-26T00:00:00.000Z"
+  },
+  {
     "id": 33,
     "title": "လိတ်မွူးအတွယ်ꩻ (၅) သွဉ်ခန်ꩻ (၁) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၁)",
     "description": "Practice Pa’O text from Volume 5, Lesson 1, Reading 1.",
@@ -290,6 +434,17 @@ export const bundledLessons: LessonRecord[] = [
     "status": "Published",
     "durationMinutes": 10,
     "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 64,
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "status": "Published",
+    "durationMinutes": 10,
+    "title": "လိတ်မွူးအတွယ်ꩻ(၅) သွဉ်ခန်ꩻ (၂)",
+    "description": "Practice Pa’O patterns from Volume 5, Lesson 2. ဗီးသရဆင်း ယပယ်ဗီးသွတ်ꩻခဏ်ꩻ",
+    "content": "ကျိတ် ကျိတ်ꩻ ကျိန် ကျိန်ꩻ ကျိန်း ကျိန်ႏ အချိန်ႏ ကျုပ် ကျုပ်ꩻ ကျုမ် ကျုမ်ꩻ ကျုမ်း ကျုမ်ႏ အုပ်ချုပ်ရေꩻ ကျောက် ကျောက်ꩻ ကျောင် ကျောင်ꩻ ကျောင်း ကျောင်ႏ ကျောင်ꩻကီ",
+    "updatedAt": "2026-10-26T00:00:00.000Z"
   },
   {
     "id": 35,
@@ -314,6 +469,17 @@ export const bundledLessons: LessonRecord[] = [
     "updatedAt": "2026-10-21T00:00:00.000Z"
   },
   {
+    "id": 65,
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "status": "Published",
+    "durationMinutes": 10,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၅) သွဉ်ခန်ꩻ (၃)",
+    "description": "Practice Pa’O patterns from Volume 5, Lesson 3. ဗီးသရဆင်းလ ရဗဲဥ်ဗီးသွတ်ꩻခဏ်ꩻ",
+    "content": "ကြိတ် ကြိတ်ꩻ ကြိန် ကြိန်ꩻ ကြိန်း ကြိန်ႏ အငေါဝ်းကြိန်ႏ ကြိပ် ကြိပ်ꩻ ကြိမ် ကြိမ်ꩻ ကြိမ်း ကြိမ်ႏ ဖက်ခေါ်ကြိပ်ꩻ ကြုတ် ကြုတ်ꩻ ကြုန် ကြုန်ꩻ ကြုန်း ကြုန်ႏ ပြုတ်ꩻဗေဟံႏ ကြုပ် ကြုပ်ꩻ ကြုမ် ကြုမ်ꩻ ကြုမ်း ကြုမ်ႏ ထျခြုမ်းခြုမ်ႏ ကြေက် ကြေက်ꩻ ကြေင် ကြေင်ꩻ ကြေင်း ကြေင်ႏ သဲ့ꩻကြေင်ႏ ကြိုတ် ကြိုတ်ꩻ ကြိုန် ကြိုန်ꩻ ကြိုန်း ကြိုန်ႏ လွိုးသိုန်းကြိန်း ကြောက် ကြောက်ꩻ ကြောင် ကြောင်ꩻ ကြောင်း ကြောင်ႏ ကြောက်ꩻခြောင်",
+    "updatedAt": "2026-10-26T00:00:00.000Z"
+  },
+  {
     "id": 37,
     "title": "လိတ်မွူးအတွယ်ꩻ (၅) သွဉ်ခန်ꩻ (၃) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၁)",
     "description": "Practice Pa’O text from Volume 5, Lesson 3, Reading 1.",
@@ -334,6 +500,17 @@ export const bundledLessons: LessonRecord[] = [
     "status": "Published",
     "durationMinutes": 10,
     "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 66,
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "status": "Published",
+    "durationMinutes": 10,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၆) သွဉ်ခန်ꩻ (၁)",
+    "description": "Practice Pa’O patterns from Volume 6, Lesson 1. ဗီးသရဝဟွဲးဗီးသွတ်ꩻခဏ်ꩻ",
+    "content": "ကွုက် ကွုက်ꩻ ကွုင် ကွုင်ꩻ ကွုင်း ကွုင်ႏ မွုင်ꩻကွုင် ကွုတ်ထာꩻ ကွုတ် ကွုတ်ꩻ ကွုန် ကွုန်ꩻ ကွုန်း ကွုန်ႏ ကွုန်ႏသယ်ႏ ကွုပ် ကွုပ်ꩻ ကွုမ် ကွုမ်ꩻ ကွုမ်း ကွုမ်ႏ ခွုမ်ပနာႏ ကွိုက် ကွိုက်ꩻ ကွိုန် ကွိုန်ꩻ ကွိုန်း ကွိုန်ႏ ပွယ်ꩻကွိုန်ꩻ ကွိုပ် ကွိုပ်ꩻ ကွိုမ် ကွိုမ်ꩻ ကွိုမ်း ကွိုမ်ႏ ထီရီႏစွိုမ်း ကွောက် ကွောက်ꩻ ကွောင် ကွောင်ꩻ ကွောင်း ကွောင်ႏ ကွောင်ꩻချင်ႏ",
+    "updatedAt": "2026-10-26T00:00:00.000Z"
   },
   {
     "id": 39,
@@ -358,6 +535,17 @@ export const bundledLessons: LessonRecord[] = [
     "updatedAt": "2026-10-21T00:00:00.000Z"
   },
   {
+    "id": 67,
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "status": "Published",
+    "durationMinutes": 10,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၆) သွဉ်ခန်ꩻ (၂)",
+    "description": "Practice Pa’O patterns from Volume 6, Lesson 2. ဗီးသရဆင်း ဝ ဟွဲး ယပယ်သွတ်ꩻခဏ်ꩻ",
+    "content": "ကျွုက် ကျွုက်ꩻ ကျွုင် ကျွုင်ꩻ ကျွုင်း ကျွုင်ႏ ခွန်ကျွုတ် ကျွုတ် ကျွုတ်ꩻ ကျွုန် ကျွုန်ꩻ ကျွုန်း ကျွုန်ႏ ကျွုတ်ထာꩻ ကျွိုက် ကျွိုက်ꩻ ကျွိုင် ကျွိုင်ꩻ ကျွိုင်း ကျွိုင်ႏ ကျွိုက်သꩻ",
+    "updatedAt": "2026-10-26T00:00:00.000Z"
+  },
+  {
     "id": 41,
     "title": "လိတ်မွူးအတွယ်ꩻ (၆) သွဉ်ခန်ꩻ (၂) ဖတ်လွူꩻခန်ꩻ အမုဲင် (၁)",
     "description": "Practice Pa’O text from Volume 6, Lesson 2, Reading 1.",
@@ -378,6 +566,17 @@ export const bundledLessons: LessonRecord[] = [
     "status": "Published",
     "durationMinutes": 10,
     "updatedAt": "2026-10-21T00:00:00.000Z"
+  },
+  {
+    "id": 68,
+    "difficulty": "Beginner",
+    "category": "Beginner",
+    "status": "Published",
+    "durationMinutes": 10,
+    "title": "လိတ်မွူးအတွယ်ꩻ (၆) သွဉ်ခန်ꩻ (၃)",
+    "description": "Practice Pa’O patterns from Volume 6, Lesson 3. ဗီးသရဆင်း ဝဟွဲး လဗဲဥ်ရဗဲဥ်ခဏ်ꩻ",
+    "content": "ကြွုက် ကြွုက်ꩻ ကြွုင် ကြွုင်ꩻ ကြွုင်း ကြွုင်ႏ ဂီတာငေါဝ်းခြွုင်ꩻခြွုင်ꩻ ကြွုတ် ကြွုတ်ꩻ ကြွုန် ကြွုန်ꩻ ကြွုန်း ကြွုန်ႏ ပွယ်ꩻစာꩻကြွုတ် ကြွုပ် ကြွုပ်ꩻ ကြွုမ် ကြွုမ်ꩻ ကြွုမ်း ကြွုမ်ႏ ကြွုမ်ဒီႏ ကြွိုက် ကြွိုက်ꩻ ကြွိုင် ကြွိုင်ꩻ ကြွိုင်း ကြွိုင်ႏ ခြွိုင်ႏသန်ꩻ ကြွိုတ် ကြွိုတ်ꩻ ကြွိုန် ကြွိုန်ꩻ ကြွိုန်း ကြွိုန်ႏ ခြွိုတ်ဗွူ ကြွိုပ် ကြွိုပ်ꩻ ကြွိုမ် ကြွိုမ်ꩻ ကြွိုမ်း ကြွိုမ်ႏ ဖြွိုမ်ဖူႏ ကြွောက် ကြွောက်ꩻ ကြွောင် ကြွောင်ꩻ ကြွောင်း ကြွောင်ႏ လိုꩻပြွောင်ႏ",
+    "updatedAt": "2026-10-26T00:00:00.000Z"
   },
   {
     "id": 43,
