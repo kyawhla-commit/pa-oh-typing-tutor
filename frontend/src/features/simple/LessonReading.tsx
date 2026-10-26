@@ -6,6 +6,7 @@ import type { LessonRecord } from '../lessons/lessonCatalog';
 import TutorBrand from './TutorBrand';
 import TutorThemeToggle from './TutorThemeToggle';
 import './lesson-reading.css';
+import { readingIllustrations } from './readingIllustrations';
 import danceIllustration from '../../assets/lessons/volume-1/dance.webp';
 import boyIllustration from '../../assets/lessons/volume-1/boy.webp';
 import childrenIllustration from '../../assets/lessons/volume-1/children.webp';
@@ -79,6 +80,7 @@ export default function LessonReading() {
   const ref = lesson ? reference(lesson) : null;
   const isBookPattern = lesson?.id === 51 || lesson?.id === 52;
   const bookReading = isBookPattern ? lessons.find(item => item.id === (lesson.id === 51 ? 11 : 9)) : undefined;
+  const illustration = lesson ? readingIllustrations[lesson.id] : undefined;
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => { heading.current?.focus(); }, [lessonId]);
 
@@ -94,7 +96,7 @@ export default function LessonReading() {
         {lessons.length ? <LessonLibrary lessons={lessons} /> : <p className="reading-empty">No published lessons yet. Please check back soon.</p>}
       </> : lesson ? <>
         <Link className="reading-back" to="/lessons"><ArrowLeft size={17} />All lessons</Link>
-        <article className={`reading-paper${isBookPattern ? ' reading-book-page' : lesson.id === 10 ? ' reading-illustrated-page' : lesson.id === 12 ? ' reading-dance-page' : ''}`} aria-labelledby="reading-title">
+        <article className={`reading-paper${isBookPattern ? ' reading-book-page' : lesson.id === 10 ? ' reading-illustrated-page' : lesson.id === 12 ? ' reading-dance-page' : illustration ? ' reading-restored-page' : ''}`} aria-labelledby="reading-title">
           {isBookPattern && <div className="reading-book-number" lang="blk">{lesson.id === 51 ? '(၁၀)' : '(၁၂)'}</div>}
           <header className="reading-paper-heading">
             <p className="reading-eyebrow">{ref ? `Volume ${ref.volume} · Lesson ${ref.lesson} · ${ref.reading ? `Reading ${ref.reading}` : 'Letter patterns'}` : 'Reading passage'}</p>
@@ -106,6 +108,8 @@ export default function LessonReading() {
             <img src={childrenIllustration} alt="Two children carrying shoulder bags" width={1254} height={1254} />
             <img src={girlIllustration} alt="A girl wearing a patterned headwrap and eating fruit" width={1254} height={1254} />
           </div>}
+          <div className={illustration ? 'reading-restored-composition' : undefined} data-lesson={lesson.id}>
+          {illustration?.position === 'top' && <figure className="reading-restored-art"><img src={illustration.src} alt={illustration.alt} decoding="async" /></figure>}
           <div className="reading-passage" lang="blk">{lesson.content.split(/\n\s*\n/).map((paragraph, i) => {
             // This source paragraph contains ten vowel families without row breaks.
             const patternRows = isBookPattern && i === 0;
@@ -135,6 +139,7 @@ export default function LessonReading() {
               </table>
             </div>;
           })}</div>
+          </div>
           {isBookPattern && <div className="reading-book-bottom" lang="blk">
             {lesson.id === 51 && <p className="reading-book-alphabet">သွုံꩻအာ - က ခ င စ ဆ ည တ ထ ဒ န ပ ဖ ဗ မ ယ ရ လ ၀ ဟ (အဖြုံႏ ၂၀ ယိုသွူ</p>}
             {bookReading && <section aria-labelledby="book-reading-title">
@@ -153,6 +158,7 @@ export default function LessonReading() {
 
           {lesson.id === 10 && <img className="reading-landscape" src={landscapeIllustration} alt="Rice fields, distant hills, trees, and a hut beside a stream" width={2172} height={724} loading="lazy" />}
           {lesson.id === 12 && <img className="reading-dance-illustration" src={danceIllustration} alt="Two Pa’O dancers in traditional clothing accompanied by a drummer and a cymbal player" width={1448} height={1086} loading="lazy" />}
+          {illustration?.position === 'bottom' && <figure className="reading-restored-art"><img src={illustration.src} alt={illustration.alt} loading="lazy" decoding="async" /></figure>}
         </article>
         <nav className="reading-pagination" aria-label="Read another lesson">
           {previous ? <Link to={`/lessons/${previous.id}`} rel="prev" aria-label="Previous lesson"><ArrowLeft size={18} /><span>Previous lesson<strong lang="blk">{previous.title}</strong></span></Link> : <span />}

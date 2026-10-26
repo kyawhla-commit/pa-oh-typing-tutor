@@ -124,3 +124,35 @@
   .reading-dance-page .reading-paired-verse { font-size: 17px; }
   .reading-dance-page .reading-paired-verse > div { gap: 12px; }
 }
+
+.reading-restored-page { padding: 28px; border-radius: 2px; border: 1px solid #777267; background: #f7f3e7; color: #292923; }
+.reading-restored-page .reading-paper-heading { margin: 0 0 24px; padding: 12px 18px; border: 1px solid #777267; border-radius: 18px; text-align: center; }
+.reading-restored-page .reading-eyebrow { display: none; }
+.reading-restored-page h1 { font-size: clamp(19px, 2.4vw, 26px); font-weight: 500; }
+.reading-restored-art { margin: 24px 0; }
+.reading-restored-art img { display: block; width: 100%; height: auto; max-height: 780px; object-fit: contain; mix-blend-mode: multiply; }
+.reading-restored-page .reading-passage { max-width: 650px; margin: 24px auto; font-size: clamp(19px, 2.3vw, 24px); line-height: 2.2; }
+:root[data-theme='dark'] .reading-restored-page { background: #e3ddcd; color: #292923; }
+@media (max-width: 480px) {
+  .reading-restored-page { padding: 14px; }
+  .reading-restored-page .reading-paper-heading { padding: 10px; }
+}
+
+@media (min-width: 800px) {
+  .reading-restored-composition { position: relative; }
+  .reading-restored-composition[data-lesson='18'],
+  .reading-restored-composition[data-lesson='20'],
+  .reading-restored-composition[data-lesson='30'],
+  .reading-restored-composition[data-lesson='36'],
+  .reading-restored-composition[data-lesson='40'],
+  .reading-restored-composition[data-lesson='45'] { --text-left: 30%; --text-top: 31%; --text-width: 36%; }
+  .reading-restored-composition[data-lesson='20'] { --text-left: 55%; --text-top: 4%; --text-width: 40%; }
+  .reading-restored-composition[data-lesson='30'] { --text-left: 43%; --text-top: 10%; --text-width: 35%; }
+  .reading-restored-composition[data-lesson='36'] { --text-left: 31%; --text-top: 31%; --text-width: 39%; }
+  .reading-restored-composition[data-lesson='40'] { --text-left: 54%; --text-top: 4%; --text-width: 40%; }
+  .reading-restored-composition[data-lesson='45'] { --text-left: 28%; --text-top: 7%; --text-width: 43%; }
+  .reading-restored-composition:where([data-lesson='18'],[data-lesson='20'],[data-lesson='30'],[data-lesson='36'],[data-lesson='40'],[data-lesson='45']) .reading-passage {
+    position: absolute; left: var(--text-left); top: var(--text-top); width: var(--text-width); margin: 0; font-size: 17px; line-height: 2; text-align: center;
+  }
+  .reading-restored-composition:where([data-lesson='18'],[data-lesson='20'],[data-lesson='30'],[data-lesson='36'],[data-lesson='40'],[data-lesson='45']) img { max-height: none; }
+}

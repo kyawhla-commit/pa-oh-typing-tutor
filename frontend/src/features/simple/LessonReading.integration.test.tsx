@@ -103,3 +103,13 @@ it('shows Lesson 2 book rows and both readings without losing catalog text', () 
   expect(host.querySelectorAll('.reading-paired-verse > div')).toHaveLength(6);
   expect(host.querySelector('.reading-paired-verse')?.textContent).toBe(bundledLessons.find(item => item.id === 12)!.content.replace(/\n/g, ''));
 });
+
+it.each([14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,45,46,47,48,49,50])('shows restored artwork and complete original text for lesson %i', id => {
+  const host = render(`/lessons/${id}`);
+  const lesson = bundledLessons.find(item => item.id === id)!;
+  const picture = host.querySelector<HTMLImageElement>('.reading-restored-art img');
+  expect(picture?.getAttribute('src')).toContain(`lesson-${id}.webp`);
+  expect(picture?.alt).toBeTruthy();
+  expect([...host.querySelectorAll('.reading-passage p')].map(p => p.textContent).join('\n\n')).toBe(lesson.content);
+  expect(host.querySelector('textarea')).toBeNull();
+});
