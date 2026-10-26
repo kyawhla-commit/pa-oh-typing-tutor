@@ -1,4 +1,5 @@
 /* Scenic homepage: shared geometry in both themes. */
+.home-reading-link { display: flex; align-items: center; gap: 10px; width: fit-content; min-height: 44px; margin-top: 12px; color: #fff9ee; font-size: 14px; text-decoration: underline; text-underline-offset: 5px; }
 .home-page {
   --ink: #123f38; --accent: #096557; --muted: #66746e; --line: #e5e2d6;
   --surface: #fffaf0f5; background: #08483f;

@@ -135,6 +135,11 @@ Read [the pilot architecture](src/features/pilot/README.md), [consent and ten-ta
 
 ### Frontend lesson catalog
 
+`/lessons` is the reading room, with lessons grouped by volume and lesson number.
+`/lessons/:lessonId` shows the full Pa’O passage and topic with previous/next
+navigation. It supports direct links and desktop hash routing. Open it from
+“Read & learn Pa’O” on Home or “Lessons” in the Practice navigation.
+
 Home and Practice use the 60 published Pa’O lessons in
 `src/features/lessons/bundledLessons.ts`. The running app does not fetch lessons
 from Supabase or browser storage. The admin route is removed.

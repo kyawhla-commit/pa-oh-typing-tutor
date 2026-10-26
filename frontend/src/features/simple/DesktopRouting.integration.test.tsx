@@ -39,3 +39,21 @@ it.each([
   act(() => root!.render(<App />));
   expect(host.querySelector('[aria-label="Lesson text"]')).not.toBeNull();
 });
+
+it.each(['desktop', 'production'])('opens a reading from Home and restores it after reload in %s', mode => {
+  vi.stubEnv('MODE', mode);
+  window.history.replaceState({}, '', '/');
+  host = document.createElement('div'); document.body.append(host);
+  root = createRoot(host);
+  act(() => root!.render(<App />));
+  act(() => host!.querySelector<HTMLAnchorElement>('.home-reading-link')!.click());
+  expect(host.querySelector('h1')?.textContent).toBe('Read & learn Pa’O');
+  act(() => host!.querySelector<HTMLAnchorElement>('.reading-choice')!.click());
+  const title = host.querySelector('h1')?.textContent;
+  expect(host.querySelector('.reading-passage')).not.toBeNull();
+  expect(mode === 'desktop' ? window.location.hash : window.location.pathname).toBe(mode === 'desktop' ? '#/lessons/51' : '/lessons/51');
+  act(() => root!.unmount()); root = createRoot(host);
+  act(() => root!.render(<App />));
+  expect(host.querySelector('h1')?.textContent).toBe(title);
+  expect(host.querySelector('.reading-passage')).not.toBeNull();
+});

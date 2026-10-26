@@ -4,7 +4,8 @@ import VirtualKeyboard from '../../components/VirtualKeyboard';
 import { useLessonCatalog } from '../lessons/LessonCatalogContext';
 import type { LessonRecord } from '../lessons/lessonCatalog';
 import TutorThemeToggle from './TutorThemeToggle';
-import { ArrowRight, ChevronLeft, ChevronRight, Keyboard as KeyboardIcon, RotateCcw, Play, Check, X, BookOpen, House, Gauge, Target, ChartNoAxesColumnIncreasing } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, RotateCcw, Play, Check, X, BookOpen, House, Gauge, Target, ChartNoAxesColumnIncreasing, Keyboard as KeyboardIcon } from 'lucide-react';
+import Brand from './TutorBrand';
 import TutorScenery from './TutorScenery';
 import { paoKeyLegends } from '../../components/keyboardLayouts';
 import { useTypingFeedback, useTypingSession, useTypingStats } from '../typing/useTypingSession';
@@ -13,9 +14,6 @@ import { revealTypingPosition } from '../typing/revealTypingPosition';
 import { getTypingGuide, nextGuideKey } from '../typing/typingGuide';
 import dakkhindaLogo from '../../assets/dakkhinda-logo.webp';
 
-function Brand() {
-  return <Link className="tutor-brand" to="/" aria-label="Pa’O Typing Tutor home"><span className="brand-icon"><KeyboardIcon size={22} /></span><span>pa’o<span className="brand-caption">typing tutor</span></span></Link>;
-}
 export function Home() {
   return <div className="simple-tutor home-page">
     <TutorScenery decorative />
@@ -30,6 +28,7 @@ export function Home() {
           <h1>Type Pa’O<br /><em>Build Your Future</em></h1>
           <p className="home-description">Practice Pa’O typing, improve your skills, and help preserve our language for generations to come.</p>
           <Link to="/practice" className="tutor-start home-start"><Play size={21} />Start practicing <ArrowRight size={19} /></Link>
+          <Link to="/lessons" className="home-reading-link"><BookOpen size={18} />Read & learn Pa’O <ArrowRight size={16} /></Link>
           <ul className="home-reassurance" aria-label="Practice benefits"><li><Check size={15} />Free to use</li><li><Check size={15} />No account needed</li><li><Check size={15} />Learn at your own pace</li></ul>
         </div>
       </section>
@@ -220,7 +219,7 @@ function PracticeSession({ availableLessons }: { availableLessons: LessonRecord[
     <header className="tutor-header"><Brand />
       <nav className="practice-nav" aria-label="Main navigation">
         <Link to="/"><House size={15} />Home</Link>
-        <button onClick={openLessons} aria-haspopup="dialog">Lessons</button>
+        <Link to="/lessons">Lessons</Link>
         <Link to="/practice" aria-current="page">Practice</Link>
         <button onClick={() => openInfo('about')} aria-haspopup="dialog">About</button>
       </nav>
