@@ -6,6 +6,10 @@ import type { LessonRecord } from '../lessons/lessonCatalog';
 import TutorBrand from './TutorBrand';
 import TutorThemeToggle from './TutorThemeToggle';
 import './lesson-reading.css';
+import boyIllustration from '../../assets/lessons/volume-1/boy.webp';
+import childrenIllustration from '../../assets/lessons/volume-1/children.webp';
+import girlIllustration from '../../assets/lessons/volume-1/girl.webp';
+import landscapeIllustration from '../../assets/lessons/volume-1/landscape.webp';
 
 // The source titles carry volume/lesson/reading numbers in Myanmar digits.
 function reference(lesson: LessonRecord) {
@@ -88,13 +92,18 @@ export default function LessonReading() {
         {lessons.length ? <LessonLibrary lessons={lessons} /> : <p className="reading-empty">No published lessons yet. Please check back soon.</p>}
       </> : lesson ? <>
         <Link className="reading-back" to="/lessons"><ArrowLeft size={17} />All lessons</Link>
-        <article className={`reading-paper${lesson.id === 51 ? ' reading-book-page' : ''}`} aria-labelledby="reading-title">
+        <article className={`reading-paper${lesson.id === 51 ? ' reading-book-page' : lesson.id === 10 ? ' reading-illustrated-page' : ''}`} aria-labelledby="reading-title">
           {lesson.id === 51 && <div className="reading-book-number" lang="blk">(၁၀)</div>}
           <header className="reading-paper-heading">
             <p className="reading-eyebrow">{ref ? `Volume ${ref.volume} · Lesson ${ref.lesson} · ${ref.reading ? `Reading ${ref.reading}` : 'Letter patterns'}` : 'Reading passage'}</p>
             <h1 id="reading-title" ref={heading} tabIndex={-1} lang="blk">{lesson.title}</h1>
             {topic(lesson) && <p className="reading-topic" lang="blk">{topic(lesson)}</p>}
           </header>
+          {lesson.id === 10 && <div className="reading-illustration-strip">
+            <img src={boyIllustration} alt="A smiling boy in a collared shirt" width={1254} height={1254} />
+            <img src={childrenIllustration} alt="Two children carrying shoulder bags" width={1254} height={1254} />
+            <img src={girlIllustration} alt="A girl wearing a patterned headwrap and eating fruit" width={1254} height={1254} />
+          </div>}
           <div className="reading-passage" lang="blk">{lesson.content.split(/\n\s*\n/).map((paragraph, i) => {
             // This source paragraph contains ten vowel families without row breaks.
             const patternRows = lesson.id === 51 && i === 0;
@@ -123,6 +132,7 @@ export default function LessonReading() {
             {lesson.content.split(/\n\s*\n/).slice(1).map((paragraph, i) => <p className="reading-book-note" key={i}>{paragraph}</p>)}
           </div>}
 
+          {lesson.id === 10 && <img className="reading-landscape" src={landscapeIllustration} alt="Rice fields, distant hills, trees, and a hut beside a stream" width={2172} height={724} loading="lazy" />}
         </article>
         <nav className="reading-pagination" aria-label="Read another lesson">
           {previous ? <Link to={`/lessons/${previous.id}`} rel="prev" aria-label="Previous lesson"><ArrowLeft size={18} /><span>Previous lesson<strong lang="blk">{previous.title}</strong></span></Link> : <span />}

@@ -1,0 +1,7 @@
+# Volume 1, Lesson 1, Reading 2 illustrations
+
+AI-assisted restorations created with the built-in imagegen tool from the user-provided textbook photographs. These are reconstructed illustrations, not exact scanned originals. Lesson text remains in the bundled catalog and is rendered as HTML.
+
+Sources: photo_6266760307875190506_y.jpg (three portraits) and photo_6266760307875190505_y.jpg (landscape). Original K.A.C. signature retained in landscape.
+
+Prompts: Extract only the specified illustration; remove page, borders, text, shadows, paper discoloration, and camera perspective. Preserve original faces, poses, clothing, traditional headwrap, bags, composition, and vintage black ink hatching. Center on white; no added details or redesign. Boy: smiling bust in collared shirt. Children: two standing with shoulder bags. Girl: patterned headwrap, necklace, eating fruit. Landscape: rice fields, distant hills, trees, hut and stream on right, wide 3:1 composition, preserve K.A.C. signature.

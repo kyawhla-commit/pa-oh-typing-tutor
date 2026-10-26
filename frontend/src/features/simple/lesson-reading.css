@@ -94,3 +94,18 @@
 
 .reading-book-page .reading-pattern-table tbody tr:last-child > * { border-bottom: 1px solid var(--line); }
 .reading-book-page .reading-pattern-table tr > * + * { border-left: 0; }
+
+.reading-illustrated-page { padding: 0; border: 1px solid #777267; border-radius: 2px; background: #f7f3e7; color: #292923; overflow: hidden; }
+.reading-illustrated-page .reading-paper-heading { margin: 0; padding: 20px 22px; text-align: center; border-bottom: 1px solid #777267; }
+.reading-illustrated-page .reading-eyebrow { display: none; }
+.reading-illustrated-page h1 { font-size: clamp(18px, 2.5vw, 25px); font-weight: 500; }
+.reading-illustration-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-bottom: 1px solid #777267; }
+.reading-illustration-strip img { display: block; width: 100%; height: auto; mix-blend-mode: multiply; }
+.reading-illustration-strip img + img { border-left: 1px solid #777267; }
+.reading-illustrated-page .reading-passage { width: fit-content; max-width: calc(100% - 32px); margin: 0 auto; padding: 20px 24px; border: 1px solid #777267; border-top: 0; font-size: clamp(17px, 2.4vw, 24px); line-height: 2; }
+.reading-landscape { display: block; width: 100%; height: auto; margin-top: 24px; mix-blend-mode: multiply; }
+:root[data-theme='dark'] .reading-illustrated-page { background: #e3ddcd; color: #292923; }
+@media (max-width: 480px) {
+  .reading-illustrated-page .reading-paper-heading { padding: 16px 12px; }
+  .reading-illustrated-page .reading-passage { padding: 16px 10px; }
+}

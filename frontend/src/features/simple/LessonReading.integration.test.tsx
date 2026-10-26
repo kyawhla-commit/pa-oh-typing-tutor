@@ -83,3 +83,11 @@ it('excludes drafts and blank lessons, including direct links', () => {
   expect(host.querySelectorAll('.reading-choice')).toHaveLength(0);
   expect(host.textContent).toContain('No published lessons yet');
 });
+
+
+it('pairs the Reading 2 illustrations with the complete selectable passage', () => {
+  const host = render('/lessons/10');
+  expect(host.querySelectorAll('.reading-illustration-strip img')).toHaveLength(3);
+  expect(host.querySelector('.reading-landscape')).not.toBeNull();
+  expect(host.querySelector('.reading-passage')?.textContent).toBe(bundledLessons.find(item => item.id === 10)!.content);
+});
