@@ -236,3 +236,7 @@ vary with runtime Unicode versions; scoring version alone does not pin that data
 ### Single-character deletion
 
 Backspace removes one Unicode code point from the committed tail, then re-segments that tail and recomputes its current correctness. Scoring and target positions still use grapheme clusters. Deleting a mark from a correct cluster can leave an incomplete, currently incorrect cluster without creating an incorrect insertion attempt. Consequently historical incorrect attempts need not equal corrected historical errors plus current incorrect units after partial deletion. Corrected errors count resolved historical mistakes only. Active IME drafts remain under native keyboard control.
+
+### Correction-first lessons
+
+`stopOnError: true` rejects further insertion after a definite mismatch until it is deleted. A matching prefix of the expected grapheme can still accept combining marks, but cannot advance to another grapheme. Multi-character commits stop at the first mismatch. Rejected text adds no typing attempts. The lesson practice screen enables this option; other engine consumers retain their existing behavior by default.

@@ -9,7 +9,7 @@ export type TypingMode = "fixed-text" | "timed" | "word-count";
 export type TypingEngineConfig = (
   | { readonly targetText: string; readonly preparedText?: never }
   | { readonly preparedText: TargetText; readonly targetText?: never }
-) & { readonly sourceIdentity?: TextSourceIdentity } & TypingModeConfig;
+) & { readonly stopOnError?: boolean; readonly sourceIdentity?: TextSourceIdentity } & TypingModeConfig;
 
 export type TypingModeConfig = (
   | { readonly mode?: "fixed-text"; readonly completionPolicy?: CompletionPolicy; readonly durationMs?: never; readonly wordLimit?: never; readonly textPolicy?: never }

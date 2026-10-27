@@ -57,6 +57,7 @@ export class TypingEngine {
   #expectedUnits: readonly string[];
   #completionPolicy: CompletionPolicy | null;
   #mode: TypingMode;
+  #stopOnError = false;
   #durationMs: number | null;
   #wordLimit: number | null;
   #targetUnitCount: number;
@@ -82,6 +83,7 @@ export class TypingEngine {
 
   constructor(config: TypingEngineConfig) {
     const prepared = prepareConfig(config, this.#segmenter);
+    this.#stopOnError = config.stopOnError ?? false;
     this.#completionPolicy = prepared.completionPolicy;
     this.#mode = prepared.mode;
     this.#durationMs = prepared.durationMs;
@@ -199,6 +201,7 @@ export class TypingEngine {
   reset(config?: TypingEngineConfig): void {
     if (config) {
       const prepared = prepareConfig(config, this.#segmenter);
+      this.#stopOnError = config.stopOnError ?? false;
       this.#completionPolicy = prepared.completionPolicy;
       this.#mode = prepared.mode;
       this.#durationMs = prepared.durationMs;
@@ -245,7 +248,16 @@ export class TypingEngine {
     return false;
   }
 
+  #hasBlockingError(): boolean {
+    const index = this.#typed.length - 1;
+    const last = this.#typed[index];
+    if (!last || last.correct) return false;
+    const expected = this.#expectedUnits[this.#mode === "timed" ? index % this.#expectedUnits.length : index];
+    return !expected?.startsWith(last.text.normalize("NFC"));
+  }
+
   #insert(text: string, atMs: number): DispatchOutcome {
+    if (this.#stopOnError && this.#hasBlockingError()) return this.#outcome(false, 0, "", text);
     const previous = this.#typed[this.#typed.length - 1];
     const tail = previous?.text ?? "";
     let first = true;
@@ -259,6 +271,7 @@ export class TypingEngine {
         this.#removeTail(atMs);
       }
       first = false;
+      if (this.#stopOnError && this.#typed.at(-1)?.correct === false) break;
       const position = this.#typed.length;
       // A full wrong buffer can revise its tail, but cannot append another position.
       if (this.#mode !== "timed" && position >= this.#targetUnitCount) break;
@@ -279,6 +292,7 @@ export class TypingEngine {
       }
       this.#typed.push({ text: part.segment, correct, mistakeIndex });
       acceptedCodeUnits = part.index + part.segment.length - tail.length;
+      if (this.#stopOnError && this.#hasBlockingError()) break;
       if (this.#mode !== "timed" && this.#typed.length === this.#targetUnitCount) break;
     }
     this.#snapshot = null;

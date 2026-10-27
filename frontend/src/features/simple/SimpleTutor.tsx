@@ -86,7 +86,7 @@ function PracticeSession({ availableLessons }: { availableLessons: LessonRecord[
     setKeyboardVisible(next);
     try { localStorage.setItem('typing-tutor.keyboard-visible', String(next)); } catch { /* Keep the control usable without storage. */ }
   };
-  const session = useTypingSession({ targetText: lessons[0] });
+  const session = useTypingSession({ targetText: lessons[0], stopOnError: true });
   const { snapshot, generation, compositionDraft, pressedKey, errorKey } = useTypingFeedback(session);
   const stats = useTypingStats(session);
   const { input, focus } = useTypingInput(session, generation);
@@ -180,10 +180,10 @@ function PracticeSession({ availableLessons }: { availableLessons: LessonRecord[
   const changeLesson = (index: number) => {
     setLesson(index);
     setStarted(false);
-    session.restart({ targetText: lessons[index] });
+    session.restart({ targetText: lessons[index], stopOnError: true });
   };
   const start = () => {
-    session.restart({ targetText: lessons[lesson] });
+    session.restart({ targetText: lessons[lesson], stopOnError: true });
     setStarted(true);
   };
   useEffect(() => {

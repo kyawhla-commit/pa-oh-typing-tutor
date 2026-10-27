@@ -684,3 +684,21 @@ it.each(["fixed-text", "timed", "word-count"] as const)("removes one mark and al
   expect(engine.getSnapshot().typedUnits).toEqual([{ text: "ကို့", correct: true }]);
   expect(engine.getSnapshot().counts).toMatchObject({ totalInsertionAttempts: 2, incorrectInsertionAttempts: 0, correctedErrors: 0 });
 });
+
+it('blocks insertion after a mistake until Backspace corrects it', () => {
+  const engine = createTypingEngine({ targetText: 'abc', stopOnError: true });
+  expect(insert(engine, 'aXc').acceptedText).toBe('aX');
+  expect(insert(engine, 'bc').accepted).toBe(false);
+  engine.dispatch({ type: 'DELETE_BACKWARD', atMs: 1 });
+  expect(insert(engine, 'bc', 2).acceptedText).toBe('bc');
+});
+
+it('allows Pa’O combining marks but not a new character after an unfinished cluster', () => {
+  const engine = createTypingEngine({ targetText: 'ကို့ a', stopOnError: true });
+  expect(insert(engine, 'က').accepted).toBe(true);
+  expect(insert(engine, 'a').accepted).toBe(false);
+  expect(insert(engine, 'ိ').accepted).toBe(true);
+  expect(insert(engine, 'ု').accepted).toBe(true);
+  expect(insert(engine, '့').accepted).toBe(true);
+  expect(insert(engine, ' a').accepted).toBe(true);
+});
