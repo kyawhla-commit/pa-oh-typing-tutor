@@ -282,7 +282,7 @@ function PracticeSession({ availableLessons }: { availableLessons: LessonRecord[
         {units.slice(sentenceStart, sentenceEnd).map((unit, offset) => {
           const i = sentenceStart + offset;
           return <span key={i} ref={i === guide?.position ? current : undefined}
-            className={snapshot.typedUnits[i]?.correct ? 'typed-correct' : i === guide?.position ? 'current-unit' : ''}>{/[\n\r]/u.test(unit) ? '↵' : unit}</span>;
+            className={[snapshot.typedUnits[i] ? snapshot.typedUnits[i].correct ? 'typed-correct' : 'target-error' : '', i === guide?.position ? 'current-unit' : ''].filter(Boolean).join(' ')}>{/[\n\r]/u.test(unit) ? '↵' : unit}</span>;
         })}
       </div>
       <div className={`classic-input-shell${focused ? " is-focused" : ""}`} onClick={() => { if (started && !complete) focus(); }}>

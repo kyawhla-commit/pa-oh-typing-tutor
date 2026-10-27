@@ -177,13 +177,13 @@ describe("backspaces and history", () => {
   it("handles repeated backspaces through an empty buffer", () => {
     const engine = createTypingEngine({ targetText: "abcdef" });
     insert(engine, "aX👩‍💻");
-    for (let atMs = 1; atMs <= 4; atMs++) {
+    for (let atMs = 1; atMs <= 6; atMs++) {
       engine.dispatch({ type: "DELETE_BACKWARD", atMs });
       expectInvariants(engine.getSnapshot());
     }
     expect(engine.getSnapshot()).toMatchObject({
       status: "running", typedUnits: [],
-      counts: { backspaces: 4, totalInsertionAttempts: 3, correctedErrors: 2, uncorrectedErrors: 0 },
+      counts: { backspaces: 6, totalInsertionAttempts: 3, correctedErrors: 2, uncorrectedErrors: 0 },
     });
   });
 
@@ -203,14 +203,14 @@ describe("backspaces and history", () => {
 
 describe("Unicode segmentation", () => {
   it.each(["😀", "👩‍💻", "🇲🇲", "👍🏽", "e\u0301", "က\u1031"])(
-    "scores and deletes %s as one grapheme", (cluster) => {
+    "scores %s as a grapheme but deletes only its last code point", (cluster) => {
       const engine = createTypingEngine({ targetText: cluster + "!" });
       insert(engine, cluster);
       expect(engine.getSnapshot().currentPosition).toBe(1);
       expect(engine.getSnapshot().counts.correctInsertionAttempts).toBe(1);
       engine.dispatch({ type: "DELETE_BACKWARD", atMs: 1 });
-      expect(engine.getSnapshot().typedUnits).toEqual([]);
-      expectInvariants(engine.getSnapshot());
+      expect(engine.getSnapshot().typedUnits.map(unit => unit.text).join("")).toBe(Array.from(cluster).slice(0, -1).join(""));
+      expect(engine.getSnapshot().counts.totalInsertionAttempts).toBe(1);
     },
   );
 
@@ -655,4 +655,32 @@ describe("correct-target completion policy", () => {
     engine.reset({ targetText: "b" });
     expect(engine.getSnapshot().completionPolicy).toBe("require-correct-target");
   });
+});
+
+it("deletes Pa’O marks individually without adding attempts or corrupting mistake history", () => {
+  const engine = createTypingEngine({ targetText: "ကို !" });
+  insert(engine, "ကို့");
+  engine.dispatch({ type: "DELETE_BACKWARD", atMs: 1 });
+  expect(engine.getSnapshot().typedUnits).toEqual([{ text: "ကို", correct: true }]);
+  expect(engine.getSnapshot().counts).toMatchObject({ totalInsertionAttempts: 1, correctedErrors: 1 });
+  engine.dispatch({ type: "DELETE_BACKWARD", atMs: 2 });
+  expect(engine.getSnapshot().typedUnits).toEqual([{ text: "ကိ", correct: false }]);
+  engine.dispatch({ type: "DELETE_BACKWARD", atMs: 3 });
+  expect(engine.getSnapshot().typedUnits.map(unit => unit.text).join("")).toBe("က");
+  engine.dispatch({ type: "DELETE_BACKWARD", atMs: 4 });
+  expect(engine.getSnapshot().typedUnits).toEqual([]);
+  expect(engine.getSnapshot().counts).toMatchObject({ totalInsertionAttempts: 1, incorrectInsertionAttempts: 1, correctedErrors: 1, backspaces: 4 });
+});
+
+it.each(["fixed-text", "timed", "word-count"] as const)("removes one mark and allows retyping in %s mode", mode => {
+  const targetText = "ကို့ next";
+  const engine = createTypingEngine(mode === "timed" ? { mode, targetText, durationMs: 60000, textPolicy: "repeat-corpus" }
+    : mode === "word-count" ? { mode, targetText, wordLimit: 2 } : { targetText });
+  insert(engine, "ကို့");
+  engine.dispatch({ type: "DELETE_BACKWARD", atMs: 1 });
+  expect(engine.getSnapshot().typedUnits).toEqual([{ text: "ကို", correct: false }]);
+  expect(engine.getSnapshot().counts).toMatchObject({ totalInsertionAttempts: 1, incorrectInsertionAttempts: 0, correctedErrors: 0 });
+  insert(engine, "့", 2);
+  expect(engine.getSnapshot().typedUnits).toEqual([{ text: "ကို့", correct: true }]);
+  expect(engine.getSnapshot().counts).toMatchObject({ totalInsertionAttempts: 2, incorrectInsertionAttempts: 0, correctedErrors: 0 });
 });

@@ -121,7 +121,7 @@ export class TypingEngine {
       case "DELETE_BACKWARD":
         if (this.#status === "paused") return this.#outcome(false);
         this.#backspaces += 1;
-        this.#removeTail(event.atMs);
+        this.#deleteCharacter(event.atMs);
         this.#snapshot = null;
         return this.#outcome(true);
       case "TICK":
@@ -314,12 +314,36 @@ export class TypingEngine {
     });
   }
 
+  #deleteCharacter(atMs: number): void {
+    const previous = this.#typed[this.#typed.length - 1];
+    if (!previous) return;
+    const remaining = Array.from(previous.text).slice(0, -1).join("");
+    if (!remaining) { this.#removeTail(atMs); return; }
+
+    this.#typed.pop();
+    if (previous.correct) this.#currentCorrect -= 1;
+    let mistakeIndex = previous.mistakeIndex;
+    for (const { segment } of this.#segmenter.segment(remaining)) {
+      const position = this.#typed.length;
+      const expected = this.#expectedUnits[this.#mode === "timed" ? position % this.#expectedUnits.length : position];
+      const correct = segment.normalize("NFC") === expected;
+      if (correct) this.#currentCorrect += 1;
+      this.#typed.push({ text: segment, correct, mistakeIndex: correct ? null : mistakeIndex });
+      if (!correct) mistakeIndex = null;
+    }
+    // Retain an unresolved original mistake, but never count deletion as typing.
+    if (mistakeIndex !== null) {
+      this.#correctedErrors += 1;
+      this.#mistakes[mistakeIndex].correctedAtMs = atMs;
+    }
+  }
+
   #removeTail(atMs: number): void {
     const removed = this.#typed.pop();
     if (!removed) return;
     if (removed.correct) {
       this.#currentCorrect -= 1;
-    } else {
+    } else if (removed.mistakeIndex !== null) {
       this.#correctedErrors += 1;
       this.#mistakes[removed.mistakeIndex!].correctedAtMs = atMs;
     }

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, BookOpen } from 'lucide-react';
 import { useLessonCatalog } from '../lessons/LessonCatalogContext';
 import type { LessonRecord } from '../lessons/lessonCatalog';
@@ -24,6 +24,26 @@ function reference(lesson: LessonRecord) {
 function topic(lesson: LessonRecord) {
   const prefix = /^Practice Pa’O patterns from Volume \d+, Lesson \d+\.\s*/;
   return prefix.test(lesson.description) ? lesson.description.replace(prefix, '').trim() : '';
+}
+
+// Each source row has six letter forms and an example, with two documented
+// exceptions. Keep source spelling, repeated rows, and missing forms intact.
+function patternRowsForLesson(id: number, paragraph: string) {
+  const words = paragraph.trim().split(/\s+/);
+  const rows: string[][] = [];
+  while (words.length) {
+    const count = id === 55 && rows.length === 3 ? 6 : id === 66 && rows.length === 0 ? 8 : 7;
+    const row = words.splice(0, count);
+    if (id === 66 && rows.length === 0) row.splice(6, 2, row.slice(6).join(' '));
+    rows.push(row);
+  }
+  return rows;
+}
+
+function PairedPassage({ text }: { text: string }) {
+  // Keep the exact source whitespace for selection and copying.
+  const phrases = text.match(/\S+\s*/g) ?? [];
+  return <p className="reading-flow-verse">{phrases.map((phrase, index) => <span key={index}>{phrase}</span>)}</p>;
 }
 
 function LessonLibrary({ lessons }: { lessons: LessonRecord[] }) {
@@ -72,17 +92,31 @@ function LessonLibrary({ lessons }: { lessons: LessonRecord[] }) {
 export default function LessonReading() {
   const { catalog } = useLessonCatalog();
   const { lessonId } = useParams<{ lessonId: string }>();
-  const lessons = catalog.filter(item => item.status === 'Published' && item.content.trim());
+  const published = catalog.filter(item => item.status === 'Published' && item.content.trim());
+  const patternFor = (item: LessonRecord) => {
+    const itemRef = reference(item);
+    if (itemRef?.reading !== 1) return undefined;
+    return published.find(candidate => {
+      const candidateRef = reference(candidate);
+      return candidateRef?.volume === itemRef.volume && candidateRef?.lesson === itemRef.lesson
+        && /^Practice Pa’O patterns from Volume/.test(candidate.description);
+    });
+  };
+  const lessons = published.filter(item => !patternFor(item));
+  const requested = published.find(item => String(item.id) === lessonId);
+  const redirect = requested ? patternFor(requested) : undefined;
   const index = lessons.findIndex(item => String(item.id) === lessonId);
   const lesson = lessons[index];
   const previous = lessons[index - 1];
   const next = lessons[index + 1];
   const ref = lesson ? reference(lesson) : null;
-  const isBookPattern = lesson?.id === 51 || lesson?.id === 52;
-  const bookReading = isBookPattern ? lessons.find(item => item.id === (lesson.id === 51 ? 11 : 9)) : undefined;
+  const isBookPattern = !!lesson && /^Practice Pa’O patterns from Volume \d+, Lesson \d+\./.test(lesson.description);
+  const bookReading = isBookPattern ? published.find(item => { const itemRef = reference(item); return itemRef?.volume === ref?.volume && itemRef?.lesson === ref?.lesson && itemRef?.reading === 1; }) : undefined;
   const illustration = lesson ? readingIllustrations[lesson.id] : undefined;
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => { heading.current?.focus(); }, [lessonId]);
+
+  if (redirect) return <Navigate to={`/lessons/${redirect.id}`} replace />;
 
   return <div className="simple-tutor reading-page">
     <header className="tutor-header">
@@ -97,7 +131,7 @@ export default function LessonReading() {
       </> : lesson ? <>
         <Link className="reading-back" to="/lessons"><ArrowLeft size={17} />All lessons</Link>
         <article className={`reading-paper${isBookPattern ? ' reading-book-page' : lesson.id === 10 ? ' reading-illustrated-page' : lesson.id === 12 ? ' reading-dance-page' : illustration ? ' reading-restored-page' : ''}`} aria-labelledby="reading-title">
-          {isBookPattern && <div className="reading-book-number" lang="blk">{lesson.id === 51 ? '(၁၀)' : '(၁၂)'}</div>}
+          {(lesson.id === 51 || lesson.id === 52) && <div className="reading-book-number" lang="blk">{lesson.id === 51 ? '(၁၀)' : '(၁၂)'}</div>}
           <header className="reading-paper-heading">
             <p className="reading-eyebrow">{ref ? `Volume ${ref.volume} · Lesson ${ref.lesson} · ${ref.reading ? `Reading ${ref.reading}` : 'Letter patterns'}` : 'Reading passage'}</p>
             <h1 id="reading-title" ref={heading} tabIndex={-1} lang="blk">{lesson.title}</h1>
@@ -109,20 +143,39 @@ export default function LessonReading() {
             <img src={girlIllustration} alt="A girl wearing a patterned headwrap and eating fruit" width={1254} height={1254} />
           </div>}
           <div className={illustration ? 'reading-restored-composition' : undefined} data-lesson={lesson.id}>
-          {illustration?.position === 'top' && <figure className="reading-restored-art"><img src={illustration.src} alt={illustration.alt} decoding="async" /></figure>}
+          {illustration && <figure className="reading-restored-art"><img src={illustration.src} alt={illustration.alt} decoding="async" /></figure>}
           <div className="reading-passage" lang="blk">{lesson.content.split(/\n\s*\n/).map((paragraph, i) => {
             // This source paragraph contains ten vowel families without row breaks.
             const patternRows = isBookPattern && i === 0;
             if (!patternRows) {
               if (isBookPattern) return null;
+              if ([46, 47, 48, 49].includes(lesson.id)) {
+                const phrases = paragraph.match(/\S+\s*/g) ?? [];
+                let offset = 0;
+                const poemLines: Record<number, number[]> = {
+                  46: [2, 2, 2, 1, 2, 2, 5],
+                  47: [4, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 3],
+                  48: [2, 1, 2, 1, 2, 1, 2, 1, 3],
+                  49: [2, 2, 2, 2, 1, 2, 1, 2, 3, 2, 1, 2, 2, 2],
+                };
+                const lineLengths = poemLines[lesson.id];
+                return <p key={i} className="reading-bird-verse">{lineLengths.map((count, line) => {
+                  const text = phrases.slice(offset, offset + count).join('');
+                  offset += count;
+                  return <span key={line}>{text}</span>;
+                })}</p>;
+              }
+              if (lesson.id !== 12) return <PairedPassage key={i} text={paragraph} />;
               if (lesson.id === 12) return <div key={i} className="reading-paired-verse">{paragraph.split('\n').map((line, row) => {
                 const split = line.indexOf(' ');
                 return <div key={row}><span>{line.slice(0, split)}</span>{' '}<span>{line.slice(split + 1)}</span></div>;
               })}</div>;
-              return <p key={i}>{paragraph}</p>;
+              return <PairedPassage key={i} text={paragraph} />;
             }
             const rowBoundary = lesson.id === 51 ? /\s+(?=ကိ |ကု |ကေ့ |ကဲ့ |ကုဲင့် |ကော့ |ကို့ |ကံ့ |ကုံ့ )/ : /\s+(?=ကျု |ကျေ့ |ကျော့ |ကျို့ |ကျံ့ |ကျုံ့ )/;
-            const rows = paragraph.split(rowBoundary).map(row => row.trim().split(/\s+/));
+            const rows = lesson.id <= 52
+              ? paragraph.split(rowBoundary).map(row => row.trim().split(/\s+/))
+              : patternRowsForLesson(lesson.id, paragraph);
             if (lesson.id === 52) {
               // Reading-only rows marked with × in the supplied book photograph.
               rows.splice(1, 0, ['ကျိ', 'ကျိꩻ', 'ကျီ', 'ကျီꩻ', 'ကျီး', 'ကျီႏ', '– (×)']);
@@ -130,7 +183,7 @@ export default function LessonReading() {
             }
             return <div key={i} className="reading-pattern-scroll" tabIndex={0} role="region" aria-label="Letter pattern table; scroll horizontally to see all columns">
               <table className="reading-pattern-table">
-                <thead><tr><th scope="col">တွယ်ꩻ</th><th scope="col">{lesson.id === 52 ? topic(lesson) : 'ဗီးတွမ်း မူလသရစဲဉ်း ရော်ꩻခဏ်ꩻ'}</th><th scope="col">ပွုံႏစံႏ</th></tr></thead>
+                <thead><tr><th scope="col">တွယ်ꩻ</th><th scope="col">{topic(lesson) || 'ဗီးတွမ်း မူလသရစဲဉ်း ရော်ꩻခဏ်ꩻ'}</th><th scope="col">ပွုံႏစံႏ</th></tr></thead>
                 <tbody>{rows.map((words, rowIndex) => <tr key={rowIndex}>
                   <th scope="row">{String(rowIndex + 1).replace(/\d/g, digit => '၀၁၂၃၄၅၆၇၈၉'[Number(digit)])}</th>
                   <td><div className="reading-pattern-letters">{words.slice(0, -1).map((word, wordIndex) => <span key={wordIndex}>{word}</span>)}</div></td>
@@ -147,7 +200,7 @@ export default function LessonReading() {
               <h3 id="book-reading-title">ဖတ်လွူꩻခန်ꩻ (၁)</h3>
               {lesson.id === 51 ? <div className="reading-book-verse">{bookReading.content.split(/\s+(?=မာꩻကုဲင်းကုဲင်း)/).map((column, columnIndex) =>
                 <p key={columnIndex}>{column.replace(/\s+(?=နီတထာ|မာꩻအလူႏ|သူႏသေ|ဟဲ့ꩻလိုꩻ|လေားကာႏ|ပအိုဝ်ႏပို|ခူးပါကုံႏ|ယုံယုံသာႏ)/g, '\n')}</p>
-              )}</div> : <div className="reading-paired-verse">{bookReading.content.split(/\s+(?=တသာႏ|ကျူႏလုဲင်ꩻ|ဟျူႏ|ဖျောႏ)/).map((line, row) => {
+              )}</div> : lesson.id !== 52 ? <div className="reading-book-verse reading-book-general-verse">{bookReading.content.split(/\n\s*\n/).map((paragraph, i) => <PairedPassage key={i} text={paragraph} />)}</div> : <div className="reading-paired-verse">{bookReading.content.split(/\s+(?=တသာႏ|ကျူႏလုဲင်ꩻ|ဟျူႏ|ဖျောႏ)/).map((line, row) => {
                 const split = line.search(/\s+(?=အုံထာꩻ|ကျိုꩻစာꩻ|နီပအိုဝ်ႏ|ကျံႏစံႏ|ပျုံးဖါ)/);
                 return <div key={row}><span>{line.slice(0, split)}</span>{' '}<span>{line.slice(split).trim()}</span></div>;
               })}</div>}
@@ -158,7 +211,7 @@ export default function LessonReading() {
 
           {lesson.id === 10 && <img className="reading-landscape" src={landscapeIllustration} alt="Rice fields, distant hills, trees, and a hut beside a stream" width={2172} height={724} loading="lazy" />}
           {lesson.id === 12 && <img className="reading-dance-illustration" src={danceIllustration} alt="Two Pa’O dancers in traditional clothing accompanied by a drummer and a cymbal player" width={1448} height={1086} loading="lazy" />}
-          {illustration?.position === 'bottom' && <figure className="reading-restored-art"><img src={illustration.src} alt={illustration.alt} loading="lazy" decoding="async" /></figure>}
+
         </article>
         <nav className="reading-pagination" aria-label="Read another lesson">
           {previous ? <Link to={`/lessons/${previous.id}`} rel="prev" aria-label="Previous lesson"><ArrowLeft size={18} /><span>Previous lesson<strong lang="blk">{previous.title}</strong></span></Link> : <span />}

@@ -368,3 +368,23 @@
 .pagination-gap { padding: 0 5px; color: var(--muted); }
 .lesson-pagination select { min-height: 36px; max-width: 100%; padding: 7px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--key-surface); color: var(--ink); font: inherit; font-size: 11px; cursor: pointer; }
 @media (max-width: 600px) { .pagination-count { flex-basis: 100%; } .pagination-pages { max-width: 100%; overflow-x: auto; padding: 4px; } .pagination-pages button { flex-shrink: 0; } }
+
+/* Distinct progress states on the light practice surface, even after blur. */
+:root:not([data-theme='dark']) .practice-page .classic-passage { color: #30343b; }
+:root:not([data-theme='dark']) .practice-page .classic-passage .typed-correct { color: #16756b; }
+:root:not([data-theme='dark']) .practice-page .classic-passage .current-unit {
+  color: #124c43;
+  background: #d1eee5;
+  border-bottom: 3px solid #096557;
+  border-radius: 4px 4px 2px 2px;
+  box-shadow: 0 0 0 2px #d1eee5;
+}
+:root:not([data-theme='dark']) .practice-page .classic-passage .target-error,
+:root:not([data-theme='dark']) .practice-page .typed-error {
+  color: #a51d35;
+  background: #ffe0e5;
+  text-decoration-color: #a51d35;
+}
+:root:not([data-theme='dark']) .practice-page .classic-passage .current-unit.target-error {
+  color: #a51d35; background: #ffe0e5; border-bottom-color: #a51d35; box-shadow: 0 0 0 2px #ffe0e5;
+}

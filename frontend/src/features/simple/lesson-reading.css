@@ -155,4 +155,101 @@
     position: absolute; left: var(--text-left); top: var(--text-top); width: var(--text-width); margin: 0; font-size: 17px; line-height: 2; text-align: center;
   }
   .reading-restored-composition:where([data-lesson='18'],[data-lesson='20'],[data-lesson='30'],[data-lesson='36'],[data-lesson='40'],[data-lesson='45']) img { max-height: none; }
+  .reading-restored-composition[data-lesson='18'] .reading-passage {
+    left: 50%; top: 44%; transform: translate(-50%, -50%);
+  }
+  .reading-restored-composition[data-lesson='30'] .reading-passage {
+    left: 62%; top: 25%; width: 38%; transform: translate(-50%, -50%); line-height: 2.4;
+  }
+  .reading-restored-composition[data-lesson='20'] .reading-passage {
+    left: 55%; top: 8%; width: 42%; font-size: 18px; line-height: 2.4;
+  }
+}
+
+.reading-flow-verse { display: grid; grid-template-columns: 1fr 1fr; column-gap: 12px; text-align: left; }
+.reading-flow-verse > span { white-space: nowrap; }
+
+.reading-book-general-verse { display: block; white-space: pre-wrap; }
+
+.reading-restored-composition[data-lesson='30'] .reading-flow-verse {
+  grid-template-columns: max-content max-content;
+  justify-content: center;
+  column-gap: 24px;
+}
+
+/* Paired phrases remain readable without clipping long Pa’O words. */
+.reading-flow-verse { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px 28px; text-align: left; font-size: 20px; line-height: 2.2; }
+.reading-flow-verse > span { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 0; }
+@media (min-width: 800px) {
+  .reading-restored-composition:not(:where([data-lesson='18'],[data-lesson='20'],[data-lesson='30'],[data-lesson='36'],[data-lesson='40'],[data-lesson='45'])) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 28px; }
+  .reading-restored-composition:not(:where([data-lesson='18'],[data-lesson='20'],[data-lesson='30'],[data-lesson='36'],[data-lesson='40'],[data-lesson='45'])) .reading-passage { width: 100%; }
+  .reading-restored-composition:is([data-lesson='18'],[data-lesson='20'],[data-lesson='30'],[data-lesson='36'],[data-lesson='40'],[data-lesson='45']) .reading-flow-verse { font-size: 18px; gap: 6px 16px; line-height: 2.2; }
+  .reading-restored-composition[data-lesson='30'] .reading-flow-verse { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}
+@media (max-width: 480px) {
+  .reading-flow-verse { font-size: 18px; gap: 8px 16px; }
+}
+
+@media (min-width: 800px) {
+  .reading-restored-composition[data-lesson='45'] .reading-passage { top: 5%; }
+  .reading-restored-composition[data-lesson='45'] .reading-flow-verse { row-gap: 0; line-height: 2; }
+}
+
+/* Center the verse as a compact block beneath each letter-pattern table. */
+.reading-book-bottom .reading-book-verse,
+.reading-book-bottom .reading-paired-verse {
+  width: fit-content;
+  max-width: 100%;
+  margin: 20px auto;
+}
+.reading-book-bottom .reading-flow-verse {
+  grid-template-columns: auto auto;
+  justify-content: center;
+  column-gap: clamp(24px, 4vw, 48px);
+}
+.reading-book-bottom .reading-paired-verse > div {
+  column-gap: clamp(24px, 4vw, 48px);
+}
+
+.reading-bird-verse { display: grid; gap: 14px; text-align: center; font-size: 20px; line-height: 2.3; }
+.reading-bird-verse > span { white-space: pre-wrap; }
+.reading-bird-verse > span:last-child { margin-top: 12px; font-weight: 500; }
+@media (min-width: 800px) {
+  .reading-restored-composition[data-lesson='46'] { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 24px; }
+}
+@media (max-width: 480px) {
+  .reading-bird-verse { font-size: 18px; gap: 10px; }
+}
+
+/* Keep the hen poem compact and give its landscape illustration full width. */
+.reading-restored-page .reading-restored-composition[data-lesson='47'] { display: flex; flex-direction: column; gap: 12px; }
+.reading-restored-composition[data-lesson='47'] .reading-restored-art { width: min(100%, 620px); margin: 12px auto; }
+.reading-restored-composition[data-lesson='47'] .reading-passage { margin: 12px auto; }
+.reading-restored-composition[data-lesson='47'] .reading-bird-verse { gap: 6px; line-height: 2.1; }
+.reading-restored-composition[data-lesson='47'] .reading-bird-verse > span:first-child { font-weight: 500; margin-bottom: 8px; }
+
+.reading-restored-page .reading-restored-composition:is([data-lesson='48'], [data-lesson='49']) { display: flex; flex-direction: column; gap: 12px; }
+.reading-restored-composition:is([data-lesson='48'], [data-lesson='49']) .reading-restored-art { width: min(100%, 580px); margin: 12px auto; }
+.reading-restored-composition:is([data-lesson='48'], [data-lesson='49']) .reading-passage { margin: 16px auto; }
+.reading-restored-composition:is([data-lesson='48'], [data-lesson='49']) .reading-bird-verse { gap: 8px; line-height: 2.1; }
+.reading-restored-composition[data-lesson='48'] .reading-bird-verse > span:nth-child(5),
+.reading-restored-composition[data-lesson='49'] .reading-bird-verse > span:nth-child(6),
+.reading-restored-composition[data-lesson='49'] .reading-bird-verse > span:nth-child(10) { margin-top: 16px; }
+
+/* Match the original book: two repeated forms and their phrase on each row. */
+.reading-illustrated-page .reading-passage {
+  width: fit-content;
+  max-width: calc(100% - 32px);
+  margin: 24px auto 28px;
+  padding: 20px clamp(14px, 3vw, 32px);
+  border: 1px solid #777267;
+}
+.reading-illustrated-page .reading-flow-verse {
+  grid-template-columns: max-content max-content minmax(0, max-content);
+  justify-content: center;
+  align-items: baseline;
+  gap: 8px clamp(12px, 2vw, 24px);
+  font-size: clamp(17px, 2.4vw, 24px);
+  line-height: 2.1;
+  text-align: left;
 }

@@ -232,3 +232,7 @@ and Unicode tail cases. Measurements describe local domain execution, not browse
 performance or a guarantee about any device. Browser composition/paste/focus are
 handled separately in `src/features/typing`; arbitrary selection edits remain unsupported. Lesson qualification and persistence remain feature-owned. Ill-formed UTF-16 is not separately validated. Unicode boundaries can
 vary with runtime Unicode versions; scoring version alone does not pin that data.
+
+### Single-character deletion
+
+Backspace removes one Unicode code point from the committed tail, then re-segments that tail and recomputes its current correctness. Scoring and target positions still use grapheme clusters. Deleting a mark from a correct cluster can leave an incomplete, currently incorrect cluster without creating an incorrect insertion attempt. Consequently historical incorrect attempts need not equal corrected historical errors plus current incorrect units after partial deletion. Corrected errors count resolved historical mistakes only. Active IME drafts remain under native keyboard control.

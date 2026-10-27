@@ -25,12 +25,12 @@ function render(path: string, catalog = bundledLessons) {
   return host;
 }
 
-it('organizes all 60 lessons into six volumes and the standalone passages', () => {
+it('organizes 42 unique reading pages into six volumes and the standalone passages', () => {
   const host = render('/lessons');
   expect(host.querySelectorAll('.reading-volume')).toHaveLength(7);
-  expect(host.querySelectorAll('.reading-choice')).toHaveLength(60);
+  expect(host.querySelectorAll('.reading-choice')).toHaveLength(42);
   const first = host.querySelector('[aria-label="Volume 1, Lesson 1"]')!;
-  expect([...first.querySelectorAll('a')].map(a => a.getAttribute('href'))).toEqual(['/lessons/51', '/lessons/11', '/lessons/10']);
+  expect([...first.querySelectorAll('a')].map(a => a.getAttribute('href'))).toEqual(['/lessons/51', '/lessons/10']);
   act(() => first.querySelector('a')!.click());
   expect(host.querySelector('h1')?.textContent).toBe(bundledLessons[0].title);
 });
@@ -54,17 +54,23 @@ it('shows all paragraphs, follows catalog order, and focuses the new reading tit
   expect(host.querySelector('[aria-label="Keyboard guide"]')).toBeNull();
   expect(host.querySelector('[aria-label="Previous lesson"]')).toBeNull();
   act(() => host.querySelector<HTMLAnchorElement>('[aria-label="Next lesson"]')!.click());
-  expect(host.querySelector('h1')?.textContent).toBe(bundledLessons[1].title);
+  expect(host.querySelector('h1')?.textContent).toBe(bundledLessons[2].title);
   expect(document.activeElement).toBe(host.querySelector('h1'));
   act(() => host.querySelector<HTMLAnchorElement>('[aria-label="Previous lesson"]')!.click());
   expect(host.querySelector('h1')?.textContent).toBe(bundledLessons[0].title);
 });
 
-it('preserves line breaks and displays the topic on a letter-pattern lesson', () => {
-  const host = render('/lessons/58');
-  const lesson = bundledLessons.find(item => item.id === 58)!;
-  expect(host.querySelector('.reading-passage p')?.textContent).toBe(lesson.content);
-  expect(host.querySelector('.reading-topic')?.textContent).toBe('ယပယ် ဗီးသွတ်ꩻခဏ်ꩻ');
+it.each([[53,10],[54,10],[55,4],[56,9],[57,10],[58,3],[59,10],[60,6],[61,4],[62,5],[63,8],[64,3],[65,7],[66,6],[67,3],[68,7]])('shows lesson %i as numbered pattern rows with examples', (id, count) => {
+  const host = render(`/lessons/${id}`);
+  const lesson = bundledLessons.find(item => item.id === id)!;
+  const rows = [...host.querySelectorAll('.reading-pattern-table tbody tr')];
+  expect(rows).toHaveLength(count);
+  // Letter spans have no separating DOM whitespace; compare their individual values.
+  const tokens = rows.flatMap(row => [...row.querySelectorAll('.reading-pattern-letters span, .reading-pattern-example')].map(cell => cell.textContent)).join(' ');
+  expect(tokens.replace(/\s+/g, ' ')).toBe(lesson.content.split(/\n\s*\n/)[0].replace(/\s+/g, ' '));
+  expect(host.querySelector('thead')?.textContent).toContain('ပွုံႏစံႏ');
+  expect(host.querySelector('.reading-book-bottom h3')).not.toBeNull();
+  expect(host.querySelector('textarea')).toBeNull();
 });
 
 it('offers the lesson library at the end of the readings', () => {
@@ -98,7 +104,6 @@ it('shows Lesson 2 book rows and both readings without losing catalog text', () 
   expect([...host.querySelectorAll('.reading-pattern-example')].filter(cell => cell.textContent === '– (×)')).toHaveLength(3);
   expect(host.querySelector('.reading-paired-verse')?.textContent).toBe(bundledLessons.find(item => item.id === 9)!.content.replace(/\s+(?=တသာႏ|ကျူႏလုဲင်ꩻ|ဟျူႏ|ဖျောႏ)/g, ''));
   act(() => host.querySelector<HTMLAnchorElement>('[aria-label="Next lesson"]')!.click());
-  act(() => host.querySelector<HTMLAnchorElement>('[aria-label="Next lesson"]')!.click());
   expect(host.querySelector('.reading-dance-illustration')).not.toBeNull();
   expect(host.querySelectorAll('.reading-paired-verse > div')).toHaveLength(6);
   expect(host.querySelector('.reading-paired-verse')?.textContent).toBe(bundledLessons.find(item => item.id === 12)!.content.replace(/\n/g, ''));
@@ -112,4 +117,11 @@ it.each([14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,45,46,47,48,49,50])('sh
   expect(picture?.alt).toBeTruthy();
   expect([...host.querySelectorAll('.reading-passage p')].map(p => p.textContent).join('\n\n')).toBe(lesson.content);
   expect(host.querySelector('textarea')).toBeNull();
+});
+
+it('redirects a bookmarked Reading 1 page to its pattern page without losing the passage', () => {
+  const host = render('/lessons/11');
+  expect(host.querySelector('h1')?.textContent).toBe(bundledLessons[0].title);
+  expect(host.querySelector('.reading-book-verse')).not.toBeNull();
+  expect(host.querySelector('[aria-label="Next lesson"]')?.getAttribute('href')).toBe('/lessons/10');
 });

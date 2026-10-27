@@ -302,3 +302,17 @@ describe("adapter with timed engine", () => {
     expect(engine.getResult()).toMatchObject({ counts: { currentTypedUnits: 1, backspaces: 0 }, completedAtMs: 1000 });
   });
 });
+
+it("deletes one Pa’O mark once across keyboard echoes and native input fallback", () => {
+  const { before, send, engine } = setup("ကို့ !");
+  before("insertText", "ကို့");
+  send("keydown", { key: "Backspace" });
+  before("deleteContentBackward");
+  send("input", { inputType: "deleteContentBackward", data: null });
+  expect(engine.getSnapshot().typedUnits.map(unit => unit.text).join("")).toBe("ကို");
+  expect(engine.getSnapshot().counts.backspaces).toBe(1);
+  before("deleteContentBackward", null, false);
+  send("input", { inputType: "deleteContentBackward", data: null });
+  expect(engine.getSnapshot().typedUnits.map(unit => unit.text).join("")).toBe("ကိ");
+  expect(engine.getSnapshot().counts.backspaces).toBe(2);
+});
