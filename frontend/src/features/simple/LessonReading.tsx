@@ -143,12 +143,61 @@ export default function LessonReading() {
             <img src={girlIllustration} alt="A girl wearing a patterned headwrap and eating fruit" width={1254} height={1254} />
           </div>}
           <div className={illustration ? 'reading-restored-composition' : undefined} data-lesson={lesson.id}>
-          {illustration && <figure className="reading-restored-art"><img src={illustration.src} alt={illustration.alt} decoding="async" /></figure>}
+          {illustration && ![14, 34, 38, 40, 44].includes(lesson.id) && <figure className="reading-restored-art"><img src={illustration.src} alt={illustration.alt} decoding="async" /></figure>}
           <div className="reading-passage" lang="blk">{lesson.content.split(/\n\s*\n/).map((paragraph, i) => {
             // This source paragraph contains ten vowel families without row breaks.
             const patternRows = isBookPattern && i === 0;
             if (!patternRows) {
               if (isBookPattern) return null;
+              if ([38, 40, 44].includes(lesson.id)) {
+                const phrases = paragraph.match(/\S+\s*/g) ?? [];
+                const crop = (viewBox: string, width: number, height: number, label: string) => <figure className="reading-panel-art"><svg viewBox={viewBox} role="img" aria-label={label}><image href={illustration?.src} width={width} height={height} /></svg></figure>;
+                const verse = (start: number, rows: number) => <p className="reading-source-stanza">{Array.from({ length: rows }, (_, row) => <span key={row}>{phrases.slice(start + row * 2, start + row * 2 + 2).map((phrase, column) => <span key={column}>{phrase}</span>)}</span>)}</p>;
+                if (lesson.id === 40) return <div key={i} className="reading-four-panel reading-harvest-panel">
+                  {crop('22 30 537 1385', 1087, 1447, 'A woman carrying an offering vessel')}
+                  {verse(0, 8)}
+                  {crop('567 887 497 528', 1087, 1447, 'Grain, baskets and harvested produce')}
+                </div>;
+                return <div key={i} className="reading-four-panel">
+                  {lesson.id === 38 ? crop('102 25 880 754', 1087, 1447, 'Fields, hills and a bare branch') : verse(0, 4)}
+                  {lesson.id === 38 ? verse(0, 4) : crop('505 14 763 501', 1536, 1024, 'Two men shovelling and sifting')}
+                  {lesson.id === 38 ? verse(8, 4) : crop('269 532 996 476', 1536, 1024, 'A man tending plants')}
+                  {lesson.id === 38 ? crop('102 813 880 611', 1087, 1447, 'An owl spreading its wings') : verse(8, 4)}
+                </div>;
+              }
+              if (lesson.id === 34) {
+                const phrases = paragraph.match(/\S+\s*/g) ?? [];
+                let offset = 0;
+                const stanza = (counts: number[]) => <p className="reading-source-stanza">{counts.map((count, row) => {
+                  const line = phrases.slice(offset, offset + count);
+                  offset += count;
+                  return <span className={count === 1 ? 'is-full-line' : ''} key={row}>{line.map((phrase, column) => <span key={column}>{phrase}</span>)}</span>;
+                })}</p>;
+                return <div key={i} className="reading-four-panel">
+                  {stanza([2, 2, 2, 2])}
+                  <figure className="reading-panel-art"><svg viewBox="340 18 690 644" role="img" aria-label="A seated bearded sage"><image href={illustration?.src} width="1165" height="1350" /></svg></figure>
+                  <figure className="reading-panel-art"><svg viewBox="135 690 895 642" role="img" aria-label="A woman spinning at a wheel"><image href={illustration?.src} width="1165" height="1350" /></svg></figure>
+                  <div>{stanza([2, 2, 2, 1, 1])}</div>
+                </div>;
+              }
+              if (lesson.id === 14) {
+                const phrases = paragraph.match(/\S+\s*/g) ?? [];
+                let offset = 0;
+                return <div key={i} className="reading-four-panel">
+                  <figure className="reading-panel-art reading-panel-art-top"><svg viewBox="25 20 1170 630" role="img" aria-label="An elderly man gesturing"><image href={illustration?.src} width="1225" height="1284" /></svg></figure>
+                  <p className="reading-source-stanza">{[2, 2, 2, 1, 2].map((count, row) => {
+                    const line = phrases.slice(offset, offset + count);
+                    offset += count;
+                    return <span className={count === 1 ? 'is-full-line' : ''} key={row}>{line.map((phrase, column) => <span key={column}>{phrase}</span>)}</span>;
+                  })}</p>
+                  <div className="reading-panel-second"><p className="reading-source-stanza">{[2, 1, 2, 2, 2].map((count, row) => {
+                    const line = phrases.slice(offset, offset + count);
+                    offset += count;
+                    return <span className={count === 1 ? 'is-full-line' : ''} key={row}>{line.map((phrase, column) => <span key={column}>{phrase}</span>)}</span>;
+                  })}</p></div>
+                  <figure className="reading-panel-art"><svg viewBox="25 655 1170 605" role="img" aria-label="Traditionally dressed men seated talking"><image href={illustration?.src} width="1225" height="1284" /></svg></figure>
+                </div>;
+              }
               if ([46, 47, 48, 49].includes(lesson.id)) {
                 const phrases = paragraph.match(/\S+\s*/g) ?? [];
                 let offset = 0;
@@ -198,7 +247,7 @@ export default function LessonReading() {
             {bookReading && <section aria-labelledby="book-reading-title">
               <h2>{lesson.title}</h2>
               <h3 id="book-reading-title">ဖတ်လွူꩻခန်ꩻ (၁)</h3>
-              {lesson.id === 51 ? <div className="reading-book-verse">{bookReading.content.split(/\s+(?=မာꩻကုဲင်းကုဲင်း)/).map((column, columnIndex) =>
+              {[67, 68].includes(lesson.id) ? <div className="reading-compact-source-verse">{bookReading.content.split(lesson.id === 67 ? /(?=စုဲင်ႏ|ခွေကျိုက်)/u : /(?=ပါꩻပေႏ|ယားမွိုန်း|ခမ်းပြွိုင်း|စက်ခြွုတ်|ဖြွုမ်ဖူႏ|အုံဖြွောင်ႏ)/u).map((line, index) => <div className={lesson.id === 67 || index === 1 || index === 3 ? "is-full-line" : undefined} key={index}>{(lesson.id === 67 ? [line] : line.split(/(?=သင်ႏခြွုင်ꩻ|တဲစ်ꩻ|လို့ကား|ဟဲ့ꩻနီ|ထုမ်ႏတရာꩻ)/u)).map((phrase, column) => <span key={column}>{phrase}</span>)}</div>)}</div> : lesson.id === 63 ? <div className="reading-original-verse reading-original-verse-four">{bookReading.content.split(/(?=ဗွေႏဗွန်|လွေꩻယုန်ꩻ|လုပ်ꩻမွေး|ဆို့ꩻအာအာ|ထမ်ႏထာꩻ|သꩻဗိုန်|ပအိုဝ်ႏလိတ်)/u).map((line, index) => <span key={index}>{line}</span>)}</div> : lesson.id === 62 ? <div className="reading-compact-source-verse">{bookReading.content.split(/(?=ထီႏသေ|လွေꩻမာꩻ|ပအိုဝ်ႏမူႏ|ဟွဲး)/u).map((line, index) => <div key={index} className={index === 1 || index === 4 ? 'is-full-line' : undefined}>{(index === 1 || index === 4 ? [line] : line.split(/(?=ပြွက်ꩻ|ပြွတ်ခွမ်ꩻ|ခင်ႏပြွမ်)/u)).map((phrase, column) => <span key={column}>{phrase}</span>)}</div>)}</div> : lesson.id === 60 ? <div className="reading-compact-source-verse">{bookReading.content.split(/(?=ကျိုꩻစာꩻ|ဗွေးဗွန်|သဲ့ꩻသွမ်ꩻ|နီကိုꩻကွယ်ႏ)/u).map((line, index) => <div key={index}>{line.split(/(?=တကွင်ꩻ|ပညာႏနေား|ကျွꩻလွဉ်|ဟောဝ်တဝ်း|ရတနာႏ)/u).map((phrase, column) => <span key={column}>{phrase}</span>)}</div>)}</div> : lesson.id === 59 ? <div className="reading-original-verse">{bookReading.content.split(/(?=ခံႏယာႏ|ဖြစ်ꩻနံႏ|လိုꩻကြဲစ်|လိုꩻထာꩻလွတန်|ခြပ်ဟတ်|လိုꩻလွထာꩻ|ဖြေꩻဟူပြယ်ႏ|ဒေ့ါꩻသင်ႏ)/u).map((line, index) => <span key={index}>{line}</span>)}</div> : lesson.id === 57 ? <div className="reading-original-verse">{bookReading.content.split(/(?=သထွုံႏပေႏ|မဥ်နာႏ|အမဲဥ်ႏတရာꩻ|ရဟန်ꩻသင်္ဃာႏ|မေႏတေန်ꩻ|နီခမ်းနီထီ|ကဗျာလင်္ကာႏ|တယ်ႏဘုရာꩻ|ထီꩻသင်ꩻ)/u).map((line, index) => <span key={index}>{line}</span>)}</div> : lesson.id === 56 ? <div className="reading-original-verse">{bookReading.content.split(/(?=နီဝေ့တဖြွီꩻ|ပါꩻဗား|ပါꩻခြွေ|စာပြွဲနေး|စာပြွဲစာရွံꩻ|ဒေါ့ꩻထာꩻ|ဒေါ့ꩻကြွို့ꩻ|ငိုးခြွံႏ|တဖူꩻလွေꩻ)/u).map((line, index) => <span key={index}>{line}</span>)}</div> : lesson.id === 54 ? <div className="reading-original-verse">{bookReading.content.split(/(?=လွူးလွ|ရုဲင်ဗွူ|နီးမွိုးသီး|နီလိုꩻပေႏ|ဒေ့ါꩻဆွော့ꩻ|နီဖါထွို့ꩻ|မွိုးဖါ|စူဝုဲင်ႏ|ထီကွုံꩻ)/u).map((line, index) => <span key={index}>{line}</span>)}</div> : lesson.id === 53 ? <div className="reading-original-verse">{bookReading.content.split(/(?=ပါꩻပြီꩻနꩻ|ပါꩻပေႏ|တသီးဖြေႏ|ဟူတပြဲႏ|ဖြုဲင်ꩻဖြီတဲ့|ဖြော်ချာ|တခြိုꩻ|ဒေါ့ꩻကြံꩻ|ပါꩻမုဲင်ꩻ)/u).map((line, index) => <span key={index}>{line}</span>)}</div> : lesson.id === 51 ? <div className="reading-book-verse">{bookReading.content.split(/\s+(?=မာꩻကုဲင်းကုဲင်း)/).map((column, columnIndex) =>
                 <p key={columnIndex}>{column.replace(/\s+(?=နီတထာ|မာꩻအလူႏ|သူႏသေ|ဟဲ့ꩻလိုꩻ|လေားကာႏ|ပအိုဝ်ႏပို|ခူးပါကုံႏ|ယုံယုံသာႏ)/g, '\n')}</p>
               )}</div> : lesson.id !== 52 ? <div className="reading-book-verse reading-book-general-verse">{bookReading.content.split(/\n\s*\n/).map((paragraph, i) => <PairedPassage key={i} text={paragraph} />)}</div> : <div className="reading-paired-verse">{bookReading.content.split(/\s+(?=တသာႏ|ကျူႏလုဲင်ꩻ|ဟျူႏ|ဖျောႏ)/).map((line, row) => {
                 const split = line.search(/\s+(?=အုံထာꩻ|ကျိုꩻစာꩻ|နီပအိုဝ်ႏ|ကျံႏစံႏ|ပျုံးဖါ)/);

@@ -253,3 +253,131 @@
   line-height: 2.1;
   text-align: left;
 }
+
+/* Volume 1, lesson 3 follows the book's two five-line stanzas. */
+.reading-original-verse {
+  display: grid;
+  grid-template-rows: repeat(5, auto);
+  grid-auto-flow: column;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 36px;
+  width: min(100%, 650px);
+  margin: 16px auto 24px;
+  font-size: 21px;
+  line-height: 2.1;
+  text-align: left;
+}
+.reading-original-verse > span { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* Preserve the five source lines, including the uninterrupted fourth line. */
+.reading-source-stanza { display: grid; gap: 10px; font-size: clamp(19px, 2.2vw, 23px); line-height: 2.1; }
+.reading-source-stanza > span { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 22px; }
+.reading-source-stanza > .is-full-line { grid-template-columns: minmax(0, 1fr); }
+.reading-source-stanza > span > span { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reading-restored-composition[data-lesson='14'] { align-items: start; }
+
+.reading-restored-page .reading-restored-composition[data-lesson='14'] { display: block; }
+.reading-restored-composition[data-lesson='14'] .reading-passage { max-width: none; width: 100%; margin: 0; }
+.reading-four-panel { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid #777267; }
+.reading-four-panel > * { min-width: 0; margin: 0; padding: 20px 14px; }
+.reading-four-panel > :nth-child(even) { border-left: 1px solid #777267; }
+.reading-four-panel > :nth-child(n + 3) { border-top: 1px solid #777267; }
+.reading-four-panel .reading-panel-art { display: flex; align-items: center; padding: 0; background: #29292308; }
+.reading-panel-art svg { display: block; width: 100%; height: auto; mix-blend-mode: multiply; }
+.reading-four-panel .reading-source-stanza { align-content: center; margin: 0; font-size: clamp(16px, 2vw, 21px); }
+.reading-four-panel .reading-source-stanza > span { column-gap: 12px; }
+@media (max-width: 540px) {
+  .reading-four-panel { grid-template-columns: minmax(0, 1fr); }
+  .reading-four-panel > :nth-child(even) { border-left: 0; }
+  .reading-four-panel > :nth-child(2) { border-top: 1px solid #777267; }
+  .reading-four-panel .reading-source-stanza { font-size: 20px; }
+}
+
+.reading-compact-source-verse {
+  width: fit-content;
+  max-width: 100%;
+  margin: 16px auto 24px;
+  font-size: 21px;
+  line-height: 2.1;
+}
+.reading-compact-source-verse > div { display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; margin-bottom: 8px; }
+.reading-compact-source-verse span { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.reading-compact-source-verse > .is-full-line { grid-template-columns: minmax(0, 1fr); }
+
+.reading-original-verse-four { grid-template-rows: repeat(4, auto); }
+.reading-restored-page .reading-restored-composition[data-lesson='34'] { display: block; }
+.reading-restored-composition[data-lesson='34'] .reading-passage { max-width: none; width: 100%; margin: 0; }
+
+.reading-restored-page .reading-restored-composition:is([data-lesson='38'], [data-lesson='40'], [data-lesson='44']) { display: block; }
+.reading-restored-page .reading-restored-composition:is([data-lesson='38'], [data-lesson='40'], [data-lesson='44']) .reading-passage { position: static; transform: none; width: 100%; max-width: none; margin: 0; padding: 0; }
+.reading-harvest-panel > :first-child { grid-row: span 2; }
+.reading-harvest-panel > :last-child { border-left: 1px solid #777267; }
+@media (max-width: 540px) {
+  .reading-harvest-panel > :first-child { grid-row: auto; }
+  .reading-harvest-panel > :last-child { border-left: 0; }
+}
+
+/* Keep the offering page's tall left panel and two stacked right panels. */
+.reading-restored-composition[data-lesson='40'] { container-type: inline-size; }
+.reading-harvest-panel {
+  grid-template-columns: minmax(0, .46fr) minmax(0, .54fr);
+  grid-template-rows: auto auto;
+}
+.reading-harvest-panel > :first-child {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  align-self: stretch;
+  background: transparent;
+}
+.reading-harvest-panel > .reading-source-stanza {
+  grid-column: 2;
+  grid-row: 1;
+  padding: clamp(12px, 3cqw, 24px) clamp(8px, 1.8cqw, 16px);
+  font-size: clamp(11px, 2.65cqw, 21px);
+  line-height: 2;
+  gap: clamp(4px, 1cqw, 8px);
+  border-left: 1px solid #777267;
+  border-top: 0;
+}
+.reading-harvest-panel > .reading-source-stanza > span { column-gap: clamp(6px, 1.4cqw, 12px); }
+.reading-harvest-panel > :last-child {
+  grid-column: 2;
+  grid-row: 2;
+  border-left: 1px solid #777267;
+  background: transparent;
+}
+
+/* Shared night palette for every reading format; artwork retains paper tones. */
+:root[data-theme='dark'] .simple-tutor.reading-page {
+  --ink: #e8e3d8;
+  --line: #3b4352;
+  --surface: #19212e;
+  --reading-art-paper: #d8d1c1;
+}
+:root[data-theme='dark'] .reading-page .reading-paper {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+  box-shadow: 0 8px 28px #0002;
+}
+:root[data-theme='dark'] .reading-page .reading-pattern-table { --line: #3b4352; }
+:root[data-theme='dark'] .reading-page :is(.reading-paper-heading, .reading-four-panel, .reading-four-panel > *, .reading-illustration-strip, .reading-illustration-strip img, .reading-illustrated-page .reading-passage) {
+  border-color: var(--line);
+}
+:root[data-theme='dark'] .reading-page :is(.reading-restored-art, .reading-panel-art, .reading-illustration-strip) {
+  background: var(--reading-art-paper);
+}
+/* A background on a multiply-blended image itself would also darken its paper. */
+:root[data-theme='dark'] .reading-page :is(.reading-landscape, .reading-dance-illustration) {
+  mix-blend-mode: normal;
+  filter: brightness(.84) sepia(.14);
+}
+@media (min-width: 800px) {
+  :root[data-theme='dark'] .reading-restored-composition:is([data-lesson='18'], [data-lesson='20'], [data-lesson='30'], [data-lesson='36'], [data-lesson='45']) .reading-passage {
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 8px;
+    box-shadow: 0 0 0 8px var(--surface);
+  }
+}
