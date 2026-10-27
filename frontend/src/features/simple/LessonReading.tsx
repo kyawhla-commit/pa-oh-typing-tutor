@@ -1,3 +1,4 @@
+import { readingPatternNotes } from './readingPatternNotes';
 import { useEffect, useRef } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, BookOpen } from 'lucide-react';
@@ -243,7 +244,7 @@ export default function LessonReading() {
           })}</div>
           </div>
           {isBookPattern && <div className="reading-book-bottom" lang="blk">
-            {lesson.id === 51 && <p className="reading-book-alphabet">သွုံꩻအာ - က ခ င စ ဆ ည တ ထ ဒ န ပ ဖ ဗ မ ယ ရ လ ၀ ဟ (အဖြုံႏ ၂၀ ယိုသွူ</p>}
+            {readingPatternNotes[lesson.id] && <p className="reading-book-alphabet">{readingPatternNotes[lesson.id]}</p>}
             {bookReading && <section aria-labelledby="book-reading-title">
               <h2>{lesson.title}</h2>
               <h3 id="book-reading-title">ဖတ်လွူꩻခန်ꩻ (၁)</h3>

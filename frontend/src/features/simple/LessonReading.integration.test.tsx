@@ -180,3 +180,8 @@ it.each([[67, 41, 3], [68, 43, 7]])('preserves source lines for pattern lesson %
   expect(verse?.children).toHaveLength(count);
   expect(verse?.textContent).toBe(bundledLessons.find(item => item.id === readingId)!.content);
 });
+
+it.each([51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61])('shows the reference alphabet note for lesson %i', id => {
+  const host = render(`/lessons/${id}`);
+  expect(host.querySelector('.reading-book-alphabet')?.textContent).toContain('သွုံꩻအာ');
+});
