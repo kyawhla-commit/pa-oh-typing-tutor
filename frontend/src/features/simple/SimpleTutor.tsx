@@ -11,7 +11,7 @@ import { paoKeyLegends } from '../../components/keyboardLayouts';
 import { useTypingFeedback, useTypingSession, useTypingStats } from '../typing/useTypingSession';
 import { useTypingInput } from '../typing/useTypingInput';
 import { revealTypingPosition } from '../typing/revealTypingPosition';
-import { getTypingGuide, nextGuideKey } from '../typing/typingGuide';
+import { getTypingGuide, inputPreview, nextGuideKey } from '../typing/typingGuide';
 import dakkhindaLogo from '../../assets/dakkhinda-logo.webp';
 
 export function Home() {
@@ -92,6 +92,7 @@ function PracticeSession({ availableLessons }: { availableLessons: LessonRecord[
   const { input, focus } = useTypingInput(session, generation);
   const guide = getTypingGuide(snapshot);
   const layout = /\p{Script=Myanmar}/u.test(snapshot.target.text) ? "Pa'O" : "QWERTY";
+  const partialPosition = guide?.partial ? guide.position : -1;
   const nextKey = nextGuideKey(snapshot, layout);
   const current = useRef<HTMLSpanElement>(null);
   const typedLine = useRef<HTMLDivElement>(null);
@@ -277,17 +278,19 @@ function PracticeSession({ availableLessons }: { availableLessons: LessonRecord[
       <div className="practice-card-top"><div className="lesson-title"><span>LESSON {String(lesson + 1).padStart(2, '0')} / {lessons.length}</span><h1>{lessonNames[lesson]}</h1></div>
         <div className="lesson-progress-summary"><div className="lesson-progress" role="progressbar" aria-label="Lesson progress" aria-valuenow={Math.round(snapshot.progress * 100)} aria-valuemin={0} aria-valuemax={100}><span style={{ width: `${snapshot.progress * 100}%` }} /></div><span>{Math.round(snapshot.progress * 100)}% complete</span></div>
       </div>
-      <div className="passage-label"><span>TEXT TO TYPE</span></div>
+      <div className="passage-label"><span>TEXT TO TYPE</span>
+        {nextKey && !guide?.mistake && <span className="next-character">Next <strong lang={layout === "Pa'O" ? "blk" : "en"}>{inputPreview(nextKey.text)}</strong></span>}
+      </div>
       <div ref={passageViewport} className="classic-passage" role="region" tabIndex={0} aria-label="Lesson text" lang={layout === "Pa'O" ? "blk" : "en"}>
         {units.slice(sentenceStart, sentenceEnd).map((unit, offset) => {
           const i = sentenceStart + offset;
           return <span key={i} ref={i === guide?.position ? current : undefined}
-            className={[snapshot.typedUnits[i] ? snapshot.typedUnits[i].correct ? 'typed-correct' : 'target-error' : '', i === guide?.position ? 'current-unit' : ''].filter(Boolean).join(' ')}>{/[\n\r]/u.test(unit) ? '↵' : unit}</span>;
+            className={[snapshot.typedUnits[i] ? snapshot.typedUnits[i].correct ? 'typed-correct' : i === partialPosition ? '' : 'target-error' : '', i === guide?.position ? 'current-unit' : ''].filter(Boolean).join(' ')}>{/[\n\r]/u.test(unit) ? '↵' : unit}</span>;
         })}
       </div>
       <div className={`classic-input-shell${focused ? " is-focused" : ""}`} onClick={() => { if (started && !complete) focus(); }}>
         <div className="classic-typed-line" ref={typedLine} aria-hidden="true" lang={layout === "Pa'O" ? "blk" : "en"}>
-          {visibleTypedUnits.map((unit, i) => <span className={unit.correct ? '' : 'typed-error'} key={lastLineStart + i}>{unit.text}</span>)}
+          {visibleTypedUnits.map((unit, i) => <span className={unit.correct || lastLineStart + i === partialPosition ? '' : 'typed-error'} key={lastLineStart + i}>{unit.text}</span>)}
           {!snapshot.typedUnits.length && !focused && !compositionDraft && <span className="input-placeholder">{started ? "Type here. Follow the highlighted key…" : "Press Start lesson below to begin."}</span>}
           {compositionDraft}{started && focused && !complete && <span className="typing-caret" />}
         </div>
@@ -326,7 +329,7 @@ function PracticeSession({ availableLessons }: { availableLessons: LessonRecord[
       <section className="keyboard-panel" aria-label="Keyboard guide"><div className="keyboard-panel-heading"><span><KeyboardIcon size={17} /> YOUR KEYBOARD GUIDE</span><div className="keyboard-heading-actions"><button type="button" className="keyboard-visibility-toggle" onClick={toggleKeyboard} aria-expanded={keyboardVisible} aria-controls="practice-keyboard">{keyboardVisible ? 'Hide keyboard' : 'Show keyboard'}</button><span className="key-legend"><i /> Next key{nextKey ? ` · ${nextKey.shift ? 'Shift + ' : ''}${nextKey.label}` : ''}</span></div></div>
       <div className="mobile-next-key" aria-live="polite"><div><span>{complete ? 'Well done' : 'Next key'}</span><strong>{complete ? 'Lesson complete' : nextKey ? `${nextKey.shift ? 'Shift + ' : ''}${nextKey.label}` : 'Follow the lesson'}</strong></div><span className="mobile-key-preview" lang={layout === "Pa'O" ? "blk" : "en"}>{nextKey?.code === 'Space' ? '␣' : nextKey?.code === 'Backspace' ? '⌫' : nextKey?.text || '✓'}</span></div>
       <div id="practice-keyboard" hidden={!keyboardVisible}>
-      <div className="keyboard-scroll" aria-label={`${layout} keyboard`}><VirtualKeyboard layout={layout} nextKey={nextKey} pressedKey={pressedKey} errorKey={errorKey} /></div>
+      <div className="keyboard-scroll" aria-label={`${layout} keyboard`}><VirtualKeyboard layout={layout} nextKey={nextKey} pressedKey={pressedKey} errorKey={guide?.partial ? '' : errorKey} /></div>
       <p className="keyboard-note">Use your keyboard to type. The highlighted key shows what comes next.<span>{layout === "Pa'O" ? "English keyboards work too — letters map to Pa’O automatically." : "Type the lesson using your English keyboard."}</span></p></div></section>
     </main>
     <footer className="tutor-footer"><span>Small steps. Steady progress.</span><a className="tutor-credit" href="https://dakkhinda.pages.dev" target="_blank" rel="noopener noreferrer"><span>Built by</span><img src={dakkhindaLogo} alt="Dakkhinda Technologies" /></a></footer>

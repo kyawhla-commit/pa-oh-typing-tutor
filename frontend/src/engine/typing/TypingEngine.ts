@@ -156,12 +156,14 @@ export class TypingEngine {
   getSnapshot(): SessionSnapshot {
     if (this.#snapshot) return this.#snapshot;
     const wordProgress = this.#wordProgress();
+    const tail = this.#typed.at(-1);
+    const partialTail = !!tail && !tail.correct && this.#isLessonPrefix(tail.text, this.#typed.length - 1);
     const counts: AttemptCounts = Object.freeze({
       totalInsertionAttempts: this.#totalAttempts,
       correctInsertionAttempts: this.#correctAttempts,
       incorrectInsertionAttempts: this.#incorrectAttempts,
       correctedErrors: this.#correctedErrors,
-      uncorrectedErrors: this.#typed.length - this.#currentCorrect,
+      uncorrectedErrors: this.#typed.length - this.#currentCorrect - Number(partialTail),
       backspaces: this.#backspaces,
       currentCorrectUnits: this.#currentCorrect,
       currentTypedUnits: this.#typed.length,
@@ -248,12 +250,18 @@ export class TypingEngine {
     return false;
   }
 
+  #isLessonPrefix(text: string, position: number): boolean {
+    if (!this.#stopOnError) return false;
+    const expected = this.#expectedUnits[this.#mode === "timed" ? position % this.#expectedUnits.length : position];
+    const actual = text.normalize("NFC");
+    return actual !== expected && !!expected?.startsWith(actual);
+  }
+
   #hasBlockingError(): boolean {
     const index = this.#typed.length - 1;
     const last = this.#typed[index];
     if (!last || last.correct) return false;
-    const expected = this.#expectedUnits[this.#mode === "timed" ? index % this.#expectedUnits.length : index];
-    return !expected?.startsWith(last.text.normalize("NFC"));
+    return !this.#isLessonPrefix(last.text, index);
   }
 
   #insert(text: string, atMs: number): DispatchOutcome {
@@ -280,9 +288,9 @@ export class TypingEngine {
       this.#totalAttempts += 1;
       insertedAttempts += 1;
       let mistakeIndex: number | null = null;
-      if (correct) {
+      if (correct || this.#isLessonPrefix(part.segment, position)) {
         this.#correctAttempts += 1;
-        this.#currentCorrect += 1;
+        if (correct) this.#currentCorrect += 1;
       } else {
         this.#incorrectAttempts += 1;
         mistakeIndex = this.#mistakes.length;
@@ -342,8 +350,9 @@ export class TypingEngine {
       const expected = this.#expectedUnits[this.#mode === "timed" ? position % this.#expectedUnits.length : position];
       const correct = segment.normalize("NFC") === expected;
       if (correct) this.#currentCorrect += 1;
-      this.#typed.push({ text: segment, correct, mistakeIndex: correct ? null : mistakeIndex });
-      if (!correct) mistakeIndex = null;
+      const unresolved = !correct && !this.#isLessonPrefix(segment, position);
+      this.#typed.push({ text: segment, correct, mistakeIndex: unresolved ? mistakeIndex : null });
+      if (unresolved) mistakeIndex = null;
     }
     // Retain an unresolved original mistake, but never count deletion as typing.
     if (mistakeIndex !== null) {

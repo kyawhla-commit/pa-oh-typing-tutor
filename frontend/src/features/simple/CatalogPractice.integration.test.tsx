@@ -81,3 +81,35 @@ it('paginates lessons and reopens on the selected lesson’s page', () => {
     }
   }
 });
+
+it('guides each key in a Pa’O character and advances the underline when it is complete', () => {
+  const host = render([record(1, 'Published', 'ကိ့က')]);
+  act(() => host.querySelector<HTMLButtonElement>('.tutor-start')!.click());
+  const input = host.querySelector('textarea')!;
+  const press = (key: string) => act(() => {
+    input.dispatchEvent(new KeyboardEvent('keydown', { key, code: 'Key' + key.toUpperCase(), bubbles: true, cancelable: true }));
+  });
+  for (const [key, hint] of [['u', 'D'], ['d', 'H']]) {
+    press(key);
+    expect(host.querySelector('.current-unit')?.textContent).toBe('ကိ့');
+    expect(host.querySelector('.key-legend')?.textContent).toContain('Next key · ' + hint);
+    expect(host.querySelector('.target-error, .typed-error')).toBeNull();
+  }
+  press('h');
+  expect(host.querySelector('.current-unit')?.textContent).toBe('က');
+  press('d');
+  expect(host.querySelector('.typed-error')).toBeTruthy();
+  expect(host.querySelector('.key-legend')?.textContent).toContain('Backspace');
+});
+
+it('points to the base and then the vowel mark in ကဲ', () => {
+  const host = render([record(1, 'Published', 'ကဲက')]);
+  act(() => host.querySelector<HTMLButtonElement>('.tutor-start')!.click());
+  const pointer = () => host.querySelector('.next-character strong')?.textContent;
+  expect(pointer()).toBe('က');
+  const input = host.querySelector('textarea')!;
+  act(() => input.dispatchEvent(new KeyboardEvent('keydown', { key: 'u', code: 'KeyU', bubbles: true, cancelable: true })));
+  expect(pointer()).toBe('◌ဲ');
+  act(() => input.dispatchEvent(new KeyboardEvent('keydown', { key: 'J', code: 'KeyJ', shiftKey: true, bubbles: true, cancelable: true })));
+  expect(pointer()).toBe('က');
+});

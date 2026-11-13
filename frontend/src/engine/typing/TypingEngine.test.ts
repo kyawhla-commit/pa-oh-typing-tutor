@@ -700,5 +700,6 @@ it('allows Pa’O combining marks but not a new character after an unfinished cl
   expect(insert(engine, 'ိ').accepted).toBe(true);
   expect(insert(engine, 'ု').accepted).toBe(true);
   expect(insert(engine, '့').accepted).toBe(true);
+  expect(engine.getSnapshot().counts).toMatchObject({ correctInsertionAttempts: 4, incorrectInsertionAttempts: 0, uncorrectedErrors: 0 });
   expect(insert(engine, ' a').accepted).toBe(true);
 });
